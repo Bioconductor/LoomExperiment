@@ -1,0 +1,19 @@
+Package: LoomExperiment
+Title: LoomExperiment container
+Description: The LoomExperiment container extends the SummarizedExperiment
+    class.  It's purpose is to provide a means to easily provide a means to 
+    convert LoomExperiment files to loom files and vice versa.
+Version: 0.99.0
+Encoding: UTF-8
+Author: Martin Morgan, Daniel Van Twisk
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+Depends: R (>= 3.5.0),
+         methods,
+         SummarizedExperiment
+Imports: DelayedArray,
+         GenomicRanges,
+         HDF5Array,
+         rhdf5
+Suggests: testthat
+License: Artistic-2.0
+RoxygenNote: 6.0.1

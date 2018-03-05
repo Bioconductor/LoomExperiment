@@ -22,8 +22,8 @@
 
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @export
-makeLoomExperimentFromLoom <-
-    function(file, rownames_attr = "rownames", colnames_attr = "colnames")
+import_loom <-
+    function(file, rownames_attr = NULL, colnames_attr = NULL)
 {
     stopifnot(file.exists(file))
 
@@ -51,18 +51,20 @@ makeLoomExperimentFromLoom <-
     colData <- .import_loom_DataFrame(file, "col_attrs", colnames_attr)
 
     le <- LoomExperiment(assays, rowData = rowData, colData = colData)
-    metadata(se) <- rhdf5::h5readAttributes(file, "/")
+    metadata(le) <- rhdf5::h5readAttributes(file, "/")
     le
 }
 
+#' @export
 setGeneric(
-    ".export_loom",
-    function(object, file = tempfile(), ...) standardGeneric(".export_loom"),
+    "export_loom",
+    function(object, file = tempfile(), ...) standardGeneric("export_loom"),
     signature = "object"
 )
 
+#' @export
 #' @importFrom rhdf5 h5write
-setMethod(".export_loom", "matrix",
+setMethod("export_loom", "matrix",
     function(object, file, name)
 {
     object <- t(object)
@@ -74,16 +76,19 @@ setMethod(".export_loom", "matrix",
     })
 })
 
+#' @export
 #' @importFrom DelayedArray DelayedArray
 #' @importFrom HDF5Array writeHDF5Array
-setMethod(".export_loom", "DelayedArray",
+setMethod("export_loom", "DelayedArray",
     function(object, file, name)
 {
     HDF5Array::writeHDF5Array(t(object), file, name)
     0L
 })
 
-setMethod(".export_loom", "data.frame",
+#' @export
+#' @importFrom rhdf5 h5write
+setMethod("export_loom", "data.frame",
     function(object, file, name, rowname_attr)
 {
     if (!is.null(rowname_attr))
@@ -92,7 +97,7 @@ setMethod(".export_loom", "data.frame",
     is.factor <- vapply(object, is, logical(1), "factor")
     if (any(is.factor))
         warning(
-            "'.export_loom()' coerced 'factor' column(s) to character:\n  ",
+            "'export_loom()' coerced 'factor' column(s) to character:\n  ",
             paste(sQuote(names(object)[is.factor]), collapse=", "),
             call. = FALSE
         )
@@ -100,6 +105,8 @@ setMethod(".export_loom", "data.frame",
 
     names <- sprintf("/%s/%s", name, names(object))
     tryCatch({
+        #for (i in seq_along(names))
+        #    rhdf5::h5write(object[[i]], names[i], file=file)
         Map(rhdf5::h5write, object, names, MoreArgs = list(file = file))
     }, error = function(err) {
         warning(conditionMessage(err))
@@ -107,35 +114,39 @@ setMethod(".export_loom", "data.frame",
     })
 })
 
-setMethod(".export_loom", "DataFrame",
+#' @export
+setMethod("export_loom", "DataFrame",
     function(object, file, name, rowname_attr)
 {
     object <- as.data.frame(object)
-    .export_loom(object, file, name, rowname_attr)
+    export_loom(object, file, name, rowname_attr)
 })
 
+#' @export
 #' @import GenomicRanges
-setMethod(".export_loom", "GenomicRanges",
+setMethod("export_loom", "GenomicRanges",
     function(object, file, name, rowname_attr)
 {
     object <- as.data.frame(rowRanges(object))
-    .export_loom(object, file, name, rowname_attr)
+    export_loom(object, file, name, rowname_attr)
 })    
 
-setMethod(".export_loom", "GenomicRangesList",
+#' @export
+setMethod("export_loom", "GenomicRangesList",
     function(object, file, name, rowname_attr)
 {
     warning(
-        "'.export_loom()' does not support '", class(object),
+        "'export_loom()' does not support '", class(object),
         "'; using mcols()",
         call. = FALSE
     )
     object <- mcols(object, use.names=TRUE)
-    .export_loom(object, file, name, rowname_attr)
+    export_loom(object, file, name, rowname_attr)
 })    
 
+#' @export
 #' @importFrom rhdf5 h5createGroup
-setMethod(".export_loom", "LoomExperiment",
+setMethod("export_loom", "LoomExperiment",
     function(object, file,
              matrix = assayNames(object)[1],
              rownames_attr = "rownames", colnames_attr = "colnames")
@@ -163,25 +174,34 @@ setMethod(".export_loom", "LoomExperiment",
     if (length(layers) > 1L)
         rhdf5::h5createGroup(file, "/layers")
     success <- unlist(Map(
-        .export_loom, assays, layers, MoreArgs = list(file = file)
+        export_loom, assays, layers, MoreArgs = list(file = file)
     ))
     if (!all(success == 0L))
         stop(
-            "'.export_loom()' failed to write assay(s)\n  ",
+            "'export_loom()' failed to write assay(s)\n  ",
             paste0(sQuote(names(layers)[success != 0]), collapse = ", ")
         )
 
     rhdf5::h5createGroup(file, "/col_attrs")
-    .export_loom(colData(object), file, "col_attrs", colnames_attr)
+    export_loom(colData(object), file, "col_attrs", colnames_attr)
     rhdf5::h5createGroup(file, "/row_attrs")
     if (is(object, "RangedSummarizedExperiment"))
         rowData <- rowRanges(object)
     else
         rowData <- rowData(object)
-    .export_loom(rowData, file, "row_attrs", rownames_attr)
+    export_loom(rowData, file, "row_attrs", rownames_attr)
 
-    rhdf5::h5createGroup(file, "col_graphs")
-    rhdf5::h5createGroup(file, "row_graphs")
+#    rhdf5::h5createGroup(file, "col_graphs")
+#    rhdf5::h5createGroup(file, "row_graphs")
+
+    h5f <- H5Fopen(file)
+ 
+    tryCatch({
+        Map(rhdf5::h5writeAttribute, metadata(object),
+            name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
+    }, error = function(err) {
+        warning(conditionMessage(err))
+    }, finally = H5Fclose(h5f))
 
     invisible(file)
 })

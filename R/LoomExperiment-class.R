@@ -9,7 +9,16 @@
 #' @export
 
 setClass("LoomExperiment",
-    contains="SummarizedExperiment")
+    contains="SummarizedExperiment",
+    representation(
+        colGraph="SimpleList",
+        rowGraph="SimpleList"
+    ),
+    prototype(
+        colGraph=SimpleList(),
+        rowGraph=SimpleList()
+    )
+)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

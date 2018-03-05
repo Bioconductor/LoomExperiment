@@ -9,11 +9,11 @@ Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.5.0),
          methods,
-         SummarizedExperiment
+         SummarizedExperiment,
+         rhdf5
 Imports: DelayedArray,
          GenomicRanges,
-         HDF5Array,
-         rhdf5
+         HDF5Array
 Suggests: testthat
 License: Artistic-2.0
 RoxygenNote: 6.0.1

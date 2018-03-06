@@ -1,0 +1,22 @@
+---
+title: "Overview of LoomExperiment"
+author: "Daniel Van Twisk"
+date: "Modified: 05 March 2018. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE, setup}
+knitr::opts_chunk$set(echo = TRUE, comment = "#>", collapse = TRUE,
+                      message = FALSE)
+```
+
+# Overview
+
+`r Biocpkg("LoomExperiment")`
+

@@ -14,6 +14,7 @@ Depends: R (>= 3.5.0),
 Imports: DelayedArray,
          GenomicRanges,
          HDF5Array
-Suggests: testthat
+Suggests: testthat,
+          BiocStyle
 License: Artistic-2.0
 RoxygenNote: 6.0.1

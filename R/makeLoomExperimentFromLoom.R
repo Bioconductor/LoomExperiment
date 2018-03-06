@@ -19,7 +19,25 @@
         df <- NULL
     df
 }
-
+#' Function for importing .loom files
+#'
+#' @description
+#'  a function for importing a \code{.loom} file as a \code{loomexperiment}.
+#' @param file character(1) a character vector indicating the file path to the
+#'  that is to be imported.
+#' @param rownames_attr character indicating the row
+#'  attributes in the .loom file that are to be designated as the loomexperiment
+#'  object's rownames.
+#' @param rownames_attr character indicating the row
+#'  attributes in the .loom file that are to be designated as the loomexperiment
+#'  object's rownames.
+#' @return loomexperiment contained the information from the .loom file.
+#' @examples
+#' test_file <- system.file(
+#'      package="loomexperiment", "extdata", "example.loom"
+#' )
+#' le <- import_loom(test_file)
+#' le
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @export
 import_loom <-
@@ -144,6 +162,28 @@ setMethod("export_loom", "GenomicRangesList",
     export_loom(object, file, name, rowname_attr)
 })    
 
+#' Method for exporting to .loom files
+#'
+#' @description
+#'  A function for exporting a \code{LoomExperiment} object to a \code{.loom}
+#'  file.
+#' @param object LoomExperiment the object that is to be exported.
+#' @param file character(1) indicating the file path to the
+#'  that is to be imported.
+#' @param matrix character(1) indicating the name of the matrix in the .loom
+#'  file.
+#' @param rownames_attr character indicating the row
+#'  attributes in the .loom file that are to be designated as the LoomExperiment
+#'  object's rownames.
+#' @param rownames_attr character indicating the row
+#'  attributes in the .loom file that are to be designated as the LoomExperiment
+#'  object's rownames.
+#' @return LoomExperiment contained the information from the .loom file.
+#' @examples
+#' temp_file <- tempfile(fileext=".h5")
+#' export_loom(le, temp_file, rownames_attr="id", colnames_attr="id")
+#' rhdf5::h5ls(temp_file)
+#' rhdf5::h5dump(temp_file)
 #' @export
 #' @importFrom rhdf5 h5createGroup
 setMethod("export_loom", "LoomExperiment",

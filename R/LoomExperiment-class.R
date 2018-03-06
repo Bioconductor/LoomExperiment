@@ -3,6 +3,14 @@
 ### -------------------------------------------------------------------------
 ###
 
+#' LoomExperiment
+#'
+#' A class that helps facilitate the transition of SummarizedExperiment objects
+#' to .loom files and vise versa.
+#'
+#' @slot colGraph A SimpleList containing the colGraph information
+#' @slot rowGraph A SimpleList containing the rowGraph information
+#'
 #' @author Daniel Van Twisk
 #' @import SummarizedExperiment
 #' @importFrom SummarizedExperiment SummarizedExperiment

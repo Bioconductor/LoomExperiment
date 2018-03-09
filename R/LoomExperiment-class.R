@@ -33,12 +33,44 @@ setClass("LoomExperiment",
 ### Validity.
 ###
 
-#.valid.LoomExperiment <- function(x)
-#{
-#    NULL
-#}
+.valid.LoomExperiment.colGraph <- function(x)
+{
+    if (length(x@colGraph) == 0L)
+        return(NULL)
+    if (any(lengths(x@colGraph) != 3)){
+        txt <- sprintf(
+            "\n each 'colGraph' entry must have a length of 3"
+        )
+        return(txt)
+    }
+    NULL
+}
 
-#setValidity2("LoomExperiemnt", .valid.LoomExperiment)
+.valid.LoomExperiment.rowGraph <- function(x)
+{
+    if (length(x@rowGraph) == 0L)
+        return(NULL)
+    if (any(lengths(x@rowGraph) != 3)){
+        txt <- sprintf(
+            "\n each 'rowGraph' entry must have a length of 3"
+        )
+        return(txt)
+    }
+    NULL
+}
+
+.valid.LoomExperiment.Graphs <- function(x)
+{
+    .valid.LoomExperiment.colGraph(x)
+    .valid.LoomExperiment.rowGraph(x)
+}
+
+.valid.LoomExperiment <- function(x)
+{
+    .valid.LoomExperiment.Graphs(x)
+}
+
+setValidity2("LoomExperiemnt", .valid.LoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,23 +199,51 @@ setMethod("LoomExperiment", "missing",
 ### Coercion.
 ###
 
-#.from_LoomExperiment_to_SummarizedExperiment <- function(from)
-#{
-#    SummarizedExperiment(assays=from@assays,
-#                         rowData=NULL,
-#                         colData=NULL,
-#                         metdata=from@elementMetadata)
-#}
+.from_LoomExperiment_to_SummarizedExperiment <- function(from)
+{
+    SummarizedExperiment(assays=from@assays,
+                         rowData=NULL,
+                         colData=from@colData,
+                         metadata=from@elementMetadata)
+}
 
-#setAs("LoomExperiment", "SummarizedExperiment",
-#    .from_LoomExperiment_to_SummarizedExperiment
-#)
+setAs("LoomExperiment", "SummarizedExperiment",
+    .from_LoomExperiment_to_SummarizedExperiment
+)
 
-#.from_SummarizedExperiment_to_LoomExperiment <- function(from)
-#{
+.from_SummarizedExperiment_to_LoomExperiment <- function(from)
+{
+    LoomExperiment(assays=from@assays,
+                         rowData=NULL,
+                         colData=from@colData,
+                         metadata=from@elementMetadata)
+}
 
-#}
+setAs("SummarizedExperiment", "LoomExperiment",
+    .from_SummarizedExperiment_to_LoomExperiment
+)
 
-#setAs("SummarizedExperiment", "LoomExperiment",
-#    .from_SummarizedExperiment_to_LoomExperiment
-#)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Get and Replace methods.
+###
+
+setGeneric("colGraph", function(x, ...) standardGeneric("colGraph"))
+
+setMethod("colGraph",
+    function(x, ...) x@colGraph)
+
+setGeneric("colGraph<-", function(x, ..., value) standardGeneric("colGraph<-"))
+
+#setReplaceMethod("colData", "LoomExperiment",
+#    function(x, ..., value) 
+
+setGeneric("rowGraph", function(x, ...) standardGeneric("rowGraph"))
+
+setMethod("rowGraph",
+    function(x, ...) x@rowGraph)
+
+setGeneric("rowGraph<-", function(x, ..., value) standardGeneric("rowGraph<-"))
+
+#setReplaceMethod("rowData", "LoomExperiment",
+#    function(x, ..., value) 

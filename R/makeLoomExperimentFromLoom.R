@@ -68,7 +68,18 @@ import_loom <-
     rowData <- .import_loom_DataFrame(file, "row_attrs", rownames_attr)
     colData <- .import_loom_DataFrame(file, "col_attrs", colnames_attr)
 
-    le <- LoomExperiment(assays, rowData = rowData, colData = colData)
+    row_graphs <- ls[ls$group == "/row_graphs", "name", drop=TRUE]
+    col_graphs <- ls[ls$group == "/col_graphs", "name", drop=TRUE]
+
+    if (row_graphs) {
+        
+    }
+    if (col_graphs) {
+
+    }
+
+    le <- LoomExperiment(assays, rowData = rowData, colData = colData,
+                         rowGraph = rowGraph, colGraph = colGraph)
     metadata(le) <- rhdf5::h5readAttributes(file, "/")
     le
 }
@@ -207,6 +218,15 @@ setMethod("export_loom", "LoomExperiment",
 
     rhdf5::h5createFile(file)
 
+    h5f <- H5Fopen(file) 
+    tryCatch({
+        rhdf5::h5writeAttribute("CreationDate", format(Sys.time(), "%Y/%m/&d %X"))
+        Map(rhdf5::h5writeAttribute, metadata(object),
+            name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
+    }, error = function(err) {
+        warning(conditionMessage(err))
+    }, finally = H5Fclose(h5f))
+
     assays <- assays(object, withDimnames = FALSE)
     layers <- setNames(paste0("/layers/", names(assays)), names(assays))
     layers[matrix] <- "/matrix"
@@ -231,17 +251,21 @@ setMethod("export_loom", "LoomExperiment",
         rowData <- rowData(object)
     export_loom(rowData, file, "row_attrs", rownames_attr)
 
-#    rhdf5::h5createGroup(file, "col_graphs")
-#    rhdf5::h5createGroup(file, "row_graphs")
+    if (!is.null(colGraph(object))) {
+        rhdf5::h5createGroup(file, "col_graphs")
+        rhdf5::h5createGroup(file, "col_graphs/KNN")
+        Map(rhdf5::h5write, colGraph(object),
+            name = paste0("col_graphs/KNN/", names(colGraph(object)),
+            MoreArgs = list(file = file)))
+    }
 
-    h5f <- H5Fopen(file)
- 
-    tryCatch({
-        Map(rhdf5::h5writeAttribute, metadata(object),
-            name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
-    }, error = function(err) {
-        warning(conditionMessage(err))
-    }, finally = H5Fclose(h5f))
+    if (!is.null(rowGraph(object))) {
+        rhdf5::h5createGroup(file, "row_graphs")
+        rhdf5::h5createGroup(file, "row_graphs/KNN")
+        Map(rhdf5::h5write, rowGraph(object),
+            name = paste0("row_graphs/KNN/", names(rowGraph(object)),
+            MoreArgs = list(file = file)))
+    }
 
     invisible(file)
 })

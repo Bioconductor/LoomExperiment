@@ -33,26 +33,41 @@ setClass("LoomExperiment",
 ### Validity.
 ###
 
-.valid.LoomExperiment.colGraph <- function(x)
+.valid.LoomExperiment.colGraph <- function(graph, type)
 {
-    if (length(x@colGraph) == 0L)
+    if (length(graph) == 0L)
         return(NULL)
-    if (any(lengths(x@colGraph) != 3)){
-        txt <- sprintf(
-            "\n each 'colGraph' entry must have a length of 3"
-        )
-        return(txt)
+    len <- lengths(graph)
+    if(length(len)==2) {
+        if (all(names(len) == c('a', 'b'))) {
+            txt <- sprintf("\n '%s' vectors must be named 'a' and 'b'", type)
+            return(txt)
+        }
+        if (all(len == 3)) {
+            txt <- sprintf(
+                "\n '%s' vectors 'a' and 'b' must be of equal length", type
+            )
+            return(txt)
+        }
     }
-    NULL
-}
-
-.valid.LoomExperiment.rowGraph <- function(x)
-{
-    if (length(x@rowGraph) == 0L)
-        return(NULL)
-    if (any(lengths(x@rowGraph) != 3)){
+    if(length(len)==3) {
+        if (all(names(len) == c('a', 'b', 'w'))) {
+            txt <- sprintf(
+                "\n '%s' vectors must be named 'a', 'b', and 'w'", type
+            )
+            return(txt)
+        }
+        if (all(len == 3)) {
+            txt <- sprintf(
+                "\n '%s' vectors 'a', 'b', and 'w' must have equal length", type
+            )
+            return(txt)
+        }
+    }
+    numerical <- vapply(graph, is.numeric, logical(1))
+    if (all(numerical)) {
         txt <- sprintf(
-            "\n each 'rowGraph' entry must have a length of 3"
+            "\n '%s' vector must be numeric", type
         )
         return(txt)
     }
@@ -61,8 +76,8 @@ setClass("LoomExperiment",
 
 .valid.LoomExperiment.Graphs <- function(x)
 {
-    .valid.LoomExperiment.colGraph(x)
-    .valid.LoomExperiment.rowGraph(x)
+    .valid.LoomExperiment.checkGraph(x@colGraph, "colGraph")
+    .valid.LoomExperiment.checkGraph(x@rowGraph, "rowGraph")
 }
 
 .valid.LoomExperiment <- function(x)
@@ -70,14 +85,15 @@ setClass("LoomExperiment",
     .valid.LoomExperiment.Graphs(x)
 }
 
-setValidity2("LoomExperiemnt", .valid.LoomExperiment)
+#setValidity2("LoomExperiemnt", .valid.LoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor.
 ###
 
-.new_LoomExperiment <- function(assays, names, rowData, colData, metadata)
+.new_LoomExperiment <- function(assays, names, rowData, colData,
+                                colGraph, rowGraph, metadata)
 {
     if (!is(assays, "Assays"))
         assays <- Assays(assays)
@@ -94,6 +110,8 @@ setValidity2("LoomExperiemnt", .valid.LoomExperiment)
                                 elementMetadata=rowData,
                                 colData=colData,
                                 assays=assays,
+                                colGraph=colGraph,
+                                rowGraph=rowGraph,
                                 metadata=as.list(metadata))
 }
 
@@ -105,7 +123,7 @@ setGeneric("LoomExperiment",
 #' @export
 setMethod("LoomExperiment", "SimpleList",
    function(assays, rowData=NULL, rowRanges=GRangesList(), colData=DataFrame(),
-            metadata=list())
+            colGraph=NULL, rowGraph=NULL, metadata=list())
 {
     if (missing(colData) && 0L != length(assays)) {
         assay <- assays[[1]]
@@ -165,7 +183,7 @@ setMethod("LoomExperiment", "SimpleList",
 
     if (missing(rowRanges) && !is(rowData, "GenomicRanges_OR_GRangesList")) {
         .new_LoomExperiment(assays, ans_rownames, rowData, colData,
-                                 metadata)
+                            colGraph, rowGraph, metadata)
     } else {
         .new_RangedSummarizedExperiment(assays, rowRanges, colData, metadata)
     }
@@ -230,20 +248,26 @@ setAs("SummarizedExperiment", "LoomExperiment",
 
 setGeneric("colGraph", function(x, ...) standardGeneric("colGraph"))
 
-setMethod("colGraph",
+setMethod("colGraph", "LoomExperiment",
     function(x, ...) x@colGraph)
 
 setGeneric("colGraph<-", function(x, ..., value) standardGeneric("colGraph<-"))
 
-#setReplaceMethod("colData", "LoomExperiment",
-#    function(x, ..., value) 
+setReplaceMethod("colGraph", "LoomExperiment",
+    function(x, ..., value) {
+        BiocGenerics:::replaceSlots(x, colGraph=colGraph, check=FALSE)
+    }
+)
 
 setGeneric("rowGraph", function(x, ...) standardGeneric("rowGraph"))
 
-setMethod("rowGraph",
+setMethod("rowGraph", "LoomExperiment",
     function(x, ...) x@rowGraph)
 
 setGeneric("rowGraph<-", function(x, ..., value) standardGeneric("rowGraph<-"))
 
-#setReplaceMethod("rowData", "LoomExperiment",
-#    function(x, ..., value) 
+setReplaceMethod("rowGraph", "LoomExperiment",
+    function(x, ..., value) {
+        BiocGenerics:::replaceSlots(x, rowGraph=rowGraph, check=FALSE)
+    }
+)

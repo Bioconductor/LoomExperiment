@@ -33,20 +33,18 @@ setClass("LoomExperiment",
 ### Validity.
 ###
 
-.valid.LoomExperiment.colGraph <- function(graph, type)
+.valid.LoomExperiment.checkGraph <- function(graph, type)
 {
     if (length(graph) == 0L)
         return(NULL)
+    test_type <- vapply(graph, function(x) is(x, "DataFrame"), logical(1))
+    if(!all(test_type)) {
+        txt <- sprintf("\n '%s' must only contain DataFrames", type)
+    }
     len <- lengths(graph)
     if(length(len)==2) {
         if (all(names(len) == c('a', 'b'))) {
             txt <- sprintf("\n '%s' vectors must be named 'a' and 'b'", type)
-            return(txt)
-        }
-        if (all(len == 3)) {
-            txt <- sprintf(
-                "\n '%s' vectors 'a' and 'b' must be of equal length", type
-            )
             return(txt)
         }
     }
@@ -54,12 +52,6 @@ setClass("LoomExperiment",
         if (all(names(len) == c('a', 'b', 'w'))) {
             txt <- sprintf(
                 "\n '%s' vectors must be named 'a', 'b', and 'w'", type
-            )
-            return(txt)
-        }
-        if (all(len == 3)) {
-            txt <- sprintf(
-                "\n '%s' vectors 'a', 'b', and 'w' must have equal length", type
             )
             return(txt)
         }
@@ -85,7 +77,7 @@ setClass("LoomExperiment",
     .valid.LoomExperiment.Graphs(x)
 }
 
-#setValidity2("LoomExperiemnt", .valid.LoomExperiment)
+setValidity2("LoomExperiment", .valid.LoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

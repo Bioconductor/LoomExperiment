@@ -68,18 +68,38 @@ import_loom <-
     rowData <- .import_loom_DataFrame(file, "row_attrs", rownames_attr)
     colData <- .import_loom_DataFrame(file, "col_attrs", colnames_attr)
 
-    row_graphs <- ls[ls$group == "/row_graphs", "name", drop=TRUE]
-    col_graphs <- ls[ls$group == "/col_graphs", "name", drop=TRUE]
+    row_edges <- ls[ls$group == "/row_edges", "name", drop=TRUE]
+    col_edges <- ls[ls$group == "/col_edges", "name", drop=TRUE]
 
-    if (row_graphs) {
-        
+    if (length(row_edges) == 0)
+        row_edges <- SimpleList()
+    if (length(col_edges) == 0)
+        col_edges <- SimpleList()
+
+    if (length(row_edges) > 0) {
+        row_edges <- paste0("/row_edges/", row_edges)
+        names(row_edges) <- basename(row_edges)
+
+        row_edges <- lapply(row_edges, function(x) {
+            as(h5read(file, x), "DataFrame")
+        })
+
+        row_edges <- as(row_edges, "SimpleList")
     }
-    if (col_graphs) {
 
+    if (length(col_edges) > 0) {
+        col_edges <- paste0("/col_edges/", col_edges)
+        names(col_edges) <- basename(col_edges)
+
+        col_edges <- lapply(col_edges, function(x) {
+            as(h5read(file, x), "DataFrame")
+        })
+
+        col_edges <- as(col_edges, "SimpleList")
     }
 
     le <- LoomExperiment(assays, rowData = rowData, colData = colData,
-                         rowGraph = rowGraph, colGraph = colGraph)
+                         rowGraph = row_edges, colGraph = col_edges)
     metadata(le) <- rhdf5::h5readAttributes(file, "/")
     le
 }
@@ -220,7 +240,7 @@ setMethod("export_loom", "LoomExperiment",
 
     h5f <- H5Fopen(file) 
     tryCatch({
-        rhdf5::h5writeAttribute("CreationDate", format(Sys.time(), "%Y/%m/&d %X"))
+        rhdf5::h5writeAttribute("LoomExperiment", name="/CreatedWith", h5obj=h5f)
         Map(rhdf5::h5writeAttribute, metadata(object),
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
     }, error = function(err) {
@@ -252,19 +272,33 @@ setMethod("export_loom", "LoomExperiment",
     export_loom(rowData, file, "row_attrs", rownames_attr)
 
     if (!is.null(colGraph(object))) {
-        rhdf5::h5createGroup(file, "col_graphs")
-        rhdf5::h5createGroup(file, "col_graphs/KNN")
-        Map(rhdf5::h5write, colGraph(object),
-            name = paste0("col_graphs/KNN/", names(colGraph(object)),
-            MoreArgs = list(file = file)))
+        rhdf5::h5createGroup(file, "/col_edges")
+        cols <- paste0("/col_edges/", names(colGraph(object)))
+        for (i in names(colGraph(object))) {
+            cols <- paste0("/col_edges/", i)
+            rhdf5::h5createGroup(file, cols)
+            for(j in colnames(colGraph(object)[i]))
+                rhdf5::h5write(colGraph(object)[i][j], file,
+                               paste0(cols, "/", j))
+        }
+        #Map(rhdf5::h5write, colGraph(object),
+        #    name = paste0("col_edges/KNN/", names(colGraph(object)),
+        #    MoreArgs = list(file = file)))
     }
 
     if (!is.null(rowGraph(object))) {
-        rhdf5::h5createGroup(file, "row_graphs")
-        rhdf5::h5createGroup(file, "row_graphs/KNN")
-        Map(rhdf5::h5write, rowGraph(object),
-            name = paste0("row_graphs/KNN/", names(rowGraph(object)),
-            MoreArgs = list(file = file)))
+        rhdf5::h5createGroup(file, "/row_edges")
+        cols <- paste0("/row_edges/", names(rowGraph(object)))
+        for (i in names(rowGraph(object))) {
+            cols <- paste0("/row_edges/", i)
+            rhdf5::h5createGroup(file, cols)
+            for(j in colnames(rowGraph(object)[i]))
+                rhdf5::h5write(rowGraph(object)[i][j], file,
+                               paste0(cols, "/", j))
+        }
+        #Map(rhdf5::h5write, rowGraph(object),
+        #    name = paste0("row_edges/KNN/", names(rowGraph(object)),
+        #    MoreArgs = list(file = file)))
     }
 
     invisible(file)

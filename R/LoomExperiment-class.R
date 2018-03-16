@@ -123,7 +123,7 @@ setGeneric("LoomExperiment",
 #' @export
 setMethod("LoomExperiment", "SimpleList",
    function(assays, rowData=NULL, rowRanges=GRangesList(), colData=DataFrame(),
-            colGraph=NULL, rowGraph=NULL, metadata=list())
+            colGraph=SimpleList(), rowGraph=SimpleList(), metadata=list())
 {
     if (missing(colData) && 0L != length(assays)) {
         assay <- assays[[1]]
@@ -255,7 +255,7 @@ setGeneric("colGraph<-", function(x, ..., value) standardGeneric("colGraph<-"))
 
 setReplaceMethod("colGraph", "LoomExperiment",
     function(x, ..., value) {
-        BiocGenerics:::replaceSlots(x, colGraph=colGraph, check=FALSE)
+        BiocGenerics:::replaceSlots(x, colGraph=value, check=FALSE)
     }
 )
 
@@ -268,6 +268,54 @@ setGeneric("rowGraph<-", function(x, ..., value) standardGeneric("rowGraph<-"))
 
 setReplaceMethod("rowGraph", "LoomExperiment",
     function(x, ..., value) {
-        BiocGenerics:::replaceSlots(x, rowGraph=rowGraph, check=FALSE)
+        BiocGenerics:::replaceSlots(x, rowGraph=value, check=FALSE)
     }
 )
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Miscellenious methods.
+###
+
+setMethod("[", c("LoomExperiment", "ANY", "missing"),
+    function(x, i, j, ...)
+{
+    res <- lapply(colGraph(x), function(y) {
+        y[!(!y[,"a"] %in% i | !y[,"b"] %in% i),]
+    })
+    res <- as(res, "SimpleList")
+    LoomExperiment(assays=assays(le), rowData=rowData(le), colData=x@colData,
+                   metadata=metadata(le), colGraph=res, rowGraph=rowGraph(le))
+})
+
+setReplaceMethod("[", c("LoomExperiment", "ANY", "missing"),
+    function(x, i, j, ...)
+{
+    res <- lapply(colGraph(x), function(y) {
+        y[!(!y[,"a"] %in% i | !y[,"b"] %in% i),]
+    })
+    colGraph(x) <- as(res, "SimpleList")
+    #LoomExperiment(assays=x@assays, colData=x@colData, metadata=x@elementMetaData,
+    #               colGraph=x@colGraph, rowGraph=x@rowGraph)
+})
+
+setMethod("show", "LoomExperiment",
+    function(object)
+{
+    scat <- function(fmt, vals=character(), exdent=2, ...)
+    {
+        vals <- ifelse(nzchar(vals), vals, "''")
+        lbls <- paste(S4Vectors:::selectSome(vals), collapse=" ")
+        txt <- sprintf(fmt, length(vals), lbls)
+        cat(strwrap(txt, exdent=exdent, ...), sep="\n")
+    }
+    callNextMethod()
+    if (length(object@rowGraph) > 0)
+        scat("rowGraph(%d): %s\n", names(object@rowGraph))
+    else
+        cat("rowGraph(0): NULL\n")
+    if (length(object@colGraph) > 0)
+        scat("colGraph(%d): %s\n", names(object@colGraph))
+    else
+        cat("colGraph(0): NULL\n")
+})

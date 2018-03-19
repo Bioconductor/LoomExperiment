@@ -240,7 +240,7 @@ setMethod("export_loom", "LoomExperiment",
 
     h5f <- H5Fopen(file) 
     tryCatch({
-        rhdf5::h5writeAttribute("LoomExperiment", name="/CreatedWith", h5obj=h5f)
+        rhdf5::h5writeAttribute("LoomExperiment", name="createdWith", h5obj=h5f)
         Map(rhdf5::h5writeAttribute, metadata(object),
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
     }, error = function(err) {
@@ -271,7 +271,7 @@ setMethod("export_loom", "LoomExperiment",
         rowData <- rowData(object)
     export_loom(rowData, file, "row_attrs", rownames_attr)
 
-    if (!is.null(colGraph(object))) {
+    if (length(colGraph(object)) > 0) {
         rhdf5::h5createGroup(file, "/col_edges")
         cols <- paste0("/col_edges/", names(colGraph(object)))
         for (i in names(colGraph(object))) {
@@ -286,7 +286,7 @@ setMethod("export_loom", "LoomExperiment",
         #    MoreArgs = list(file = file)))
     }
 
-    if (!is.null(rowGraph(object))) {
+    if (length(rowGraph(object)) > 0) {
         rhdf5::h5createGroup(file, "/row_edges")
         cols <- paste0("/row_edges/", names(rowGraph(object)))
         for (i in names(rowGraph(object))) {

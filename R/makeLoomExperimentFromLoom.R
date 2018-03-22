@@ -72,19 +72,20 @@ import_loom <-
     col_edges <- ls[ls$group == "/col_edges", "name", drop=TRUE]
 
     if (length(row_edges) == 0)
-        row_edges <- SimpleList()
+        row_edges <- LoomGraphs()
     if (length(col_edges) == 0)
-        col_edges <- SimpleList()
+        col_edges <- LoomGraphs()
 
     if (length(row_edges) > 0) {
         row_edges <- paste0("/row_edges/", row_edges)
         names(row_edges) <- basename(row_edges)
 
         row_edges <- lapply(row_edges, function(x) {
-            as(h5read(file, x), "DataFrame")
+            res <- as(h5read(file, x), "DataFrame")
+            as(res, "LoomGraph")
         })
 
-        row_edges <- as(row_edges, "SimpleList")
+        row_edges <- .LoomGraphs(row_edges) # as(row_edges, "LoomGraphs")
     }
 
     if (length(col_edges) > 0) {
@@ -92,10 +93,11 @@ import_loom <-
         names(col_edges) <- basename(col_edges)
 
         col_edges <- lapply(col_edges, function(x) {
-            as(h5read(file, x), "DataFrame")
+            res <- as(h5read(file, x), "DataFrame")
+            as(res, "LoomGraph")
         })
 
-        col_edges <- as(col_edges, "SimpleList")
+        col_edges <- .LoomGraphs(col_edges) # as(col_edges, "LoomGraphs")
     }
 
     le <- LoomExperiment(assays, rowData = rowData, colData = colData,

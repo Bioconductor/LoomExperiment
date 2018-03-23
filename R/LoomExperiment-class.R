@@ -238,32 +238,10 @@ setReplaceMethod("rowGraphs", "LoomExperiment",
 setMethod("[", c("LoomExperiment", "ANY", "ANY"),
     function(x, i, j, ...)
 {
-    if (!missing(i)) {
-        res <- lapply(rowGraphs(x), function(y) y[i,])
-        rowGraphs(x) <- as(res, "LoomGraphs")
-    }
-    if (!missing(j)) {
-        res <- lapply(colGraphs(x), function(y) y[i,])
-        colGraphs(x) <- as(res, "LoomGraphs")
-    }
-    callNextMethod()
-})
-
-setReplaceMethod("[", c("LoomExperiment", "ANY", "ANY", "LoomExperiment"),
-    function(x, i, j, ..., value)
-{
-    if (!missing(i)) {
-        res <- lapply(seq_len(rowGraphs(x)), function(idx) {
-            rowGraphs(x)[[idx]][i,] <- rowGraphs(value)[[idx]]
-        })
-        rowGraphs(x) <- as(res, "LoomGraphs")
-    }
-    if (!missing(j)) {
-        res <- lapply(seq_len(colGraphs(x)), function(idx) {
-            colGraphs(x)[[idx]][j,] <- colGraphs(value)[[idx]]
-        })
-        colGraphs(x) <- as(res, "LoomGraphs")
-    }
+    if (!missing(i))
+        rowGraphs(x) <- endoapply(rowGraphs(x), function(y) y[i,])
+    if (!missing(j))
+        colGraphs(x) <- endoapply(colGraphs(x), function(y) y[i,])
     callNextMethod()
 })
 

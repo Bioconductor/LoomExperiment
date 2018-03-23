@@ -112,21 +112,16 @@ setMethod("[", c("LoomGraph", "ANY", "missing"),
     subset(x, x[["a"]] %in% ii & x[["b"]] %in% ii)   
 })
 
-setReplaceMethod("[", c("LoomGraph", "ANY", "missing", "LoomGraph"),
+#' importFrom plyr mapvalues
+setReplaceMethod("[", c("LoomGraph", "ANY", "missing", "numeric"),
     function(x, i, j, ..., value)          
 {
     ii <- .convert_subset_index(i, rownames(x))
 
-    rgx <- x[i,]
-
-    ## update 'rgx' by
-    ## - removing 'i' nodes from rgx
-    ## - adding rgv to rgx
-
-    rgx <- rbind(rgx, value)
-
-    x@rownames <- rgx@rownames
-    x@nrows <- rgx@nrows
-    x@listData <- rgx@listData
-    x
+    ld <- x@listData
+    res <- lapply(ld[c('a', 'b')], function(x){
+        mapvalues(x, ii, value)
+    })
+    ld[c('a', 'b')] <- res
+    x@listData <- ld
 })

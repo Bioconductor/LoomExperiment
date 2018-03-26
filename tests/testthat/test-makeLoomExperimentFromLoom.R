@@ -27,6 +27,8 @@ context("import_loom: Import")
 
 test_that("Import", {
     le <- import_loom(file)
+
+    
 })
 
 ############################################################
@@ -34,5 +36,10 @@ context("export_loom: Export")
 ############################################################
 
 test_that("Export", {
+    le <- import_loom(file)
+    temp <- tempfile(fileext=".h5")
+    export_loom(le, temp)
     
+    ls <- h5ls(file)
+    object <- subset(ls, group)
 })

@@ -1,9 +1,9 @@
 ### =========================================================================
-### LoomExperiment objects
+### SingleCellLoomExperiment objects
 ### -------------------------------------------------------------------------
 ###
 
-#' LoomExperiment
+#' SingleCellLoomExperiment
 #'
 #' A class that helps facilitate the transition of SummarizedExperiment objects
 #' to .loom files and vise versa.
@@ -12,12 +12,12 @@
 #' @slot rowGraphs A SimpleList containing the rowGraphs information
 #'
 #' @author Daniel Van Twisk
-#' @import SummarizedExperiment
-#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @import SingleCellExperiment
+#' @importFrom SignleCellExperiment SingleCellExperiment
 #' @export
 
-setClass("LoomExperiment",
-    contains="SummarizedExperiment",
+setClass("SingleCellLoomExperiment",
+    contains="SingleCellExperiment",
     representation(
         colGraphs="LoomGraphs",
         rowGraphs="LoomGraphs"
@@ -33,24 +33,24 @@ setClass("LoomExperiment",
 ### Validity.
 ###
 
-.valid.LoomExperiment.Graphs <- function(x)
+.valid.SingleCellLoomExperiment.Graphs <- function(x)
 {
     NULL
 }
 
-.valid.LoomExperiment <- function(x)
+.valid.SingleCellLoomExperiment <- function(x)
 {
-    .valid.LoomExperiment.Graphs(x)
+    .valid.SingleCellLoomExperiment.Graphs(x)
 }
 
-#setValidity2("LoomExperiment", .valid.LoomExperiment)
+#setValidity2("SingleCellLoomExperiment", .valid.SingleCellLoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor.
 ###
 
-.new_LoomExperiment <- function(assays, names, rowData, colData,
+.new_SingleCellLoomExperiment <- function(assays, names, rowData, colData,
                                 colGraphs, rowGraphs, metadata)
 {
     if (!is(assays, "Assays"))
@@ -64,7 +64,7 @@ setClass("LoomExperiment",
     } else {
         rownames(rowData) <- NULL
     }
-    new("LoomExperiment", NAMES=names,
+    new("SingleCellLoomExperiment", NAMES=names,
                                 elementMetadata=rowData,
                                 colData=colData,
                                 assays=assays,
@@ -74,12 +74,12 @@ setClass("LoomExperiment",
 }
 
 #' @export
-setGeneric("LoomExperiment",
-    function(assays, ...) standardGeneric("LoomExperiment")
+setGeneric("SingleCellLoomExperiment",
+    function(assays, ...) standardGeneric("SingleCellLoomExperiment")
 )
 
 #' @export
-setMethod("LoomExperiment", "SimpleList",
+setMethod("SingleCellLoomExperiment", "SimpleList",
    function(assays, rowData=NULL, rowRanges=GRangesList(), colData=DataFrame(),
             colGraphs=SimpleList(), rowGraphs=SimpleList(), metadata=list())
 {
@@ -140,7 +140,7 @@ setMethod("LoomExperiment", "SimpleList",
     assays <- Assays(assays)
 
     if (missing(rowRanges) && !is(rowData, "GenomicRanges_OR_GRangesList")) {
-        .new_LoomExperiment(assays, ans_rownames, rowData, colData,
+        .new_SingleCellLoomExperiment(assays, ans_rownames, rowData, colData,
                             colGraphs, rowGraphs, metadata)
     } else {
         .new_RangedSummarizedExperiment(assays, rowRanges, colData, metadata)
@@ -148,26 +148,26 @@ setMethod("LoomExperiment", "SimpleList",
 })
 
 #' @export
-setMethod("LoomExperiment", "ANY",
+setMethod("SingleCellLoomExperiment", "ANY",
     function(assays, ...)
 {
     if (is.matrix(assays) && is.list(assays))
         assays <- list(assays)
-    LoomExperiment(assays, ...)
+    SingleCellLoomExperiment(assays, ...)
 })
 
 #' @export
-setMethod("LoomExperiment", "list",
+setMethod("SingleCellLoomExperiment", "list",
     function(assays, ...)
 {
-    LoomExperiment(do.call(SimpleList, assays), ...)
+    SingleCellLoomExperiment(do.call(SimpleList, assays), ...)
 })
 
 #' @export
-setMethod("LoomExperiment", "missing",
+setMethod("SingleCellLoomExperiment", "missing",
     function(assays, ...)
 {
-    LoomExperiment(SimpleList(), ...)
+    SingleCellLoomExperiment(SimpleList(), ...)
 })
 
 
@@ -175,7 +175,7 @@ setMethod("LoomExperiment", "missing",
 ### Coercion.
 ###
 
-.from_LoomExperiment_to_SummarizedExperiment <- function(from)
+.from_SingleCellLoomExperiment_to_SummarizedExperiment <- function(from)
 {
     SummarizedExperiment(assays=from@assays,
                          rowData=NULL,
@@ -183,20 +183,20 @@ setMethod("LoomExperiment", "missing",
                          metadata=from@elementMetadata)
 }
 
-setAs("LoomExperiment", "SummarizedExperiment",
-    .from_LoomExperiment_to_SummarizedExperiment
+setAs("SingleCellLoomExperiment", "SummarizedExperiment",
+    .from_SingleCellLoomExperiment_to_SummarizedExperiment
 )
 
-.from_SummarizedExperiment_to_LoomExperiment <- function(from)
+.from_SummarizedExperiment_to_SingleCellLoomExperiment <- function(from)
 {
-    LoomExperiment(assays=from@assays,
+    SingleCellLoomExperiment(assays=from@assays,
                          rowData=NULL,
                          colData=from@colData,
                          metadata=from@elementMetadata)
 }
 
-setAs("SummarizedExperiment", "LoomExperiment",
-    .from_SummarizedExperiment_to_LoomExperiment
+setAs("SummarizedExperiment", "SingleCellLoomExperiment",
+    .from_SummarizedExperiment_to_SingleCellLoomExperiment
 )
 
 
@@ -206,12 +206,12 @@ setAs("SummarizedExperiment", "LoomExperiment",
 
 setGeneric("colGraphs", function(x, ...) standardGeneric("colGraphs"))
 
-setMethod("colGraphs", "LoomExperiment",
+setMethod("colGraphs", "SingleCellLoomExperiment",
     function(x, ...) x@colGraphs)
 
 setGeneric("colGraphs<-", function(x, ..., value) standardGeneric("colGraphs<-"))
 
-setReplaceMethod("colGraphs", "LoomExperiment",
+setReplaceMethod("colGraphs", "SingleCellLoomExperiment",
     function(x, ..., value) {
         BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
     }
@@ -219,12 +219,12 @@ setReplaceMethod("colGraphs", "LoomExperiment",
 
 setGeneric("rowGraphs", function(x, ...) standardGeneric("rowGraphs"))
 
-setMethod("rowGraphs", "LoomExperiment",
+setMethod("rowGraphs", "SingleCellLoomExperiment",
     function(x, ...) x@rowGraphs)
 
 setGeneric("rowGraphs<-", function(x, ..., value) standardGeneric("rowGraphs<-"))
 
-setReplaceMethod("rowGraphs", "LoomExperiment",
+setReplaceMethod("rowGraphs", "SingleCellLoomExperiment",
     function(x, ..., value) {
         BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
     }
@@ -235,7 +235,7 @@ setReplaceMethod("rowGraphs", "LoomExperiment",
 ### Miscellenious methods.
 ###
 
-setMethod("[", c("LoomExperiment", "ANY", "ANY"),
+setMethod("[", c("SingleCellLoomExperiment", "ANY", "ANY"),
     function(x, i, j, ...)
 {
     if (!missing(i))
@@ -245,7 +245,7 @@ setMethod("[", c("LoomExperiment", "ANY", "ANY"),
     callNextMethod()
 })
 
-setMethod("show", "LoomExperiment",
+setMethod("show", "SingleCellLoomExperiment",
     function(object)
 {
     scat <- function(fmt, vals=character(), exdent=2, ...)

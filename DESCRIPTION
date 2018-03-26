@@ -9,6 +9,7 @@ Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.5.0),
          methods,
+         SingleCellExperiment,
          SummarizedExperiment,
          rhdf5
 Imports: DelayedArray,
@@ -20,6 +21,8 @@ Collate: test_loom.R
     utils.R
     LoomGraph-class.R
     LoomExperiment-class.R
+    RangedLoomExperiment-class.R
+    SingleCellLoomExperiment-class.R
     makeLoomExperimentFromLoom.R
 License: Artistic-2.0
 RoxygenNote: 6.0.1

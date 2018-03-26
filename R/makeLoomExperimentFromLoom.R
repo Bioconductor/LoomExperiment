@@ -19,6 +19,7 @@
         df <- NULL
     df
 }
+
 #' Function for importing .loom files
 #'
 #' @description
@@ -195,32 +196,25 @@ setMethod("export_loom", "GenomicRangesList",
     export_loom(object, file, name, rowname_attr)
 })    
 
-#' Method for exporting to .loom files
-#'
-#' @description
-#'  A function for exporting a \code{LoomExperiment} object to a \code{.loom}
-#'  file.
-#' @param object LoomExperiment the object that is to be exported.
-#' @param file character(1) indicating the file path to the
-#'  that is to be imported.
-#' @param matrix character(1) indicating the name of the matrix in the .loom
-#'  file.
-#' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the LoomExperiment
-#'  object's rownames.
-#' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the LoomExperiment
-#'  object's rownames.
-#' @return LoomExperiment contained the information from the .loom file.
-#' @examples
-#' temp_file <- tempfile(fileext=".h5")
-#' export_loom(le, temp_file, rownames_attr="id", colnames_attr="id")
-#' rhdf5::h5ls(temp_file)
-#' rhdf5::h5dump(temp_file)
-#' @export
-#' @importFrom rhdf5 h5createGroup
-setMethod("export_loom", "LoomExperiment",
-    function(object, file,
+setMethod("export_loom", "LoomGraph", 
+    function(object, file, name, rowname_attr)
+{
+    rhdf5::h5createGroup(file, name)
+    for (i in names(object))
+        rhdf5::h5write(object[[i]], file, paste0(name, '/', i))
+})
+
+setMethod("export_loom", "LoomGraphs", 
+    function(object, file, name, rowname_attr)
+{
+    rhdf5::h5createGroup(file, name)
+    name <- paste0(name, names(object))
+    for (i in seq_len(length(object)))
+        export_loom(object[[i]], file, name[i], rowname_attr)
+})
+
+.export_loom.Experiment <-
+        function(object, file,
              matrix = assayNames(object)[1],
              rownames_attr = "rownames", colnames_attr = "colnames")
 {
@@ -273,36 +267,42 @@ setMethod("export_loom", "LoomExperiment",
         rowData <- rowData(object)
     export_loom(rowData, file, "row_attrs", rownames_attr)
 
-    if (length(colGraph(object)) > 0) {
-        rhdf5::h5createGroup(file, "/col_edges")
-        cols <- paste0("/col_edges/", names(colGraph(object)))
-        for (i in names(colGraph(object))) {
-            cols <- paste0("/col_edges/", i)
-            rhdf5::h5createGroup(file, cols)
-            for(j in colnames(colGraph(object)[i]))
-                rhdf5::h5write(colGraph(object)[i][j], file,
-                               paste0(cols, "/", j))
-        }
-        #Map(rhdf5::h5write, colGraph(object),
-        #    name = paste0("col_edges/KNN/", names(colGraph(object)),
-        #    MoreArgs = list(file = file)))
-    }
+    if (length(colGraphs(object)) > 0)
+        export_loom(colGraphs(object), file, "col_graphs", colnames_attr)
 
-    if (length(rowGraph(object)) > 0) {
-        rhdf5::h5createGroup(file, "/row_edges")
-        cols <- paste0("/row_edges/", names(rowGraph(object)))
-        for (i in names(rowGraph(object))) {
-            cols <- paste0("/row_edges/", i)
-            rhdf5::h5createGroup(file, cols)
-            for(j in colnames(rowGraph(object)[i]))
-                rhdf5::h5write(rowGraph(object)[i][j], file,
-                               paste0(cols, "/", j))
-        }
-        #Map(rhdf5::h5write, rowGraph(object),
-        #    name = paste0("row_edges/KNN/", names(rowGraph(object)),
-        #    MoreArgs = list(file = file)))
-    }
+    if (length(rowGraphs(object)) > 0)
+        export_loom(rowGraphs(object), file, "row_graphs", rownames_attr)
 
     invisible(file)
-})
+}
+
+#' Method for exporting to .loom files
+#'
+#' @description
+#'  A function for exporting a \code{LoomExperiment} object to a \code{.loom}
+#'  file.
+#' @param object LoomExperiment the object that is to be exported.
+#' @param file character(1) indicating the file path to the
+#'  that is to be imported.
+#' @param matrix character(1) indicating the name of the matrix in the .loom
+#'  file.
+#' @param rownames_attr character indicating the row
+#'  attributes in the .loom file that are to be designated as the LoomExperiment
+#'  object's rownames.
+#' @param rownames_attr character indicating the row
+#'  attributes in the .loom file that are to be designated as the LoomExperiment
+#'  object's rownames.
+#' @return LoomExperiment contained the information from the .loom file.
+#' @examples
+#' temp_file <- tempfile(fileext=".h5")
+#' export_loom(le, temp_file, rownames_attr="id", colnames_attr="id")
+#' rhdf5::h5ls(temp_file)
+#' rhdf5::h5dump(temp_file)
+#' @export
+#' @importFrom rhdf5 h5createGroup
+setMethod("export_loom", "LoomExperiment", .export_loom.Experiment)
+
+setMethod("export_loom", "RangedLoomExperiment", .export_loom.Experiment)
+
+setMethod("export_loom", "SingleCellLoomExperiment", .export_loom.Experiment)
 

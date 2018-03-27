@@ -50,144 +50,30 @@ setClass("SingleCellLoomExperiment",
 ### Constructor.
 ###
 
-.new_SingleCellLoomExperiment <- function(assays, names, rowData, colData,
-                                colGraphs, rowGraphs, metadata)
-{
-    if (!is(assays, "Assays"))
-        assays <- Assays(assays)
-    if (is.null(rowData)) {
-        if (is.null(names))
-            nrow <- nrow(assays)
-        else
-            nrow <- length(names)
-        rowData <- S4Vectors:::make_zero_col_DataFrame(nrow)
-    } else {
-        rownames(rowData) <- NULL
-    }
-    new("SingleCellLoomExperiment", NAMES=names,
-                                elementMetadata=rowData,
-                                colData=colData,
-                                assays=assays,
-                                colGraphs=colGraphs,
-                                rowGraphs=rowGraphs,
-                                metadata=as.list(metadata))
+SingleCellLoomExperiment <- function(..., colGraphs=NULL, rowGraphs=NULL) {
+    sce <- SingleCellExperiment(...)
+    new("SingleCellLoomExperiment", sce, colGraphs=colGraphs,
+        rowGraphs=rowGraphs)
 }
-
-#' @export
-setGeneric("SingleCellLoomExperiment",
-    function(assays, ...) standardGeneric("SingleCellLoomExperiment")
-)
-
-#' @export
-setMethod("SingleCellLoomExperiment", "SimpleList",
-   function(assays, rowData=NULL, rowRanges=GRangesList(), colData=DataFrame(),
-            colGraphs=SimpleList(), rowGraphs=SimpleList(), metadata=list())
-{
-    if (missing(colData) && 0L != length(assays)) {
-        assay <- assays[[1]]
-        nms <- colnames(assay)
-        colData <- DataFrame(x=seq_len(ncol(assay)), row.names=nms)[, FALSE]
-    } else if (!missing(colData)) {
-        colData <- as(colData, "DataFrame")
-        if (is.null(rownames(colData)))
-            rownames(colData) <- SummarizedExperiment:::.get_colnames_from_assays(assays)
-    }
-    ans_colnames <- rownames(colData)
-
-    if (is.null(rowData)) {
-        if (missing(rowRanges)) {
-            ans_rownames <- SummarizedExperiment:::.get_rownames_from_assays(assays)
-        } else {
-            if (is.null(names(rowRanges)))
-                names(rowRanges) <- SummarizedExperiment:::.get_rownames_from_assays(assays)
-            ans_rownames <- names(rowRanges)
-        }
-    } else {
-        if (!missing(rowRanges))
-            stop("only one of 'rowData' and 'rowRanges' can be specified")
-        if (is(rowData, "GenomicRanges_OR_GRangesList")) {
-            rowRanges <- rowData
-            if (is.null(names(rowRanges)))
-                names(rowRanges) <- SummarizedExperiment:::.get_rownames_from_assays(assays)
-            ans_rownames <- names(rowRanges)
-        } else {
-            rowData <- as(rowData, "DataFrame")
-            ans_rownames <- rownames(rowData)
-            if (is.null(ans_rownames))
-                ans_rownames <- SummarizedExperiment:::.get_rownames_from_assays(assays)
-        }
-    }
-
-    ## validate
-#    ok <- vapply(assays, function(x) {
-#        colnames <- colnames(x)
-#        test <- is.null(colnames) || identical(colnames, ans_colnames)
-#        if (!test)
-#            stop("assay colnames() must be NULL or equal colData rownames()")
-#
-#        rownames <- rownames(x)
-#        test <- test &&
-#            is.null(rownames) || identical(rownames, ans_rownames)
-#        if (!test) {
-#            txt <- "assay rownames() must be NULL or equal rowData rownames() /
-#                    rowRanges names()"
-#            stop(paste(strwrap(txt, exdent=2), collapse="\n"))
-#        }
-#
-#        test
-#    }, logical(1))
-
-    assays <- Assays(assays)
-
-    if (missing(rowRanges) && !is(rowData, "GenomicRanges_OR_GRangesList")) {
-        .new_SingleCellLoomExperiment(assays, ans_rownames, rowData, colData,
-                            colGraphs, rowGraphs, metadata)
-    } else {
-        .new_RangedSummarizedExperiment(assays, rowRanges, colData, metadata)
-    }
-})
-
-#' @export
-setMethod("SingleCellLoomExperiment", "ANY",
-    function(assays, ...)
-{
-    if (is.matrix(assays) && is.list(assays))
-        assays <- list(assays)
-    SingleCellLoomExperiment(assays, ...)
-})
-
-#' @export
-setMethod("SingleCellLoomExperiment", "list",
-    function(assays, ...)
-{
-    SingleCellLoomExperiment(do.call(SimpleList, assays), ...)
-})
-
-#' @export
-setMethod("SingleCellLoomExperiment", "missing",
-    function(assays, ...)
-{
-    SingleCellLoomExperiment(SimpleList(), ...)
-})
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Coercion.
 ###
 
-.from_SingleCellLoomExperiment_to_SummarizedExperiment <- function(from)
+.from_SingleCellLoomExperiment_to_SingleCellExperiment <- function(from)
 {
-    SummarizedExperiment(assays=from@assays,
+    SingleCellExperiment:::.SingleCellExperiment(assays=from@assays,
                          rowData=NULL,
                          colData=from@colData,
                          metadata=from@elementMetadata)
 }
 
-setAs("SingleCellLoomExperiment", "SummarizedExperiment",
-    .from_SingleCellLoomExperiment_to_SummarizedExperiment
+setAs("SingleCellLoomExperiment", "SingleCellExperiment",
+    .from_SingleCellLoomExperiment_to_SingleCellExperiment
 )
 
-.from_SummarizedExperiment_to_SingleCellLoomExperiment <- function(from)
+.from_SingleCellExperiment_to_SingleCellLoomExperiment <- function(from)
 {
     SingleCellLoomExperiment(assays=from@assays,
                          rowData=NULL,
@@ -195,8 +81,8 @@ setAs("SingleCellLoomExperiment", "SummarizedExperiment",
                          metadata=from@elementMetadata)
 }
 
-setAs("SummarizedExperiment", "SingleCellLoomExperiment",
-    .from_SummarizedExperiment_to_SingleCellLoomExperiment
+setAs("SingleCellExperiment", "SingleCellLoomExperiment",
+    .from_SingleCellExperiment_to_SingleCellLoomExperiment
 )
 
 
@@ -204,12 +90,8 @@ setAs("SummarizedExperiment", "SingleCellLoomExperiment",
 ### Get and Replace methods.
 ###
 
-setGeneric("colGraphs", function(x, ...) standardGeneric("colGraphs"))
-
 setMethod("colGraphs", "SingleCellLoomExperiment",
     function(x, ...) x@colGraphs)
-
-setGeneric("colGraphs<-", function(x, ..., value) standardGeneric("colGraphs<-"))
 
 setReplaceMethod("colGraphs", "SingleCellLoomExperiment",
     function(x, ..., value) {
@@ -217,12 +99,8 @@ setReplaceMethod("colGraphs", "SingleCellLoomExperiment",
     }
 )
 
-setGeneric("rowGraphs", function(x, ...) standardGeneric("rowGraphs"))
-
 setMethod("rowGraphs", "SingleCellLoomExperiment",
     function(x, ...) x@rowGraphs)
-
-setGeneric("rowGraphs<-", function(x, ..., value) standardGeneric("rowGraphs<-"))
 
 setReplaceMethod("rowGraphs", "SingleCellLoomExperiment",
     function(x, ..., value) {

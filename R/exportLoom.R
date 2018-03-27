@@ -1,11 +1,4 @@
 #' @export
-setGeneric(
-    "exportLoom",
-    function(object, file = tempfile(), ...) standardGeneric("exportLoom"),
-    signature = "object"
-)
-
-#' @export
 #' @importFrom rhdf5 h5write
 setMethod("exportLoom", "matrix",
     function(object, file, name)

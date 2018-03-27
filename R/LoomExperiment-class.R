@@ -108,12 +108,8 @@ setAs("SummarizedExperiment", "LoomExperiment",
 ### Get and Replace methods.
 ###
 
-setGeneric("colGraphs", function(x, ...) standardGeneric("colGraphs"))
-
 setMethod("colGraphs", "LoomExperiment",
     function(x, ...) x@colGraphs)
-
-setGeneric("colGraphs<-", function(x, ..., value) standardGeneric("colGraphs<-"))
 
 setReplaceMethod("colGraphs", "LoomExperiment",
     function(x, ..., value) {
@@ -121,12 +117,8 @@ setReplaceMethod("colGraphs", "LoomExperiment",
     }
 )
 
-setGeneric("rowGraphs", function(x, ...) standardGeneric("rowGraphs"))
-
 setMethod("rowGraphs", "LoomExperiment",
     function(x, ...) x@rowGraphs)
-
-setGeneric("rowGraphs<-", function(x, ..., value) standardGeneric("rowGraphs<-"))
 
 setReplaceMethod("rowGraphs", "LoomExperiment",
     function(x, ..., value) {

@@ -4,105 +4,77 @@
 ###
 
 #' @export
-.LoomGraph <- setClass(
-    "LoomGraph",
+setClass("LoomGraph",
     contains = "DataFrame"
 )
 
 #' @export
-.LoomGraphs <- setClass(
-    "LoomGraphs",
+setClass("LoomGraphs",
     contains = "SimpleList",
     prototype = prototype(
         elementType = "LoomGraph"
     )
 )
 
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Vaidity
 ###
 
-.LoomGraph.validity <- function(x) {
+.valid.LoomGraph <- function(x) {
     if (isEmpty(x))
         return(NULL)
-    numerals <- vapply(df, is.numeric, logical(1))
+    numerals <- vapply(x, is.numeric, logical(1))
     if (!all(numerals)) {
-        txt <- sprintf("\n LoomGraph must only contain numeric elements")
+        txt <- sprintf("\n A LoomGraph must only contain numeric elements")
         return(txt)
     }
     cols <- colnames(x)
     if (length(cols) == 2) {
         if(!all(cols == c('a', 'b'))) {
-            txt <- sprintf("\n LoomGraph with two columns must be named 'a' and 'b'")
+            txt <- sprintf("\n A LoomGraph with two columns must be named 'a' and 'b'")
             return(txt)
         }
     } else if (length(cols) == 3) {
         if(!all(cols == c('a', 'b'))) {
-            txt <- sprintf("\n LoomGraph with two columns must be named 'a' and 'b'")
+            txt <- sprintf("\n A LoomGraph with two columns must be named 'a' and 'b'")
             return(txt)
         }
     } else {
-        txt <- sprintf("\n LoomGraph must have two or three columns")
+        txt <- sprintf("\n A LoomGraph must have two or three columns")
         return(txt)
     }
     NULL
 }
 
-#setValidity2("LoomGraph", .LoomGraph.validity)
+setValidity2("LoomGraph", .valid.LoomGraph)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructors
 ###
 
-#setGeneric("LoomGraph", function(graph, ...), standardGeneric("LoomGraph"))
-
-#setMethod("LoomGraph", "DataFrame",
-#    function(graph, ...)
-#{
-#    as(lg, "LoomGraph")
-#})
-
-LoomGraph <- function(..., row.names = NULL, check.names = TRUE) {
-    df <- DataFrame(..., row.names = row.names, check.names = check.names)
-    as(df, "LoomGraph")
+.new_LoomGraph <- function(df) {
+    new("LoomGraph", df)
 }
 
-#setGeneric("LoomGraphs", function(graph, ...), standardGeneric("LoomGraphs"))
+.new_LoomGraphs <- function(sl) {
+    new("LoomGraphs", sl)
+}
 
-#setMethod("LoomGraph", "DataFrame",
-#    function(graph, ...)
-#{
-#    lg <- .LoomGraph()
-#    as(graph, "DataFrame")
-#})
+LoomGraph <- function(...) {
+    df <- DataFrame(...)
+    .new_LoomGraph(df)
+}
 
 LoomGraphs <- function(...) {
-    .LoomGraphs(list(...))
+    sl <- SimpleList(...)
+    .new_LoomGraphs(sl)
 }
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Coercion
-###
-
-#.from_LoomGraph_to_DataFrame <- function(from)
-#{
-    
-#}
-
-#setAs("LoomGraph", "DataFrame", .from_LoomGraph_to_DataFrame)
-
-#.from_DataFrame_to_LoomGraph <- function(from)
-#{
-    
-#}
-
-#setAs("DataFrame", "LoomGraph", .from_DataFrame_to_LoomGraph)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Misc.
+### Miscellanious methods
 ###
 
 setMethod("[", c("LoomGraph", "ANY", "missing"),

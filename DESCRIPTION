@@ -8,24 +8,27 @@ Encoding: UTF-8
 Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.5.0),
-         methods,
          SingleCellExperiment,
          SummarizedExperiment,
-         rhdf5
+         methods,
+         rhdf5,
+         rtracklayer
 Imports: DelayedArray,
          GenomicRanges,
-         HDF5Array
+         HDF5Array,
 Suggests: testthat,
           BiocStyle
 Collate: AllGenerics.R
-    test_loom.R
-    utils.R
-    LoomGraph-class.R
-    LoomExperiment-class.R
-    RangedLoomExperiment-class.R
-    SingleCellLoomExperiment-class.R
-    importLoom.R
-    exportLoom.R
+         test_loom.R
+         utils.R
+         SharedMethods.R
+         LoomGraph-class.R
+         LoomExperiment-class.R
+         RangedLoomExperiment-class.R
+         SingleCellLoomExperiment-class.R
+         LoomFile-class.R
+         importLoom.R
+         exportLoom.R
 License: Artistic-2.0
 RoxygenNote: 6.0.1
 BiocViews: DataRepresntation, DataImport, Intrastructure, SingleCell

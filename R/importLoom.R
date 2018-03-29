@@ -1,15 +1,15 @@
 #' @importFrom HDF5Array HDF5Array
 .importLoom_matrix <-
-    function(file, name)
+    function(con, name)
 {
-    t(HDF5Array::HDF5Array(file, name))
+    t(HDF5Array::HDF5Array(con, name))
 }
 
 #' @importFrom rhdf5 h5read
 .importLoom_DataFrame <-
-    function(file, name, rowname)
+    function(con, name, rowname)
 {
-    df <- DataFrame(rhdf5::h5read(file, name))
+    df <- DataFrame(rhdf5::h5read(con, name))
     df[] <- lapply(df, as.vector)
     if (!is.null(rowname)) {
         rownames(df) <- df[[rowname]]
@@ -23,30 +23,33 @@
 #' Function for importing .loom files
 #'
 #' @description
-#'  a function for importing a \code{.loom} file as a \code{loomexperiment}.
-#' @param file character(1) a character vector indicating the file path to the
+#'  a function for importing a \code{.loom} con as a \code{loomexperiment}.
+#' @param con character(1) a character vector indicating the file path to the
 #'  that is to be imported.
 #' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the loomexperiment
+#'  attributes in the .loom file that are to be designated as the LoomExperiment
 #'  object's rownames.
 #' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the loomexperiment
+#'  attributes in the .loom con that are to be designated as the LoomExperiment
 #'  object's rownames.
-#' @return loomexperiment contained the information from the .loom file.
+#' @return LoomExperiment contained the information from the .loom file.
 #' @examples
-#' test_file <- system.file(
+#' test_con <- system.con(
 #'      package="loomexperiment", "extdata", "example.loom"
 #' )
-#' le <- importLoom(test_file)
+#' le <- importLoom(test_con)
 #' le
-#' @importFrom rhdf5 h5ls h5readAttributes
 #' @export
-importLoom <-
-    function(file, rownames_attr = NULL, colnames_attr = NULL)
+#' @importFrom rhdf5 h5ls h5readAttributes
+#' @importFrom rtracklayer import
+#' @importMethodsFrom rtracklayer import
+setMethod("import.loom", signature=c("ANY"),
+    function(con, ..., rownames_attr = NULL, colnames_attr = NULL)
+#import_loom <- function(con, rownames_attr = NULL, colnames_attr = NULL)
 {
-    stopifnot(file.exists(file))
+    stopifnot(file.exists(con))
 
-    ls <- rhdf5::h5ls(file)
+    ls <- rhdf5::h5ls(con)
     rowColnames <- ls[ls$group == "/row_attrs", "name", drop=TRUE]
     colColnames <- ls[ls$group == "/col_attrs", "name", drop=TRUE]
     if (missing(rownames_attr) && "rownames" %in% rowColnames)
@@ -58,51 +61,50 @@ importLoom <-
         is.null(colnames_attr) || colnames_attr %in% colColnames
     )
 
-    assay <- .importLoom_matrix(file, "/matrix")
+    assay <- .importLoom_matrix(con, "/matrix")
     layerNames <- ls[ls$group == "/layers", "name", drop = TRUE]
     layers <- lapply(setNames(layerNames, layerNames), function(layer) {
         layer <- paste0("/layers/", layer)
-        .importLoom_matrix(file, layer)
+        .importLoom_matrix(con, layer)
     })
     assays <- c(list(matrix = assay), layers)
 
-    rowData <- .importLoom_DataFrame(file, "row_attrs", rownames_attr)
-    colData <- .importLoom_DataFrame(file, "col_attrs", colnames_attr)
+    rowData <- .importLoom_DataFrame(con, "row_attrs", rownames_attr)
+    colData <- .importLoom_DataFrame(con, "col_attrs", colnames_attr)
 
-    row_edges <- ls[ls$group == "/row_edges", "name", drop=TRUE]
-    col_edges <- ls[ls$group == "/col_edges", "name", drop=TRUE]
+    row_graphs <- ls[ls$group == "/row_graphs", "name", drop=TRUE]
+    col_graphs <- ls[ls$group == "/col_graphs", "name", drop=TRUE]
 
-    if (length(row_edges) == 0)
-        row_edges <- LoomGraphs()
-    if (length(col_edges) == 0)
-        col_edges <- LoomGraphs()
+    if (length(row_graphs) == 0)
+        row_graphs <- LoomGraphs()
+    if (length(col_graphs) == 0)
+        col_graphs <- LoomGraphs()
 
-    if (length(row_edges) > 0) {
-        row_edges <- paste0("/row_edges/", row_edges)
-        names(row_edges) <- basename(row_edges)
+    if (length(row_graphs) > 0) {
+        row_graphs <- paste0("/row_graphs/", row_graphs)
+        names(row_graphs) <- basename(row_graphs)
 
-        row_edges <- lapply(row_edges, function(x) {
-            res <- as(h5read(file, x), "DataFrame")
-            as(res, "LoomGraph")
+        row_graphs <- lapply(row_graphs, function(x) {
+            LoomGraph(h5read(con, x))
         })
 
-        row_edges <- .LoomGraphs(row_edges) # as(row_edges, "LoomGraphs")
+        row_graphs <- LoomGraphs(row_graphs) # as(row_graphs, "LoomGraphs")
     }
 
-    if (length(col_edges) > 0) {
-        col_edges <- paste0("/col_edges/", col_edges)
-        names(col_edges) <- basename(col_edges)
+    if (length(col_graphs) > 0) {
+        col_graphs <- paste0("/col_graphs/", col_graphs)
+        names(col_graphs) <- basename(col_graphs)
 
-        col_edges <- lapply(col_edges, function(x) {
-            res <- as(h5read(file, x), "DataFrame")
-            as(res, "LoomGraph")
+        col_graphs <- lapply(col_graphs, function(x) {
+            LoomGraph(h5read(con, x))
         })
 
-        col_edges <- .LoomGraphs(col_edges) # as(col_edges, "LoomGraphs")
+        col_graphs <- LoomGraphs(col_graphs) # as(col_graphs, "LoomGraphs")
     }
 
     le <- LoomExperiment(assays, rowData = rowData, colData = colData,
-                         rowGraph = row_edges, colGraph = col_edges)
-    metadata(le) <- rhdf5::h5readAttributes(file, "/")
+                         rowGraphs = row_graphs, colGraphs = col_graphs)
+    metadata(le) <- rhdf5::h5readAttributes(con, "/")
     le
-}
+})
+#}

@@ -44,11 +44,15 @@ setValidity2("RangedLoomExperiment", .valid.LoomExperiment)
 RangedLoomExperiment <-
     function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
-    rse <- SummarizedExperiment(...)
-    if(!is(rse, "RangedSummarizedExperiment"))
-        rse <- as(rse, "RangedSummarizedExperiment")
-        #stop("Input is a 'SummarizedExperiment'.  Use 'LoomExperiment()'.")
-    .new_RangedLoomExperiment(rse, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    te <- list(...)[[1]]
+    if (is(te, "SummarizedExperiment"))
+        .new_RangedLoomExperiment(te, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    else {    
+        rse <- SummarizedExperiment(...)
+        if(!is(rse, "RangedSummarizedExperiment"))
+            rse <- as(rse, "RangedSummarizedExperiment")
+        .new_RangedLoomExperiment(rse, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    }
 }
 
 

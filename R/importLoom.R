@@ -20,6 +20,10 @@
     df
 }
 
+.importLoom_GRanges <- function(con, name) {
+
+}
+
 #' Function for importing .loom files
 #'
 #' @description
@@ -43,10 +47,10 @@
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @importFrom rtracklayer import
 #' @importMethodsFrom rtracklayer import
-setMethod("import.loom", signature=c("ANY"),
+setMethod("import", "loomFile",
     function(con, ..., rownames_attr = NULL, colnames_attr = NULL)
-#import_loom <- function(con, rownames_attr = NULL, colnames_attr = NULL)
 {
+    con <- path(con)
     stopifnot(file.exists(con))
 
     ls <- rhdf5::h5ls(con)
@@ -69,11 +73,25 @@ setMethod("import.loom", signature=c("ANY"),
     })
     assays <- c(list(matrix = assay), layers)
 
-    rowData <- .importLoom_DataFrame(con, "row_attrs", rownames_attr)
+    is_rangedloomexperiment <- nrow(ls[ls$name == "granges1",]) > 0
+    is_singlecellloomexperiment <- nrow(ls[ls$name == "singlecellexperiment",]) > 0
+
     colData <- .importLoom_DataFrame(con, "col_attrs", colnames_attr)
 
-    row_graphs <- ls[ls$group == "/row_graphs", "name", drop=TRUE]
-    col_graphs <- ls[ls$group == "/col_graphs", "name", drop=TRUE]
+    if (is_rangedloomexperiment) {
+        rowData <- .importLoom_GRangesList(con, "row_attrs", rownames_attr)
+    } else {
+        rowData <- .importLoom_DataFrame(con, "row_attrs", rownames_attr)
+    }
+
+    if (is_singlecellloomexperiment) {
+        int_colData <- .importLoom_DataFrame(con, "singlecellexperiment/int_colData")
+        int_elementMetadata <- .importLoom_DataFrame(con, "singlecellexperiment/int_elementMetadata")
+        reducedDims <- importLoom_DataFrame(con, "singlecellexperiment/reducedDims")
+    }
+
+    row_graphs <- ls[ls$group == "/row_edges", "name", drop=TRUE]
+    col_graphs <- ls[ls$group == "/col_edges", "name", drop=TRUE]
 
     if (length(row_graphs) == 0)
         row_graphs <- LoomGraphs()
@@ -81,7 +99,7 @@ setMethod("import.loom", signature=c("ANY"),
         col_graphs <- LoomGraphs()
 
     if (length(row_graphs) > 0) {
-        row_graphs <- paste0("/row_graphs/", row_graphs)
+        row_graphs <- paste0("/row_edges/", row_graphs)
         names(row_graphs) <- basename(row_graphs)
 
         row_graphs <- lapply(row_graphs, function(x) {
@@ -92,7 +110,7 @@ setMethod("import.loom", signature=c("ANY"),
     }
 
     if (length(col_graphs) > 0) {
-        col_graphs <- paste0("/col_graphs/", col_graphs)
+        col_graphs <- paste0("/col_edges/", col_graphs)
         names(col_graphs) <- basename(col_graphs)
 
         col_graphs <- lapply(col_graphs, function(x) {
@@ -107,4 +125,3 @@ setMethod("import.loom", signature=c("ANY"),
     metadata(le) <- rhdf5::h5readAttributes(con, "/")
     le
 })
-#}

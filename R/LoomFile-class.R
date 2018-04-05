@@ -1,14 +1,15 @@
-setClass("LoomFile", contains="RTLFile")
+setClass("loomFile", contains="RTLFile")
 
-LoomFile <- function(path)
+loomFile <- function(path)
 {
     if (!isSingleString(path))
         stop("'filename' must be a single string, specifiying a path")
-    new("LoomFile", resource=path)
+    new("loomFile", resource=path)
 }
 
-#setMethod("import.LoomFile", "ANY",
-#    function(con, ...)
-#{
-#    import(con, "LoomFile", ...)
-#})
+setMethod("import.loomFile", "ANY",
+    function(con, ...)
+{
+    print("hi")
+    #import(con, "LoomFile", ...)
+})

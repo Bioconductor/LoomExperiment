@@ -6,11 +6,11 @@ setGeneric("colGraphs<-", function(x, ..., value) standardGeneric("colGraphs<-")
 setGeneric("rowGraphs", function(x, ...) standardGeneric("rowGraphs"))
 setGeneric("rowGraphs<-", function(x, ..., value) standardGeneric("rowGraphs<-"))
 
-setGeneric("import.loom", function(con, ...) standardGeneric("import.loom"))
+setGeneric("import.loomFile", function(con, ...) standardGeneric("import.loomFile"))
 
 ## exportLoom
 
 setGeneric(".exportLoom",
-    function(object, file = tempfile(), ...) standardGeneric(".exportLoom"),
+    function(object, con = tempfile(), name, ...) standardGeneric(".exportLoom"),
     signature = "object"
 )

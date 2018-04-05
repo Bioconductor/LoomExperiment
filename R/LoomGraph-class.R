@@ -36,8 +36,8 @@ setClass("LoomGraphs",
             return(txt)
         }
     } else if (length(cols) == 3) {
-        if(!all(cols == c('a', 'b'))) {
-            txt <- sprintf("\n A LoomGraph with two columns must be named 'a' and 'b'")
+        if(!all(cols == c('a', 'b', 'w'))) {
+            txt <- sprintf("\n A LoomGraph with three columns must be named 'a', 'b', and 'w'")
             return(txt)
         }
     } else {

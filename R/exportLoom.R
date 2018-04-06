@@ -151,10 +151,10 @@ setMethod(".exportLoom", "LoomGraphs",
         Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
 
         rhdf5::h5createGroup(con, "/singlecellexperiment/int_colData")
-        .exportLoom(object@int_colData, con, "singlecellexperiment/int_colData", rownames_attr)
+        .exportLoom(object@int_colData, con, "singlecellexperiment/int_colData", NULL)
 
         rhdf5::h5createGroup(con, "/singlecellexperiment/int_elementMetadata")
-        .exportLoom(object@int_elementMetadata, con, "singlecellexperiment/int_elementMetadata", rownames_attr)
+        .exportLoom(object@int_elementMetadata, con, "singlecellexperiment/int_elementMetadata", NULL)
     }
 
     rhdf5::h5createGroup(con, "/col_attrs")

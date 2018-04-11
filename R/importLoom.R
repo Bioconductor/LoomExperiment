@@ -122,7 +122,19 @@ setMethod("import", "loomFile",
     }
 
     row_graphs <- ls[ls$group == "/row_edges", "name", drop=TRUE]
+    if (length(row_graphs) > 0)
+        row_graphs_names <- "/row_edges/"
+    else {
+        row_graphs <- ls[ls$group == "/row_graphs", "name", drop=TRUE]
+        row_graphs_names <- "/row_graphs/"
+    }
     col_graphs <- ls[ls$group == "/col_edges", "name", drop=TRUE]
+    if (length(col_graphs) > 0)
+        col_graphs_names <- "/col_edges/"
+    else {
+        col_graphs <- ls[ls$group == "/col_graphs", "name", drop=TRUE]
+        col_graphs_names <- "/col_graphs/"
+    }
 
     if (length(row_graphs) == 0)
         row_graphs <- LoomGraphs()
@@ -130,7 +142,7 @@ setMethod("import", "loomFile",
         col_graphs <- LoomGraphs()
 
     if (length(row_graphs) > 0) {
-        row_graphs <- paste0("/row_edges/", row_graphs)
+        row_graphs <- paste0(row_graphs_names, row_graphs)
         names(row_graphs) <- basename(row_graphs)
 
         row_graphs <- lapply(row_graphs, function(x) {
@@ -141,7 +153,7 @@ setMethod("import", "loomFile",
     }
 
     if (length(col_graphs) > 0) {
-        col_graphs <- paste0("/col_edges/", col_graphs)
+        col_graphs <- paste0(col_graphs_names, col_graphs)
         names(col_graphs) <- basename(col_graphs)
 
         col_graphs <- lapply(col_graphs, function(x) {

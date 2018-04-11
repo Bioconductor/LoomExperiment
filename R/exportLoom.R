@@ -202,9 +202,3 @@ setMethod(".exportLoom", "LoomGraphs",
 #' @importFrom rtracklayer export
 setMethod("export", signature=c("LoomExperiment", "character", "ANY"),
     .exportLoom.LoomExperiment)
-
-setMethod("export", signature=c("RangedLoomExperiment", "character", "ANY"),
-    .exportLoom.LoomExperiment)
-
-setMethod("export", signature=c("SingleCellLoomExperiment", "character", "ANY"),
-    .exportLoom.LoomExperiment)

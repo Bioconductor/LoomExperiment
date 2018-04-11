@@ -21,7 +21,6 @@ Suggests: testthat,
 Collate: AllGenerics.R
          test_loom.R
          utils.R
-         SharedMethods.R
          LoomGraph-class.R
          LoomExperiment-class.R
          RangedLoomExperiment-class.R

@@ -166,15 +166,15 @@ setMethod("import", "loomFile",
     if (is_singlecellloomexperiment) {
         if (length(rowData) == 1)
             rowData <- rowData[[1]]
-        le <- SingleCellLoomExperiment(assays, rowData = rowData, colData = colData,
-                                       reducedDims = reducedDims,
-                                       rowGraphs = row_graphs, colGraphs = col_graphs)
+        le <- LoomExperiment(assays, rowData = rowData, colData = colData,
+                             reducedDims = reducedDims,
+                             rowGraphs = row_graphs, colGraphs = col_graphs)
         le@int_colData <- int_colData
         le@int_elementMetadata <- int_elementMetadata
     } else if (is_rangedloomexperiment) {
         if (length(rowData) == 1)
             rowData <- rowData[[1]]
-        le <- RangedLoomExperiment(assays, rowData = rowData, colData = colData,
+        le <- LoomExperiment(assays, rowData = rowData, colData = colData,
                              rowGraphs = row_graphs, colGraphs = col_graphs)
     } else {
         le <- LoomExperiment(assays, rowData = rowData, colData = colData,

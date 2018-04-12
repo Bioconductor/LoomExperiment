@@ -23,8 +23,6 @@ Collate: AllGenerics.R
          utils.R
          LoomGraph-class.R
          LoomExperiment-class.R
-         RangedLoomExperiment-class.R
-         SingleCellLoomExperiment-class.R
          LoomFile-class.R
          importLoom.R
          exportLoom.R

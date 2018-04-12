@@ -91,6 +91,57 @@ setAs("SummarizedExperiment", "LoomExperiment",
     .from_SummarizedExperiment_to_LoomExperiment
 )
 
+.from_RangedSummarizedExperiment_to_LoomExperiment <- function(from)
+{
+    .new_LoomExperiment(from,
+                        rowGraphs=LoomGraphs(),
+                        colGraphs=LoomGraphs())
+}
+
+setAs("RangedSummarizedExperiment", "LoomExperiment",
+    .from_RangedSummarizedExperiment_to_LoomExperiment
+)
+
+.from_LoomExperiment_to_RangedSummarizedExperiment <- function(from)
+{
+    SummarizedExperiment(assays=assays(from),
+                         rowRanges=le@rowRanges,
+                         colData=colData(le),
+                         metadata=metadata(le))
+}
+
+setAs("LoomExperiment", "RangedSummarizedExperiment",
+    .from_LoomExperiment_to_RangedSummarizedExperiment
+)
+
+.from_LoomExperiment_to_SingleCellExperiment <- function(from)
+{
+    le <- SingleCellExperiment(assays=assays(from),
+                               rowRanges=le@rowRanges,
+                               colData=colData(le),
+                               metadata=metadata(le),
+                               reducedDims=le@reducedDims)
+    le <- BiocGenerics:::replaceSlots(le, int_colData=se@int_colData, check=FALSE)
+    le <- BiocGenerics:::replaceSlots(le, int_metadata=se@int_metadata, check=FALSE)
+    le <- BiocGenerics:::replaceSlots(le, int_elementMetadata=se@int_elementMetadata, check=FALSE)
+    le
+}
+
+setAs("LoomExperiment", "SingleCellExperiment",
+    .from_LoomExperiment_to_SingleCellExperiment
+)
+
+.from_SingleCellExperiment_to_LoomExperiment <- function(from)
+{
+    .new_LoomExperiment(from,
+                        rowGraphs=LoomGraphs(),
+                        colGraphs=LoomGraphs())
+}
+
+setAs("SingleCellExperiment", "LoomExperiment",
+    .from_SingleCellExperiment_to_LoomExperiment
+)
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Get and Replace methods.

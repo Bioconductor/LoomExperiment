@@ -142,17 +142,27 @@ setMethod(".exportLoom", "LoomGraphs",
             paste0(sQuote(names(layers)[success != 0]), collapse = ", ")
         )
 
-    if (is(object, "SingleCellLoomExperiment")) {
+    has_reducedDims <- !is.null(object@reducedDims)
+    has_int_colData <- !is.null(object@int_colData)
+    has_int_metadata <- !is.null(object@int_metadata)
+    has_int_elementMetadata <- !is.null(object@int_elementMetadata)
+
+    if (has_reducedDims || has_int_colData || has_int_metadata || has_int_elemenetMetadata)
         rhdf5::h5createGroup(con, "/singlecellexperiment")
 
+    if (has_reducedDims) {
         reducedDims_names <- "/singlecellexperiment/reducedDims"
         rhdf5::h5createGroup(con, reducedDims_names)
-        reducedDims_names <- paste0(reducedDims_names, '/', names(reducedDims(object)))
+        reducedDims_names <- paste0(reducedDims_names, '/', names(object@reducedDims))
         Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
+    }
 
+    if (has_int_colData) {
         rhdf5::h5createGroup(con, "/singlecellexperiment/int_colData")
         .exportLoom(object@int_colData, con, "singlecellexperiment/int_colData", NULL)
+    }
 
+    if (has_int_elementMetadata) {
         rhdf5::h5createGroup(con, "/singlecellexperiment/int_elementMetadata")
         .exportLoom(object@int_elementMetadata, con, "singlecellexperiment/int_elementMetadata", NULL)
     }
@@ -160,7 +170,7 @@ setMethod(".exportLoom", "LoomGraphs",
     rhdf5::h5createGroup(con, "/col_attrs")
     .exportLoom(colData(object), con, "col_attrs", colnames_attr)
     rhdf5::h5createGroup(con, "/row_attrs")
-    if (is(object, "RangedSummarizedExperiment"))
+    if (!is.null(rowRanges(object)))
         rowData <- GRangesList(rowRanges(object))
     else
         rowData <- rowData(object)

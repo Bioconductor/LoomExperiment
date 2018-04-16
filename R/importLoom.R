@@ -70,7 +70,7 @@
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @importFrom rtracklayer import
 #' @importMethodsFrom rtracklayer import
-setMethod("import", "loomFile",
+setMethod("import", "LoomFile",
     function(con, ..., rownames_attr = NULL, colnames_attr = NULL)
 {
     con <- path(con)

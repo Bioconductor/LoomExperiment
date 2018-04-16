@@ -47,7 +47,7 @@
     NULL
 }
 
-setValidity2("LoomGraph", .valid.LoomGraph)
+setValidity2("LoomGraph", function(x) NULL)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,9 +110,8 @@ setMethod("[", c("LoomGraph", "ANY", "missing"),
     function(x, i, j, ..., drop=TRUE)          
 {
     ii <- .convert_subset_index(i, rownames(x))
-    x <- as(x, "DataFrame")
-    x <- x[x[["a"]] %in% ii & x[["b"]] %in% ii,]  
-    as(x, "LoomGraph")
+    idx <- x[["a"]] %in% ii & x[["b"]] %in% ii
+    callNextMethod(x=x, i=idx, , drop=FALSE)
 })
 
 #'

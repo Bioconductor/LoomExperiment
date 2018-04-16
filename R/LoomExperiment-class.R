@@ -1,4 +1,5 @@
 
+##' @exportClass "G..
 setClassUnion("GenomicRanges_OR_GRangesList_OR_NULL", c("GenomicRanges", "GRangesList", "NULL"))
 
 ### =========================================================================
@@ -85,6 +86,7 @@ setValidity2("LoomExperiment", .valid.LoomExperiment)
 #' @export
 LoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
+    ## ISSUE in SummarizedExperiment
     te <- list(...)[[1]]
     if (is(te, "SummarizedExperiment"))
         .new_LoomExperiment(te, colGraphs=colGraphs, rowGraphs=rowGraphs)

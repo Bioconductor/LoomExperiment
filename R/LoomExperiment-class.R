@@ -1,3 +1,4 @@
+
 setClassUnion("GenomicRanges_OR_GRangesList_OR_NULL", c("GenomicRanges", "GRangesList", "NULL"))
 
 ### =========================================================================
@@ -5,20 +6,7 @@ setClassUnion("GenomicRanges_OR_GRangesList_OR_NULL", c("GenomicRanges", "GRange
 ### -------------------------------------------------------------------------
 ###
 
-#' LoomExperiment
-#'
-#' A class that helps facilitate the transition of SummarizedExperiment objects
-#' to .loom files and vise versa.
-#'
-#' @slot colGraphs A SimpleList containing the colGraphs information
-#' @slot rowGraphs A SimpleList containing the rowGraphs information
-#'
-#' @author Daniel Van Twisk
-#' @import SummarizedExperiment
-#' @importFrom SummarizedExperiment SummarizedExperiment
-#' @export
-
-setClass("LoomExperiment",
+.LoomExperiment <- setClass("LoomExperiment",
     contains="SummarizedExperiment",
     representation(
         int_elementMetadata="DataFrame",
@@ -51,7 +39,7 @@ setValidity2("LoomExperiment", .valid.LoomExperiment)
 .new_LoomExperiment <-
     function(se, colGraphs, rowGraphs)
 {
-    le <- new("LoomExperiment", se, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    le <- .LoomExperiment(se, colGraphs=colGraphs, rowGraphs=rowGraphs)
     le <- BiocGenerics:::replaceSlots(le, rowRanges=rowRanges(se), check=FALSE)
     if (is(se, "SingleCellExperiment")) {
         le <- BiocGenerics:::replaceSlots(le, reducedDims=se@reducedDims, check=FALSE)
@@ -62,6 +50,39 @@ setValidity2("LoomExperiment", .valid.LoomExperiment)
     le
 }
 
+#'
+#' The LoomExperiment representation class
+#'
+#' SummarizedExperiment-like class that facilitate the transition of 
+#' SummarizedExperiment, RangedSummarizedExperiment, and
+#' SingleCellExperiment objects to storage or retrieval in the loom format.
+#'
+#' @author Daniel Van Twisk
+#'
+#' @slot int_elementMetaData DataFrame. Mirrors int_elementMetadata from
+#'  SingleCellExperiment.
+#' @slot int_colData DataFrame. Mirrors int_colData from SingleCellExperiment.
+#' @slot int_metadata List. Mirrors int_metadata from SingleCellExperiment.
+#' @slot reducedDims SimpleList of matrices. Mirrors reducedDims from
+#'  SingleCellExperiment.
+#' @slot colGraphs LoomGraphs containing the loom file's colGraphs
+#'  information. Optional.
+#' @slot rowGraphs LoomGraphs containing the loom file's rowGraphs
+#'  information. Optional.
+#'
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SummarizedExperiment SummarizedExperiment RangedSummarizedExperiment
+#' 
+#' @examples
+#'
+#'  library(SingleCellExperiment)
+#'  counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+#'  sce <- SingleCellExperiment(assays = list(counts = counts))
+#'  le <- LoomExperiment(sce)
+#'  le
+#' 
+#' @rdname LoomExperiment-class
+#' @export
 LoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
     te <- list(...)[[1]]
@@ -87,6 +108,7 @@ LoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
                         colGraphs=LoomGraphs())
 }
 
+#' @export
 setAs("SummarizedExperiment", "LoomExperiment",
     .from_SummarizedExperiment_to_LoomExperiment
 )
@@ -98,6 +120,7 @@ setAs("SummarizedExperiment", "LoomExperiment",
                         colGraphs=LoomGraphs())
 }
 
+#' @export
 setAs("RangedSummarizedExperiment", "LoomExperiment",
     .from_RangedSummarizedExperiment_to_LoomExperiment
 )
@@ -110,6 +133,7 @@ setAs("RangedSummarizedExperiment", "LoomExperiment",
                          metadata=metadata(le))
 }
 
+#' @export
 setAs("LoomExperiment", "RangedSummarizedExperiment",
     .from_LoomExperiment_to_RangedSummarizedExperiment
 )
@@ -127,6 +151,7 @@ setAs("LoomExperiment", "RangedSummarizedExperiment",
     le
 }
 
+#' @export
 setAs("LoomExperiment", "SingleCellExperiment",
     .from_LoomExperiment_to_SingleCellExperiment
 )
@@ -138,6 +163,7 @@ setAs("LoomExperiment", "SingleCellExperiment",
                         colGraphs=LoomGraphs())
 }
 
+#' @export
 setAs("SingleCellExperiment", "LoomExperiment",
     .from_SingleCellExperiment_to_LoomExperiment
 )
@@ -167,12 +193,42 @@ setAs("SingleCellExperiment", "LoomExperiment",
     BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
 }
 
+#'
+#' @examples
+#'  ## colGraphs of LoomExperiment object
+#'  colGraphs(le)
+#' 
+#' @rdname LoomExperiment-class
+#' @exportMethod colGraphs
 setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
 
+#'
+#' @examples
+#'  ## replace colGraphs of LoomExperiment object
+#'  lg <- LoomGraph(a=c(1, 2, 3), b=(3, 2, 1))
+#'  colGraphs(le) <- lg
+#' 
+#' @rdname LoomExperiment-class
+#' @exportMethod colGraphs<-
 setReplaceMethod("colGraphs", "LoomExperiment", .replace.colGraphs)
 
+#'
+#' @examples
+#'  ## rowGraphs of LoomExperiment object
+#'  rowGraphs(le)
+#' 
+#' @rdname LoomExperiment-class
+#' @exportMethod rowGraphs
 setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
 
+#'
+#' @examples
+#'  ## replace rowGraphs of LoomExperiment object
+#'  lg <- LoomGraph(a=c(1, 2, 3), b=(3, 2, 1))
+#'  rowGraphs(le) <- lg
+#' 
+#' @rdname LoomExperiment-class
+#' @exportMethod rowGraphs<-
 setReplaceMethod("rowGraphs", "LoomExperiment", .replace.rowGraphs)
 
 
@@ -189,6 +245,10 @@ setReplaceMethod("rowGraphs", "LoomExperiment", .replace.rowGraphs)
     callNextMethod()
 }
 
+#'
+#'
+#' @rdname LoomExperiment-class
+#' @exportMethod [
 setMethod("[", c("LoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
 
 .show.LoomExperiment <- function(object)
@@ -219,4 +279,6 @@ setMethod("[", c("LoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
         cat("colGraphs(0): NULL\n")
 }
 
+#' @export
 setMethod("show", "LoomExperiment", .show.LoomExperiment)
+

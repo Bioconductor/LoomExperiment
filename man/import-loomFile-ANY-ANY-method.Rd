@@ -3,7 +3,7 @@
 \docType{methods}
 \name{import,loomFile,ANY,ANY-method}
 \alias{import,loomFile,ANY,ANY-method}
-\title{Function for importing .loom files}
+\title{Function for importing loom files}
 \usage{
 \S4method{import}{loomFile,ANY,ANY}(con, ..., rownames_attr = NULL,
   colnames_attr = NULL)

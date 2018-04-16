@@ -47,7 +47,7 @@
     grl
 }
 
-#' Function for importing .loom files
+#' Function for importing loom files
 #'
 #' @description
 #'  a function for importing a \code{.loom} con as a \code{loomexperiment}.

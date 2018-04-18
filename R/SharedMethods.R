@@ -1,33 +1,3 @@
-## Validty for '_Experiment' classes
-
-.valid.LoomExperiment <- function(x)
-{
-    NULL
-}
-
-
-## colGraphs/rowGraphs getters and replacers
-
-.get.colGraphs <- function(x, ...)
-{
-    x@colGraphs
-}
-
-.replace.colGraphs <- function(x, ..., value)
-{
-    BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
-}
-
-.get.rowGraphs <- function(x, ...)
-{
-    x@rowGraphs
-}
-
-.replace.rowGraphs <- function(x, ..., value)
-{
-    BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
-}
-
 
 ## Miscellanious methods
 
@@ -59,3 +29,4 @@
     else
         cat("colGraphs(0): NULL\n")
 }
+

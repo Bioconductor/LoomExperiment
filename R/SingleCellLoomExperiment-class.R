@@ -1,3 +1,4 @@
+
 ### =========================================================================
 ### SingleCellLoomExperiment objects
 ### -------------------------------------------------------------------------
@@ -15,13 +16,8 @@
 #' @import SingleCellExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @export
-
 setClass("SingleCellLoomExperiment",
-    contains="SingleCellExperiment",
-    representation(
-        colGraphs="LoomGraphs",
-        rowGraphs="LoomGraphs"
-    )
+    contains=c("SingleCellExperiment", "LoomExperiment")
 )
 
 
@@ -29,7 +25,12 @@ setClass("SingleCellLoomExperiment",
 ### Validity.
 ###
 
-setValidity2("SingleCellLoomExperiment", .valid.LoomExperiment)
+.valid.SingleCellLoomExperiment <- function(x)
+{
+    NULL
+}
+
+setValidity2("SingleCellLoomExperiment", .valid.SingleCellLoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,22 +72,10 @@ setAs("SingleCellExperiment", "SingleCellLoomExperiment",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Get and Replace methods.
-###
-
-setMethod("colGraphs", "SingleCellLoomExperiment", .get.colGraphs)
-
-setReplaceMethod("colGraphs", "SingleCellLoomExperiment", .replace.colGraphs)
-
-setMethod("rowGraphs", "SingleCellLoomExperiment", .get.rowGraphs)
-
-setReplaceMethod("rowGraphs", "SingleCellLoomExperiment", .replace.rowGraphs)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Miscellenious methods.
 ###
 
 setMethod("[", c("SingleCellLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
 
 setMethod("show", "SingleCellLoomExperiment", .show.LoomExperiment)
+

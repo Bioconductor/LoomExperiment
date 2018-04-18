@@ -1,3 +1,4 @@
+
 ### =========================================================================
 ### LoomExperiment objects
 ### -------------------------------------------------------------------------
@@ -17,8 +18,8 @@
 #' @export
 
 setClass("LoomExperiment",
-    contains="SummarizedExperiment",
     representation(
+        "VIRTUAL",
         colGraphs="LoomGraphs",
         rowGraphs="LoomGraphs"
     )
@@ -29,66 +30,43 @@ setClass("LoomExperiment",
 ### Validity.
 ###
 
+.valid.LoomExperiment <- function(x)
+{
+    NULL
+}
+
 setValidity2("LoomExperiment", .valid.LoomExperiment)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Constructor.
-###
-
-.new_LoomExperiment <-
-    function(se, colGraphs, rowGraphs)
-{
-    new("LoomExperiment", se, colGraphs=colGraphs, rowGraphs=rowGraphs)
-}
-
-LoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
-{
-    te <- list(...)[[1]]
-    if (is(te, "SummarizedExperiment"))
-        .new_LoomExperiment(te, colGraphs=colGraphs, rowGraphs=rowGraphs)
-    else {
-        se <- SummarizedExperiment(...)
-        if(is(se, "RangedSummarizedExperiment"))
-            se <- as(se, "SummarizedExperiment")
-        .new_LoomExperiment(se, colGraphs=colGraphs, rowGraphs=rowGraphs)
-    }
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Coercion.
-###
-
-.from_SummarizedExperiment_to_LoomExperiment <- function(from)
-{
-    .new_LoomExperiment(from,
-                        rowGraphs=LoomGraphs(),
-                        colGraphs=LoomGraphs())
-}
-
-setAs("SummarizedExperiment", "LoomExperiment",
-    .from_SummarizedExperiment_to_LoomExperiment
-)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Get and Replace methods.
 ###
 
+.get.colGraphs <- function(x, ...)
+{
+    x@colGraphs
+}
+
 setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
+
+.replace.colGraphs <- function(x, ..., value)
+{
+    BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
+}
 
 setReplaceMethod("colGraphs", "LoomExperiment", .replace.colGraphs)
 
+.get.rowGraphs <- function(x, ...)
+{
+    x@rowGraphs
+}
+
 setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
+
+.replace.rowGraphs <- function(x, ..., value)
+{
+    BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
+}
 
 setReplaceMethod("rowGraphs", "LoomExperiment", .replace.rowGraphs)
 
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Miscellenious methods.
-###
-
-setMethod("[", c("LoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
-
-setMethod("show", "LoomExperiment", .show.LoomExperiment)

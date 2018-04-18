@@ -24,6 +24,7 @@ Collate: AllGenerics.R
          SharedMethods.R
          LoomGraph-class.R
          LoomExperiment-class.R
+         SummarizedLoomExperiment-class.R
          RangedLoomExperiment-class.R
          SingleCellLoomExperiment-class.R
          LoomFile-class.R

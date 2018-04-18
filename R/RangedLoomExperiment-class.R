@@ -1,3 +1,4 @@
+
 ### =========================================================================
 ### RangedLoomExperiment objects
 ### -------------------------------------------------------------------------
@@ -14,13 +15,8 @@
 #' @author Daniel Van Twisk
 #' @import SummarizedExperiment
 #' @export
-
 setClass("RangedLoomExperiment",
-    contains="RangedSummarizedExperiment",
-    representation(
-        colGraphs="LoomGraphs",
-        rowGraphs="LoomGraphs"
-    )
+    contains=c("RangedSummarizedExperiment", "LoomExperiment")
 )
 
 
@@ -28,7 +24,12 @@ setClass("RangedLoomExperiment",
 ### Validity.
 ###
 
-setValidity2("RangedLoomExperiment", .valid.LoomExperiment)
+.valid.RangedLoomExperiment <- function(x)
+{
+    NULL
+}
+
+setValidity2("RangedLoomExperiment", .valid.RangedLoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -73,22 +74,10 @@ setAs("RangedSummarizedExperiment", "RangedLoomExperiment",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Get and Replace methods.
-###
-
-setMethod("colGraphs", "RangedLoomExperiment", .get.colGraphs)
-
-setReplaceMethod("colGraphs", "RangedLoomExperiment", .replace.colGraphs)
-
-setMethod("rowGraphs", "RangedLoomExperiment", .get.rowGraphs)
-
-setReplaceMethod("rowGraphs", "RangedLoomExperiment", .replace.rowGraphs)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Miscellenious methods.
 ###
 
 setMethod("[", c("RangedLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
 
 setMethod("show", "RangedLoomExperiment", .show.LoomExperiment)
+

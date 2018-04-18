@@ -1,3 +1,4 @@
+
 #' @importFrom HDF5Array HDF5Array
 .importLoom_matrix <-
     function(con, name)
@@ -40,6 +41,8 @@
 {
     ls <- h5ls(con)
     names <- ls[grep('granges', ls$name), "name", drop=TRUE]
+    if (names %in% "granges")
+        return(.importLoom_GRanges(con, paste0(name, '/', names)))
     grl <- lapply(names, function(x) {
         .importLoom_GRanges(con, paste0(name, '/', x))
     })
@@ -96,7 +99,7 @@ setMethod("import", "loomFile",
     })
     assays <- c(list(matrix = assay), layers)
 
-    is_rangedloomexperiment <- nrow(ls[ls$name == "granges1",]) > 0
+    is_rangedloomexperiment <- nrow(ls[grep('granges', ls$name),]) > 0
     is_singlecellloomexperiment <- nrow(ls[ls$name == "singlecellexperiment",]) > 0
 
     colData <- .importLoom_DataFrame(con, "col_attrs", colnames_attr)
@@ -108,9 +111,6 @@ setMethod("import", "loomFile",
     }
 
     if (is_singlecellloomexperiment) {
-        int_colData <- .importLoom_DataFrame(con, "/singlecellexperiment/int_colData", rownames_attr)
-        int_elementMetadata <- .importLoom_DataFrame(con, "/singlecellexperiment/int_elementMetadata", rownames_attr)
-
         reducedDims_names <- "/singlecellexperiment/reducedDims"
         names <- ls[ls$group == reducedDims_names, "name", drop=TRUE]
 
@@ -119,6 +119,16 @@ setMethod("import", "loomFile",
         })
         names(reducedDims) <- names
         reducedDims <- SimpleList(reducedDims)
+
+        int_colData <- .importLoom_DataFrame(con, "/singlecellexperiment/int_colData", rownames_attr)
+        int_elementMetadata <- .importLoom_DataFrame(con, "/singlecellexperiment/int_elementMetadata", rownames_attr)
+        
+        int_metadata_fields <- c("version", "spike_names", "size_factor_names")
+        int_metadata <- lapply(int_metadata_fields, function(x) {
+            int_metadata_names <- paste0("/singlecellexperiment/int_metadata/", x)
+            rhdf5::h5read(con, int_metadata_names)
+        })
+        int_metadata[["version"]] <- package_version(int_metadata[["version"]])
     }
 
     row_graphs <- ls[ls$group == "/row_edges", "name", drop=TRUE]
@@ -169,7 +179,11 @@ setMethod("import", "loomFile",
         le <- SingleCellLoomExperiment(assays, rowData = rowData, colData = colData,
                                        reducedDims = reducedDims,
                                        rowGraphs = row_graphs, colGraphs = col_graphs)
+        if (is.null(int_colData))
+            int_colData <- DataFrame(matrix(0, nrow(le), 0))
         le@int_colData <- int_colData
+        if (is.null(int_elementMetadata))
+            int_elementMetadata <- DataFrame(matrix(0, nrow(se), 0))
         le@int_elementMetadata <- int_elementMetadata
     } else if (is_rangedloomexperiment) {
         if (length(rowData) == 1)
@@ -177,9 +191,10 @@ setMethod("import", "loomFile",
         le <- RangedLoomExperiment(assays, rowData = rowData, colData = colData,
                              rowGraphs = row_graphs, colGraphs = col_graphs)
     } else {
-        le <- LoomExperiment(assays, rowData = rowData, colData = colData,
+        le <- SummarizedLoomExperiment(assays, rowData = rowData, colData = colData,
                              rowGraphs = row_graphs, colGraphs = col_graphs)
     }
     metadata(le) <- rhdf5::h5readAttributes(con, "/")
     le
 })
+

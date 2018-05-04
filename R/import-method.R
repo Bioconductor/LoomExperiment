@@ -50,29 +50,10 @@
     grl
 }
 
-#' Function for importing .loom files
-#'
-#' @description
-#'  a function for importing a \code{.loom} con as a \code{loomexperiment}.
-#' @param con character(1) a character vector indicating the file path to the
-#'  that is to be imported.
-#' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the LoomExperiment
-#'  object's rownames.
-#' @param rownames_attr character indicating the row
-#'  attributes in the .loom con that are to be designated as the LoomExperiment
-#'  object's rownames.
-#' @return LoomExperiment contained the information from the .loom file.
-#' @examples
-#' test_con <- system.con(
-#'      package="loomexperiment", "extdata", "example.loom"
-#' )
-#' le <- importLoom(test_con)
-#' le
-#' @export
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @importFrom rtracklayer import
 #' @importMethodsFrom rtracklayer import
+#' @export
 setMethod("import", "loomFile",
     function(con, ..., rownames_attr = NULL, colnames_attr = NULL)
 {
@@ -183,7 +164,7 @@ setMethod("import", "loomFile",
             int_colData <- DataFrame(matrix(0, nrow(le), 0))
         le@int_colData <- int_colData
         if (is.null(int_elementMetadata))
-            int_elementMetadata <- DataFrame(matrix(0, nrow(se), 0))
+            int_elementMetadata <- DataFrame(matrix(0, nrow(le), 0))
         le@int_elementMetadata <- int_elementMetadata
     } else if (is_rangedloomexperiment) {
         if (length(rowData) == 1)

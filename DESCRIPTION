@@ -17,7 +17,8 @@ Imports: DelayedArray,
          GenomicRanges,
          HDF5Array,
 Suggests: testthat,
-          BiocStyle
+          BiocStyle,
+          knitr
 Collate: AllGenerics.R
          test_loom.R
          utils.R
@@ -28,9 +29,9 @@ Collate: AllGenerics.R
          RangedLoomExperiment-class.R
          SingleCellLoomExperiment-class.R
          LoomFile-class.R
-         importLoom.R
-         exportLoom.R
+         export-method.R
+         import-method.R
 License: Artistic-2.0
-RoxygenNote: 6.0.1
+VignetteBuilder: knitr
 BiocViews: DataRepresntation, DataImport, Intrastructure, SingleCell
-VignetteBuilder: knittr
+RoxygenNote: 6.0.1

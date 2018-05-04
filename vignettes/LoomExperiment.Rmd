@@ -1,22 +1,83 @@
 ---
-title: "Overview of LoomExperiment"
+title: "The LoomExperiment Classes"
 author: "Daniel Van Twisk"
-date: "Modified: 05 March 2018. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
-output: BiocStyle::html_document
+package: LoomExperiment
+output:
+  BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{An introduction to the LoomExperiment class}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: console
+  %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE, setup}
-knitr::opts_chunk$set(echo = TRUE, comment = "#>", collapse = TRUE,
-                      message = FALSE)
+```{r options, include=FALSE, echo=FALSE}
+library(BiocStyle)
+knitr::opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
 ```
 
-# Overview
+# The `LoomExperiment` class
 
-`r Biocpkg("LoomExperiment")`
+## Definition
 
+The `LoomExperiment` family of classes inherits from the virtual class `LoomExperiment`
+as well as the Experiment class that they are named after. For example, the `SingleCellLoomExperiment`
+class inheirts from both `LoomExperiment` and `SingleCellExperiment`.
+
+The purpose of the `LoomExperiment` class is to act as an intermediary between Biocondcutor's
+Experiment classes and the Linnarson Lab's Loom File Format (http://linnarssonlab.org/loompy/index.html).
+The Loom File Format uses HDF5 to store Experiment data.
+
+The `LoomExperiment` class contains the following slots.
+
+* `colGraphs`
+* `rowGraphs`
+
+Both of these slots are `LoomGraphs` obects that describe the `col_graph` and `row_graph` attributes
+as specified by the Loom File Format.
+
+## Create instances of LoomExperiment
+
+There are several  ways to create instances of a `LoomExperiment` class of object.
+One can plug an exisiting Experiment obect into the appropriate constructor:
+
+```{r construct1}
+library(LoomExperiment)
+counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+sce <- SingleCellExperiment(assays = list(counts = counts))
+scle <- SingleCellLoomExperiment(sce)
+```
+
+One can also simply plug the the arguments into the appropriate constructor, since all
+`LoomExperiment` constructors call the applicable class's constructor
+
+```{r construct2}
+scle <- SingleCellLoomExperiment(assays = list(counts = counts))
+```
+
+Also, it is also possible to create a `LoomExperiment` extending class via coercion:
+
+```{r coerce}
+scle <- as(sce, "SingleCellLoomExperiment")
+scle
+```
+
+Finally, one can create a `LoomExperiment` object from import a Loom File.
+
+## Setting up a simple example
+
+We will use the following `SingleCellLoomExperiment` for the remainder of the package.
+
+```{r fluidigm}
+l1_file <- system.file("extdata", "L1_abrev.loom", package = "LoomExperiment")
+scle <- import(l1_file)
+scle
+```
+
+# Available methods for the `LoomExperiment`
+
+
+# Session Info
+
+```{r}
+sessionInfo()
+```

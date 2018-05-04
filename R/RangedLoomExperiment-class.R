@@ -4,15 +4,6 @@
 ### -------------------------------------------------------------------------
 ###
 
-#' RangedLoomExperiment
-#'
-#' A class that helps facilitate the transition of SummarizedExperiment objects
-#' to .loom files and vise versa.
-#'
-#' @slot colGraphs A LoomGraphs object containing the colGraphs information
-#' @slot rowGraphs A LoomGraphs containing the rowGraphs information
-#'
-#' @author Daniel Van Twisk
 #' @import SummarizedExperiment
 #' @export
 setClass("RangedLoomExperiment",
@@ -77,7 +68,9 @@ setAs("RangedSummarizedExperiment", "RangedLoomExperiment",
 ### Miscellenious methods.
 ###
 
+#' @export
 setMethod("[", c("RangedLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
 
+#' @export
 setMethod("show", "RangedLoomExperiment", .show.LoomExperiment)
 

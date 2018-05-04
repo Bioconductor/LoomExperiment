@@ -62,11 +62,13 @@ setValidity2("LoomGraph", .valid.LoomGraph)
     new("LoomGraphs", sl)
 }
 
+#' @export
 LoomGraph <- function(...) {
     df <- DataFrame(...)
     .new_LoomGraph(df)
 }
 
+#' @export
 LoomGraphs <- function(...) {
     sl <- SimpleList(...)
     .new_LoomGraphs(sl)
@@ -77,6 +79,7 @@ LoomGraphs <- function(...) {
 ### Miscellanious methods
 ###
 
+#' @export
 setMethod("[", c("LoomGraph", "ANY", "missing"),
     function(x, i, j, ..., drop=TRUE)          
 {
@@ -85,6 +88,7 @@ setMethod("[", c("LoomGraph", "ANY", "missing"),
 })
 
 #' importFrom plyr mapvalues
+#' @export
 setReplaceMethod("[", c("LoomGraph", "ANY", "missing", "numeric"),
     function(x, i, j, ..., value)          
 {

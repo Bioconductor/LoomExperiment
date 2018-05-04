@@ -12,7 +12,7 @@
 
 .show.LoomExperiment <- function(object)
 {
-        scat <- function(fmt, vals=character(), exdent=2, ...)
+    scat <- function(fmt, vals=character(), exdent=2, ...)
     {
         vals <- ifelse(nzchar(vals), vals, "''")
         lbls <- paste(S4Vectors:::selectSome(vals), collapse=" ")

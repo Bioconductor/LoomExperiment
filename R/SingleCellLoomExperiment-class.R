@@ -4,15 +4,6 @@
 ### -------------------------------------------------------------------------
 ###
 
-#' SingleCellLoomExperiment
-#'
-#' A class that helps facilitate the transition of SummarizedExperiment objects
-#' to .loom files and vise versa.
-#'
-#' @slot colGraphs A SimpleList containing the colGraphs information
-#' @slot rowGraphs A SimpleList containing the rowGraphs information
-#'
-#' @author Daniel Van Twisk
 #' @import SingleCellExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @export
@@ -42,6 +33,7 @@ setValidity2("SingleCellLoomExperiment", .valid.SingleCellLoomExperiment)
     new("SingleCellLoomExperiment", sce, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
+#' @export
 SingleCellLoomExperiment <-
     function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
@@ -75,7 +67,9 @@ setAs("SingleCellExperiment", "SingleCellLoomExperiment",
 ### Miscellenious methods.
 ###
 
+#' @export
 setMethod("[", c("SingleCellLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
 
+#' @export
 setMethod("show", "SingleCellLoomExperiment", .show.LoomExperiment)
 

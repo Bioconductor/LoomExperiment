@@ -4,19 +4,9 @@
 ### -------------------------------------------------------------------------
 ###
 
-#' SummarizedLoomExperiment
-#'
-#' A class that helps facilitate the transition of SummarizedExperiment objects
-#' to .loom files and vise versa.
-#'
-#' @slot colGraphs A SimpleList containing the colGraphs information
-#' @slot rowGraphs A SimpleList containing the rowGraphs information
-#'
-#' @author Daniel Van Twisk
 #' @import SummarizedExperiment
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @export
-
 setClass("SummarizedLoomExperiment",
     contains=c("SummarizedExperiment", "LoomExperiment")
 )
@@ -44,9 +34,12 @@ setValidity2("SummarizedLoomExperiment", .valid.SummarizedLoomExperiment)
     new("SummarizedLoomExperiment", se, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
+#' @export
 SummarizedLoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
-    te <- list(...)[[1]]
+    te <- list(...)
+    if (length(te) > 0)
+        te <- te[[1]]
     if (is(te, "SummarizedExperiment"))
         .new_SummarizedLoomExperiment(te, colGraphs=colGraphs, rowGraphs=rowGraphs)
     else {
@@ -78,7 +71,9 @@ setAs("SummarizedExperiment", "SummarizedLoomExperiment",
 ### Miscellenious methods.
 ###
 
+#' @export
 setMethod("[", c("SummarizedLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
 
+#' @export
 setMethod("show", "SummarizedLoomExperiment", .show.LoomExperiment)
 

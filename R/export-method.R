@@ -153,6 +153,8 @@ setMethod(".exportLoom", "LoomGraphs",
         reducedDims_names <- "/singlecellexperiment/reducedDims"
         rhdf5::h5createGroup(con, reducedDims_names)
         reducedDims_names <- paste0(reducedDims_names, '/', names(reducedDims(object)))
+        if (length(reducedDims(object)) == 0)
+            reducedDims_names <- character(0)
         Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
 
         rhdf5::h5createGroup(con, "/singlecellexperiment/int_colData")
@@ -171,8 +173,15 @@ setMethod(".exportLoom", "LoomGraphs",
     rhdf5::h5createGroup(con, "/col_attrs")
     .exportLoom(colData(object), con, "col_attrs", colnames_attr)
     rhdf5::h5createGroup(con, "/row_attrs")
-    if (is(object, "RangedSummarizedExperiment"))
+    if (is(object, "RangedSummarizedExperiment")) {
         rowData <- rowRanges(object)
+##      TODO: properly export granges
+#        if (is(rowData, "GRangesList")) {
+#            len <- lengths(rowData)
+#            rowData <- unlist(rowData)
+#           .exportLoom(len, con, "row_attrs", rownames_attr)
+#        }   
+    }
     else
         rowData <- rowData(object)
     .exportLoom(rowData, con, "row_attrs", rownames_attr)
@@ -186,31 +195,9 @@ setMethod(".exportLoom", "LoomGraphs",
     invisible(con)
 }
 
-#' Method for exporting to .loom files
-#'
-#' @description
-#'  A function for exporting a \code{LoomExperiment} object to a \code{.loom}
-#'  con.
-#' @param object LoomExperiment the object that is to be exported.
-#' @param file character(1) indicating the file path to the
-#'  that is to be imported.
-#' @param matrix character(1) indicating the name of the matrix in the .loom
-#'  file.
-#' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the LoomExperiment
-#'  object's rownames.
-#' @param rownames_attr character indicating the row
-#'  attributes in the .loom file that are to be designated as the LoomExperiment
-#'  object's rownames.
-#' @return LoomExperiment contained the information from the .loom file.
-#' @examples
-#' temp_con <- tempcon(conext=".h5")
-#' .exportLoom(le, temp_con, rownames_attr="id", colnames_attr="id")
-#' rhdf5::h5ls(temp_con)
-#' rhdf5::h5dump(temp_con)
-#' @export
 #' @importFrom rhdf5 h5createGroup
 #' @importFrom rtracklayer export
+#' @export
 setMethod("export", signature=c("LoomExperiment", "loomFile", "ANY"),
     .exportLoom.LoomExperiment)
 

@@ -4,15 +4,6 @@
 ### -------------------------------------------------------------------------
 ###
 
-#' LoomExperiment
-#'
-#' A class that helps facilitate the transition of SummarizedExperiment objects
-#' to .loom files and vise versa.
-#'
-#' @slot colGraphs A SimpleList containing the colGraphs information
-#' @slot rowGraphs A SimpleList containing the rowGraphs information
-#'
-#' @author Daniel Van Twisk
 #' @import SummarizedExperiment
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @export
@@ -47,6 +38,7 @@ setValidity2("LoomExperiment", .valid.LoomExperiment)
     x@colGraphs
 }
 
+#' @export
 setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
 
 .replace.colGraphs <- function(x, ..., value)
@@ -54,6 +46,7 @@ setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
     BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
 }
 
+#' @export
 setReplaceMethod("colGraphs", "LoomExperiment", .replace.colGraphs)
 
 .get.rowGraphs <- function(x, ...)
@@ -61,6 +54,7 @@ setReplaceMethod("colGraphs", "LoomExperiment", .replace.colGraphs)
     x@rowGraphs
 }
 
+#' @export
 setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
 
 .replace.rowGraphs <- function(x, ..., value)
@@ -68,5 +62,6 @@ setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
     BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
 }
 
+#' @export
 setReplaceMethod("rowGraphs", "LoomExperiment", .replace.rowGraphs)
 

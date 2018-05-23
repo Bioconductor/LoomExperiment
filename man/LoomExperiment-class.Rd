@@ -41,7 +41,8 @@
 
 \description{
 
-    The LoomExperiment family of classes is used as a bridge between Bioconductor's Experiment classes.
+    The LoomExperiment family of classes is used as a bridge between Bioconductor's Experiment classes
+    and the Linnarson Lab's Loom file format.
     The family of LoomExperiment classes all inherit from the virtual class LoomExperiment as well as their
     respectively named parent classes.
 }

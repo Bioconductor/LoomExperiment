@@ -23,7 +23,7 @@ setClass("LoomExperiment",
 
 .valid.LoomExperiment <- function(x)
 {
-    NULL
+       
 }
 
 setValidity2("LoomExperiment", .valid.LoomExperiment)

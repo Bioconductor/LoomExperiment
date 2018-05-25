@@ -1,6 +1,25 @@
 
 ## Miscellanious methods
 
+.valid.LoomExperiment <- function(x)
+{
+    clgs <- colGraphs(x)
+    rlgs <- rowGraphs(x)
+    cols <- seq_len(dims(x)[[2]])
+    rows <- seq_len(dims(x)[[1]])
+    ## Check that no "a" or "b" columns in LoomGraphs lie outside of dimensions.
+    txt <- "All LoomGraph objects in LoomExperiment reference a row in the LoomExperiment"
+    for (lg in clgs) {
+        if(!all(lg$a %in% rows & lg$b %in% rows))
+            return(txt)
+    }
+    for (lg in rlgs) {
+        if(!all(lg$a %in% cols & lg$b %in% cols))
+            return(txt)
+    }
+    NULL
+}
+
 .subset.LoomExperiment <- function(x, i, j, ...)
 {
     if (!missing(i))

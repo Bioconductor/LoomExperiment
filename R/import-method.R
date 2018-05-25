@@ -15,7 +15,7 @@
     names <- paste0(name, "/", names_ls)
 
     df <- lapply(names, function(x) {
-        rhdf5::h5read(con, names)
+        rhdf5::h5read(con, x)
     })
     names(df) <- names_ls
     df <- DataFrame(df)
@@ -33,15 +33,15 @@
 .importLoom_GRanges <-
     function(con, name, ls)
 {
+    name <- paste0(name, "/GRanges")
     ls <- h5ls(con)
     #gr <- lapply(names, function(x) {
     #    rhdf5::h5read(con, paste0(name, '/', x))
     #})
     gr <- rhdf5::h5read(con, name)
-    gr <- gr[[1]]
     gr <- as.data.frame(gr)
 
-    #gr['seqnames'] <- as.character(gr[['seqnames']])
+    gr['seqnames'] <- as.character(gr[['seqnames']])
     GRanges(gr)
 }
 
@@ -83,7 +83,9 @@
 #' @importMethodsFrom rtracklayer import
 #' @export
 setMethod("import", "loomFile",
-    function(con, ..., rownames_attr = NULL, colnames_attr = NULL)
+    function(con, ...,
+             type = c("SingleCellLoomExperiment", "SummarizedLoomExperiment", "RangedLoomExperiment"),
+             rownames_attr = NULL, colnames_attr = NULL)
 {
     con <- path(con)
     stopifnot(file.exists(con))
@@ -100,6 +102,8 @@ setMethod("import", "loomFile",
         is.null(colnames_attr) || colnames_attr %in% colColnames
     )
 
+    metadata <- rhdf5::h5readAttributes(con, "/")
+
     assay <- .importLoom_matrix(con, "/matrix")
     layerNames <- ls[ls$group == "/layers", "name", drop = TRUE]
     layers <- lapply(setNames(layerNames, layerNames), function(layer) {
@@ -107,6 +111,9 @@ setMethod("import", "loomFile",
         .importLoom_matrix(con, layer)
     })
     assays <- c(list(matrix = assay), layers)
+
+    #is_rangedloomexperiment <- meta['LoomExperiment-class']
+    #is_singlecellloomexperiment <- meta['LoomExperiment-class']
 
     is_rangedloomexperiment <- nrow(ls[grep('GRanges', ls$name),]) > 0
     is_singlecellloomexperiment <- nrow(ls[ls$name == "reducedDims",]) > 0
@@ -190,28 +197,33 @@ setMethod("import", "loomFile",
         col_graphs <- LoomGraphs(col_graphs) # as(col_graphs, "LoomGraphs")
     }
 
-    browser()
-
-    if (is_singlecellloomexperiment) {
-        le <- SingleCellLoomExperiment(assays, rowData = rowData, colData = colData,
-                                       reducedDims = reducedDims,
-                                       rowGraphs = row_graphs, colGraphs = col_graphs)
-#        if (is.null(int_colData))
-#            int_colData <- DataFrame(matrix(0, nrow(le), 0))
-#        le@int_colData <- int_colData
-#        if (is.null(int_elementMetadata))
-#            int_elementMetadata <- DataFrame(matrix(0, nrow(le), 0))
-#        le@int_elementMetadata <- int_elementMetadata
-    } else if (is_rangedloomexperiment) {
-        if (length(rowData) == 1)
-            rowData <- rowData[[1]]
-        le <- RangedLoomExperiment(assays, rowData = rowData, colData = colData,
-                             rowGraphs = row_graphs, colGraphs = col_graphs)
-    } else {
-        le <- SummarizedLoomExperiment(assays, rowData = rowData, colData = colData,
-                             rowGraphs = row_graphs, colGraphs = col_graphs)
+    if (!missing(type)) { ## check if LoomExperiment class is specified
+        type <- match.arg(type)
+        le <- do.call(type, list(assays=assays, rowData=rowData, colData=colData,
+                           rowGraphs=row_graphs, colGraphs=col_graphs))
+        if (is_singlecellloomexperiment) {
+            reducedDims(le) <- reducedDims
+        }
+    } else { ## discover
+        if (is_singlecellloomexperiment) {
+            le <- SingleCellLoomExperiment(assays, rowData = rowData, colData = colData,
+                                           reducedDims = reducedDims,
+                                           rowGraphs = row_graphs, colGraphs = col_graphs)
+#           if (is.null(int_colData))
+#                int_colData <- DataFrame(matrix(0, nrow(le), 0))
+#           le@int_colData <- int_colData
+#           if (is.null(int_elementMetadata))
+#                int_elementMetadata <- DataFrame(matrix(0, nrow(le), 0))
+#           le@int_elementMetadata <- int_elementMetadata
+        } else if (is_rangedloomexperiment) {
+            le <- RangedLoomExperiment(assays, rowData = rowData, colData = colData,
+                                 rowGraphs = row_graphs, colGraphs = col_graphs)
+        } else {
+            le <- SummarizedLoomExperiment(assays, rowData = rowData, colData = colData,
+                                 rowGraphs = row_graphs, colGraphs = col_graphs)
+        }
     }
-    metadata(le) <- rhdf5::h5readAttributes(con, "/")
+    metadata(le) <- metadata
     le
 })
 

@@ -15,12 +15,7 @@ setClass("RangedLoomExperiment",
 ### Validity.
 ###
 
-.valid.RangedLoomExperiment <- function(x)
-{
-    NULL
-}
-
-setValidity2("RangedLoomExperiment", .valid.RangedLoomExperiment)
+setValidity2("RangedLoomExperiment", .valid.LoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

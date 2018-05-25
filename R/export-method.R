@@ -65,7 +65,9 @@ setMethod(".exportLoom", "GenomicRanges",
     function(object, con, name, rowname_attr)
 {
     object <- as.data.frame(object)
-    names <- paste0("GRanges_", colnames(object))
+    name <- paste0(name, "/GRanges")
+    rhdf5::h5createGroup(con, name)
+    names <- colnames(object)
     colnames(object) <- names
     .exportLoom(object, con, name, rowname_attr)
 })
@@ -159,8 +161,10 @@ setMethod(".exportLoom", "LoomGraphs",
 
     h5f <- H5Fopen(con) 
     tryCatch({
-        rhdf5::h5writeAttribute(paste("LoomExperiment-", as.character(
+        rhdf5::h5writeAttribute(paste0("LoomExperiment-", as.character(
             packageVersion("LoomExperiment"))), name="CreatedWith", h5obj=h5f)
+        rhdf5::h5writeAttribute(class(object), name="LoomExperiment-class",
+            h5obj=h5f)
         Map(rhdf5::h5writeAttribute, metadata(object),
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
     }, error = function(err) {

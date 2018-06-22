@@ -1,80 +1,104 @@
-browser()
 
 l1_f <- system.file(
     package="LoomExperiment", "extdata", "L1_DRG_20_example.loom"
 )
 
-rle_f <- system.file(
-    package="LoomExperiment", "extdata", "rle_example.loom"
-)
+sle_f <- tempfile(fileext=".loom")
+rle_empty_f <- tempfile(fileext=".loom")
+rle_some_f <- tempfile(fileext=".loom")
+rle_full_f <- tempfile(fileext=".loom")
+scle_f <- tempfile(fileext=".loom")
 
-sle_f <- system.file(
-    package="LoomExperiment", "extdata", "sle_example.loom"
-)
+file_list <- list(sle_f, rle_empty_f, rle_some_f, rle_full_f, scle_f)
 
-scle_f <- system.file(
-    package="LoomExperiment", "extdata", "scle_example.loom"
-)
+assay <- List(matrix=matrix(seq_len(120), 20))
 
-examples(SummarizedExperiment, echo=FALSE)
-examples(SingleCellExperiment, echo=FALSE)
+lg <- LoomGraph(a=c(1, 2, 3), b=c(3, 2, 1), w=c(4, 5, 6))
+lgs <- LoomGraphs(PAM=lg, KAM=lg)
 
-se <- as(rse, "SummarizedExperiment")
-sce2 <- as(se, "SummarizedLoomExperiment")
-rle2 <- as(rse, "RangedLoomExperiment")
-scle2 <- as(scle, "SingleCellLoomExperiment")
+granges_one <- GRanges("chr1", IRanges(1, 1))
+granges <- rep(granges_one, 20)
+grangeslist_empty <- GRangesList(lapply(seq_len(20), function(x) GRanges()))
+grangeslist_some <- grangeslist_empty
+grangeslist_some[seq(from=4, to=20, by=4)] <- GRangesList(granges)
+grangeslist_some[seq(from=3, to=20, by=4)] <- GRangesList(granges_one)
+grangeslist_full <- GRangesList(lapply(seq_len(20), function(x) granges))
 
-################################################################################
-context("import method works")
-################################################################################
+reducedDims_value <- matrix(seq_len(24), 6)
+reducedDims <- List(KNN=reducedDims_value, MKNN=reducedDims_value)
 
-test_that("Import", {
-    rle <- import(rle_f)
-    expect_equal(dim(rle), dim(rle2))
-    expect_equal(assays(rle)[[1]], assays(rle2)[[1]])
-    expect_equal(rowData(rle)[[1]], rowData(rle2)[[1]])
-    expect_equal(colData(rle), colData(rle2))
-    expect_equal(rowRanges(rle), rowRanges(rle2))
+sle <- SummarizedLoomExperiment(assays=assay, colGraphs=lgs, rowGraphs=lgs)
+rle_empty <- RangedLoomExperiment(assays=assay, rowRanges=grangeslist_empty, colGraphs=lgs, rowGraphs=lgs)
+rle_some <- RangedLoomExperiment(assays=assay, rowRanges=grangeslist_some, colGraphs=lgs, rowGraphs=lgs)
+rle_full <- RangedLoomExperiment(assays=assay, rowRanges=grangeslist_full, colGraphs=lgs, rowGraphs=lgs)
+scle <- SingleCellLoomExperiment(assays=assay, rowRanges=granges, reducedDims=reducedDims, colGraphs=lgs, rowGraphs=lgs)
 
-    sle <- import(sle_f)
-    expect_equal(dim(sle), dim(sle2))
-    expect_equal(assays(sle)[[1]], assays(sle2)[[1]])
-    expect_equal(rowData(sle)[[1]], rowData(sle2)[[1]])
-    expect_equal(colData(sle), colData(sle2))
-
-    scle <- import(scle_f)
-    expect_equal(dim(scle), dim(scle2))
-    expect_equal(assays(scle)[[1]], assays(scle2)[[1]])
-    expect_equal(rowData(scle)[[1]], rowData(scle2)[[1]])
-    expect_equal(colData(scle), colData(scle2))
-    expect_equal(rowRanges(scle), rowRanges(scle2))
-    expect_equal(reducedDims(scle), reducedDims(scle2))
-    expect_equal(scle@int_colData, scle2@int_colData)
-    expect_equal(scle@int_elementMetadata, scle2@int_elementMetadata)
-    expect_equal(scle@int_metadata, scle2@int_metadata)
-    
-    l1 <- import(l1_f)
-    expect_equal(nrow(l1), 282)
-})
+experiment_list <- list(sle, rle_empty, rle_some, rle_full, scle)
 
 ################################################################################
 context("export method works")
 ################################################################################
 
+.test_export <- function(experiment, file) {
+    export(experiment, file)
+
+    ls <- h5ls(file)
+
+#    expect_true(nrow(ls_rle[ls_rle$group %in% "/row_attrs/GRanges",]) > 0)
+#    expect_true(nrow(ls_scle[ls_scle$group %in% "/row_attrs/GRangesList",]) > 0)
+}
+
 test_that("export", {
-    sle <- tempfile(fileext=".h5")
-    rle <- tempfile(fileext=".h5")
-    scle <- tempfile(fileext=".h5")
+    Map(.test_export, experiment_list, file_list)
+})
 
-    export(sle2, sle)
-    export(rle2, rle)
-    export(scle2, scle)
+################################################################################
+context("import method works")
+################################################################################
 
-    ls_sle <- h5ls(sle)
-    ls_rle <- h5ls(rle)
-    ls_scle <- h5ls(scle)
+test_that("import", {
+    rle2 <- import(rle_empty_f)
+    expect_equal(dim(rle_empty), dim(rle2))
+    rle_m <- as.matrix(assays(rle2)[[1]])
+    colnames(rle_m) <- NULL
+    expect_equal(rle_m, assays(rle_empty)[[1]])
+    expect_equal(rowData(rle_empty), rowData(rle2))
+    expect_equivalent(colData(rle_empty), colData(rle2))
+    expect_equal(rowRanges(rle_empty), rowRanges(rle2))
 
-    expect_true(nrow(ls_rle[ls_rle$group %in% "/row_attrs/GRanges",]) > 0)
-    expect_true(nrow(ls_scle[ls_scle$group %in% "/row_attrs/GRangesList",]) > 0)
+    rle2_some <- import(rle_some_f)
+    expect_equal(rowRanges(rle_some), rowRanges(rle2_some))
+
+    rle2_full <- import(rle_full_f)
+    expect_equal(rowRanges(rle_full), rowRanges(rle2_full))
+
+    sle2 <- import(sle_f)
+    expect_equal(dim(sle), dim(sle2))
+    sle_m <- as.matrix(assays(sle2)[[1]])
+    #colnames(sle_m) <- NULL
+    expect_equal(sle_m, as.matrix(assays(sle2)[[1]]))
+    expect_equivalent(rowData(sle), rowData(sle2))
+    expect_equivalent(colData(sle), colData(sle2))
+
+    scle2 <- import(scle_f)
+    expect_equal(dim(scle), dim(scle2))
+    scle_m <- as.matrix(assays(sle2)[[1]])
+    rownames(scle_m) <- NULL
+    expect_equal(scle_m, as.matrix(assays(scle2)[[1]]))
+#    expect_equivalent(rowData(scle), rowData(scle2))
+    expect_equivalent(colData(scle), colData(scle2))
+    expect_equal(rowRanges(scle), rowRanges(scle2))
+    rd_scle <- lapply(reducedDims(scle), function(rd) {
+        rownames(rd) <- seq_len(nrow(rd))
+        rd
+    })
+    rd_scle <- List(rd_scle)
+    expect_equal(rd_scle, reducedDims(scle2))
+    expect_equal(scle@int_colData, scle2@int_colData)
+    expect_equal(scle@int_elementMetadata, scle2@int_elementMetadata)
+    expect_equal(scle@int_metadata, scle2@int_metadata)
+    
+    l1 <- import(l1_f, type="SingleCellLoomExperiment")
+    expect_equal(nrow(l1), 20)
 })
 

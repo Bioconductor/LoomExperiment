@@ -72,6 +72,10 @@ setMethod(".exportLoom", "GenomicRanges",
     .exportLoom(object, con, name, rowname_attr)
 })
 
+.get_empty_GRangesList_value <- function(type) {
+    switch(type, "character" = '', "numeric" = 0, "integer" = 0, "double" = 0, '')
+}
+
 setMethod(".exportLoom", "GenomicRangesList",
     function(object, con, name, rowname_attr)
 {
@@ -96,15 +100,26 @@ setMethod(".exportLoom", "GenomicRangesList",
     df['rownames'] <- rownames
 
     names <- colnames(df)
-    names <- names[!names %in% c("group", "group_names")]
+    names <- names[!names %in% c("group")]
     
+    na_types <- vapply(df, class, character(1))
+    names(na_types) <- names
+
     dfs <- lapply(names, function(i) {
         val <- lapply(seq_len(num), function(idx) {
+            na <- .get_empty_GRangesList_value(na_types[[i]])
             if(!idx %in% df$group)
-                rep(0, max)
+                rep_len(na, max)
             else {
-                temp <- df[df$group==idx, i]
-                temp[seq_len(max)]
+                temp <- df[df$group==idx,i]
+                if(all(is.na(temp))) 
+                    rep_len(na, max) 
+                else {
+                    temp <- rep_len(temp, max)
+                    if(is(temp, "factor"))
+                        temp <- as(temp, "character")
+                    temp
+                }
             }
         })
         do.call(rbind, val)

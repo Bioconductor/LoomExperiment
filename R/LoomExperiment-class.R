@@ -23,7 +23,7 @@ setClass("LoomExperiment",
 
 .valid.LoomExperiment <- function(x)
 {
-       
+    NULL
 }
 
 setValidity2("LoomExperiment", .valid.LoomExperiment)
@@ -43,7 +43,9 @@ setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
 
 .replace.colGraphs <- function(x, ..., value)
 {
-    BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
+    x <- BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
+    validObject(x)
+    x
 }
 
 #' @export
@@ -59,7 +61,9 @@ setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
 
 .replace.rowGraphs <- function(x, ..., value)
 {
-    BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
+    x <- BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
+    validObject(x)
+    x
 }
 
 #' @export

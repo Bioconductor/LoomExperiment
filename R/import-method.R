@@ -42,6 +42,9 @@
     gr <- as.data.frame(gr)
 
     gr['seqnames'] <- as.character(gr[['seqnames']])
+    gr['rownames'] <- as.character(gr[['rownames']])
+    gr <- subset(gr, select = -c(rownames))
+
     GRanges(gr)
 }
 
@@ -64,13 +67,13 @@
             offset <- offset + 1
             GRanges(NULL)
         } else {
-            temp <- lapply(grl, `[`, idx+offset, seq_len(len))
+            temp <- lapply(grl, `[`, seq_len(len), idx+offset)
             offset <- offset + len
-            res <- do.call(rbind, temp)
-            res <- t(res)
-            colnames(res) <- names(grl)
-            rownames(res) <- res[['rownames']]
-            res <- subset(res, select = -c(rownames))
+            res <- do.call(cbind.data.frame, temp)
+            #res <- t(res)
+            #colnames(res) <- names(grl)
+            rownames(res) <- as.character(res[['rownames']])
+            res <- subset(res, select = -c(rownames, group_name))
             GRanges(res)
         }
     })
@@ -125,7 +128,6 @@ setMethod("import", "loomFile",
             rowData <- .importLoom_GRangesList(con, "/row_attrs", ls)
         else
             rowData <- .importLoom_GRanges(con, "/row_attrs", ls)
-            
     } else {
         rowData <- .importLoom_DataFrame(con, "/row_attrs", rownames_attr)
     }
@@ -183,7 +185,7 @@ setMethod("import", "loomFile",
             LoomGraph(h5read(con, x))
         })
 
-        row_graphs <- LoomGraphs(row_graphs) # as(row_graphs, "LoomGraphs")
+        row_graphs <- do.call("LoomGraphs", row_graphs)
     }
 
     if (length(col_graphs) > 0) {
@@ -194,7 +196,7 @@ setMethod("import", "loomFile",
             LoomGraph(h5read(con, x))
         })
 
-        col_graphs <- LoomGraphs(col_graphs) # as(col_graphs, "LoomGraphs")
+        col_graphs <- do.call("LoomGraphs", col_graphs)
     }
 
     if (!missing(type)) { ## check if LoomExperiment class is specified

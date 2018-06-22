@@ -12,8 +12,8 @@ test_that("LoomGraph constructor work", {
     ## not between two and three columns
     expect_error(LoomGraph(a=c(1, 2, 3), b=c(5, 4, 3), w=c(5, 4, 3), h=c(5, 4, 3)))
 
-    df <- DataFrame(a=c(1, 2, 3), b=(1, 2, 3), w=c(1, 2, 3))
-    lg <- LoomGraph(a=c(1, 2, 3), b=(1, 2, 3), w=c(1, 2, 3))
+    df <- DataFrame(a=c(1, 2, 3), b=c(1, 2, 3), w=c(1, 2, 3))
+    lg <- LoomGraph(a=c(1, 2, 3), b=c(1, 2, 3), w=c(1, 2, 3))
     lg2 <- LoomGraph(df)
 
     expect_equal(df, as(lg, "DataFrame"))
@@ -22,7 +22,7 @@ test_that("LoomGraph constructor work", {
 
 test_that("LoomGraph methods work", {
     lg <- LoomGraph(a=c(1, 2, 3, 4), b=c(4, 2, 1, 3), w=c(4, 5, 6, 7))
-    lg_new <- LoomGraph(a=c(3), b=c(1), w=c(7))
+    lg_new <- LoomGraph(a=c(3), b=c(1), w=c(6))
     
     expect_equal(lg[c(1, 3)], lg_new)
 })

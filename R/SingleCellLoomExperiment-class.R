@@ -16,7 +16,7 @@ setClass("SingleCellLoomExperiment",
 ### Validity.
 ###
 
-setValidity2("SingleCellLoomExperiment", .valid.LoomExperiment)
+setValidity2("SingleCellLoomExperiment", .valid.Experiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,13 +32,12 @@ setValidity2("SingleCellLoomExperiment", .valid.LoomExperiment)
 SingleCellLoomExperiment <-
     function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
-    te <- list(...)[[1]]
-    if (is(te, "SummarizedExperiment"))
-        .new_SingleCellLoomExperiment(te, colGraphs=colGraphs, rowGraphs=rowGraphs)
-    else {
+    te <- list(...)
+    if (length(te) > 0 && is(te[[1]], "SingleCellExperiment"))
+        sce <- te[[1]]
+    else
         sce <- SingleCellExperiment(...)
-        .new_SingleCellLoomExperiment(sce, colGraphs=colGraphs, rowGraphs=rowGraphs)
-    }
+    .new_SingleCellLoomExperiment(sce, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
 

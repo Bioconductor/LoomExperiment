@@ -58,8 +58,8 @@ setValidity2("LoomGraph", .valid.LoomGraph)
     new("LoomGraph", df)
 }
 
-.new_LoomGraphs <- function(sl) {
-    new("LoomGraphs", sl)
+.new_LoomGraphs <- function(li) {
+    new("LoomGraphs", listData = li)
 }
 
 #' @export
@@ -70,8 +70,9 @@ LoomGraph <- function(...) {
 
 #' @export
 LoomGraphs <- function(...) {
-    sl <- SimpleList(...)
-    .new_LoomGraphs(sl)
+    #sl <- SimpleList(...)
+    list <- list(...)
+    .new_LoomGraphs(list)
 }
 
 

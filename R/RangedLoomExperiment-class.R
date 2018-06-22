@@ -15,7 +15,7 @@ setClass("RangedLoomExperiment",
 ### Validity.
 ###
 
-setValidity2("RangedLoomExperiment", .valid.LoomExperiment)
+setValidity2("RangedLoomExperiment", .valid.Experiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,15 +31,15 @@ setValidity2("RangedLoomExperiment", .valid.LoomExperiment)
 RangedLoomExperiment <-
     function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
-    te <- list(...)[[1]]
-    if (is(te, "SummarizedExperiment"))
-        .new_RangedLoomExperiment(te, colGraphs=colGraphs, rowGraphs=rowGraphs)
-    else {    
+    te <- list(...)
+    if(length(te) > 0 && is(te[[1]], "SummarizedExperiment"))
+        rse <- te[[1]]
+    else {
         rse <- SummarizedExperiment(...)
         if(!is(rse, "RangedSummarizedExperiment"))
             rse <- as(rse, "RangedSummarizedExperiment")
-        .new_RangedLoomExperiment(rse, colGraphs=colGraphs, rowGraphs=rowGraphs)
     }
+    .new_RangedLoomExperiment(rse, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
 

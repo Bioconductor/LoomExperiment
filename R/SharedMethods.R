@@ -1,23 +1,27 @@
 
 ## Miscellanious methods
 
-.valid.LoomExperiment <- function(x)
+.valid.Experiment <- function(x)
 {
     clgs <- colGraphs(x)
     rlgs <- rowGraphs(x)
-    cols <- seq_len(dims(x)[[2]])
-    rows <- seq_len(dims(x)[[1]])
+    cols <- c(0, seq_len(dim(x)[[2]]))
+    rows <- c(0, seq_len(dim(x)[[1]]))
     ## Check that no "a" or "b" columns in LoomGraphs lie outside of dimensions.
-    txt <- "All LoomGraph objects in LoomExperiment reference a row in the LoomExperiment"
-    for (lg in clgs) {
-        if(!all(lg$a %in% rows & lg$b %in% rows))
+    col_test <- lapply(clgs, function(lg) {
+        txt <- "All LoomGraph objects in LoomExperiment must reference a column in the LoomExperiment"
+        test <- lg$a %in% cols & lg$b %in% cols
+        if ((length(test) == 0 || !all(test)) && length(lg$a) > 0)
             return(txt)
-    }
-    for (lg in rlgs) {
-        if(!all(lg$a %in% cols & lg$b %in% cols))
+    })
+    row_test <- lapply(rlgs, function(lg) {
+        txt <- "All LoomGraph objects in LoomExperiment must reference a row in the LoomExperiment"
+        test <- lg$a %in% rows & lg$b %in% rows
+        if ((length(test) == 0 || !all(test)) && length(lg$a) > 0)
             return(txt)
-    }
-    NULL
+    })
+    res <- list(col_test, row_test)
+    unlist(res)
 }
 
 .subset.LoomExperiment <- function(x, i, j, ...)
@@ -25,7 +29,7 @@
     if (!missing(i))
         rowGraphs(x) <- endoapply(rowGraphs(x), function(y) y[i,])
     if (!missing(j))
-        colGraphs(x) <- endoapply(colGraphs(x), function(y) y[i,])
+        colGraphs(x) <- endoapply(colGraphs(x), function(y) y[,j])
     callNextMethod()
 }
 

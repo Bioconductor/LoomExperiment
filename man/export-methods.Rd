@@ -15,8 +15,6 @@
 \usage{
 \S4method{export}{LoomExperiment,LoomFile,ANY}(object, con,
     matrix=assayNames(object)[1], rownames_attr="rownames", colnames_attr="colnames")
-#export(object, con, matrix=assayNames(object)[1], rownames_attr="rownames",
-#       colnames_attr="colnames")
 }
 
 \arguments{

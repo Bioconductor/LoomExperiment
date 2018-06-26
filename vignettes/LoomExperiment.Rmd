@@ -19,26 +19,20 @@ knitr::opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
 
 ## Definition
 
-The `LoomExperiment` family of classes inherits from the virtual class `LoomExperiment`
-as well as the Experiment class that they are named after. For example, the `SingleCellLoomExperiment`
-class inheirts from both `LoomExperiment` and `SingleCellExperiment`.
+The `LoomExperiment` family of classes inherits from the virtual class `LoomExperiment` as well as the Experiment class that they are named after. For example, the `SingleCellLoomExperiment` class inheirts from both `LoomExperiment` and `SingleCellExperiment`.
 
-The purpose of the `LoomExperiment` class is to act as an intermediary between Biocondcutor's
-Experiment classes and the Linnarson Lab's Loom File Format (http://linnarssonlab.org/loompy/index.html).
-The Loom File Format uses HDF5 to store Experiment data.
+The purpose of the `LoomExperiment` class is to act as an intermediary between Biocondcutor's Experiment classes and the Linnarson Lab's Loom File Format (http://linnarssonlab.org/loompy/index.html).  The Loom File Format uses HDF5 to store Experiment data.
 
 The `LoomExperiment` class contains the following slots.
 
 * `colGraphs`
 * `rowGraphs`
 
-Both of these slots are `LoomGraphs` obects that describe the `col_graph` and `row_graph` attributes
-as specified by the Loom File Format.
+Both of these slots are `LoomGraphs` obects that describe the `col_graph` and `row_graph` attributes as specified by the Loom File Format.
 
 ## Create instances of LoomExperiment
 
-There are several  ways to create instances of a `LoomExperiment` class of object.
-One can plug an exisiting Experiment obect into the appropriate constructor:
+There are several  ways to create instances of a `LoomExperiment` class of object.  One can plug an exisiting Experiment obect into the appropriate constructor:
 
 ```{r construct1}
 library(LoomExperiment)
@@ -47,8 +41,7 @@ sce <- SingleCellExperiment(assays = list(counts = counts))
 scle <- SingleCellLoomExperiment(sce)
 ```
 
-One can also simply plug the the arguments into the appropriate constructor, since all
-`LoomExperiment` constructors call the applicable class's constructor
+One can also simply plug the the arguments into the appropriate constructor, since all `LoomExperiment` constructors call the applicable class's constructor
 
 ```{r construct2}
 scle <- SingleCellLoomExperiment(assays = list(counts = counts))
@@ -61,7 +54,7 @@ scle <- as(sce, "SingleCellLoomExperiment")
 scle
 ```
 
-Finally, one can create a `LoomExperiment` object from import a Loom File.
+Finally, one can create a `LoomExperiment` object from importing a Loom File.
 
 ## Setting up a simple example
 
@@ -69,12 +62,92 @@ We will use the following `SingleCellLoomExperiment` for the remainder of the pa
 
 ```{r load_l1}
 l1_file <- system.file("extdata", "L1_DRG_20_example.loom", package = "LoomExperiment")
-scle <- import(l1_file)
+scle <- import(l1_file, type="SingleCellLoomExperiment")
 scle
 ```
 
-# Available methods for the `LoomExperiment`
+All the following methods apply to all `LoomExperiment` classes.
 
+# The `LoomGraph` class
+
+The `colGraphs` and `rowGraphs` slots correspond to the `col_graphs` and `row_graphs` in the Loom File format.  Both of these slots require `LoomGraphs` objects.
+
+A `LoomGraph` object extends the `S4Vectors::DataFrame` object with the requirements that a `LoomGraph` object must:
+
+* Have 2 or 3 columns named either `c('a','b')` or `c('a','b','w')`
+* Contents must all be of class `numeric`
+* All columns are of equal length
+* Have col/row numbers corresponding to entries in the `LoomExperiment` object (if attached to a `LoomExperiment` object)
+
+The columns `a` and `b` correspond to either `row` or `col` indices in the `LoomExperiment` object while `w` is an optional column that specifies that weight.
+
+A LoomGraph can be constructed in three ways:
+
+```{r construct_LoomGraph}
+a <- c(1, 2, 3)
+b <- c(3, 2, 1)
+w <- c(100, 10, 1)
+df <- DataFrame(a, b, w)
+lg <- LoomGraph(df)
+
+## OR
+
+lg <- as(df, "LoomGraph")
+
+## OR
+
+lg <- LoomGraph(a, b, w)
+lg
+```
+
+`LoomGraph` objects can be subset by the 'row'/'col' indices.  If, for an entry in a `LoomGraph`, either the `a` or `b` index is not present in the subsetting operation, this row will not appear in the final object.
+
+```{r subset_LoomGraph}
+lg[c(1, 2)]
+lg[-c(2)]
+```
+
+# The `LoomGraphs` class
+
+A `LoomGraphs` object extends the `S4Vectors:SimpleList` object.  It contains multiple `LoomGraph` objects with its only requirment being that it must contain `LoomGraph` objects.
+
+It can be created simply by using `LoomGraph` objects in the `LoomGraphs` constructor
+
+```{r construct_LoomGraphs}
+lgs <- LoomGraphs(lg, lg)
+lgs
+```
+
+`LoomGraphs` objects can be subsetted in a manner similar to `LoomGraph` objects.  The difference is that the subsetting will be passed to all `LoomGraph` objects contained in the `LoomGraphs` object.
+
+```{r subset_LoomGraphs}
+lgs[c(1, 2)]
+```
+
+# Available methods for the `LoomExperiment` 
+
+The `LoomGraphs` assigned to these `colGraphs` and `rowGraphs` slots can be obtained by their eponymous methods:
+
+```{r get_col_row_graphs}
+colGraphs(scle)
+rowGraphs(scle)
+```
+
+The same symbols can also be used to replace the respective `LoomGraphs`
+
+```{r replace_LoomGraphs}
+colGraphs(scle) <- lgs
+rowGraphs(scle) <- lgs
+
+colGraphs(scle)
+rowGraphs(scle)
+```
+
+`LoomExperiment` objects can be subsetting in such a way that the `assays`, `colGraphs`, and `rowGraphs` will all be subsetted.  `assays` will will be subsetted as any `matrix` would.  The `i` element in the subsetting operation will subset the `rowGraphs` slot and the `j` element in the subsetting operation will subset the `colGraphs` slot, as we've seen from the subsetting method from `LoomGraphs`.
+
+```{r subset_LoomExperiment}
+lgs[c(1, 2), c(1, 3)]
+```
 
 # Session Info
 

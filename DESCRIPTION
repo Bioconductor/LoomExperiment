@@ -18,7 +18,9 @@ Imports: BiocGenerics,
          DelayedArray,
          GenomicRanges,
          HDF5Array,
-         plyr
+         plyr,
+         stats,
+         utils
 Suggests: testthat,
           BiocStyle,
           knitr
@@ -36,5 +38,5 @@ Collate: AllGenerics.R
          import-method.R
 License: Artistic-2.0
 VignetteBuilder: knitr
-BiocViews: DataRepresntation, DataImport, Intrastructure, SingleCell
+biocViews: DataRepresentation, DataImport, Infrastructure, SingleCell
 RoxygenNote: 6.0.1

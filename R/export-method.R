@@ -150,6 +150,12 @@ setMethod(".exportLoom", "LoomGraphs",
     Map(.exportLoom, object, name = name, MoreArgs = list(con = con))
 })
 
+#' @importFrom S4Vectors metadata
+#' @importFrom methods is
+#' @importFrom rhdf5 H5Fclose H5Fopen
+#' @importFrom rtracklayer path
+#' @importFrom stats setNames
+#' @importFrom utils packageVersion
 .exportLoom.LoomExperiment <-
         function(object, con,
              matrix = assayNames(object)[1],
@@ -252,6 +258,6 @@ setMethod(".exportLoom", "LoomGraphs",
 #' @importFrom rhdf5 h5createGroup
 #' @importFrom rtracklayer export
 #' @export
-setMethod("export", signature=c("LoomExperiment", "loomFile", "ANY"),
+setMethod("export", signature=c("LoomExperiment", "LoomFile", "ANY"),
     .exportLoom.LoomExperiment)
 

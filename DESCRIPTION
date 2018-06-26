@@ -8,14 +8,17 @@ Encoding: UTF-8
 Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.5.0),
+         S4Vectors,
          SingleCellExperiment,
          SummarizedExperiment,
          methods,
          rhdf5,
          rtracklayer
-Imports: DelayedArray,
+Imports: BiocGenerics,
+         DelayedArray,
          GenomicRanges,
          HDF5Array,
+         plyr
 Suggests: testthat,
           BiocStyle,
           knitr

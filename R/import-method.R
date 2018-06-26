@@ -6,6 +6,7 @@
     t(HDF5Array::HDF5Array(con, name))
 }
 
+#' @importFrom S4Vectors DataFrame SimpleList
 #' @importFrom rhdf5 h5read
 .importLoom_DataFrame <-
     function(con, name, rowname)
@@ -85,7 +86,7 @@
 #' @importFrom rtracklayer import
 #' @importMethodsFrom rtracklayer import
 #' @export
-setMethod("import", "loomFile",
+setMethod("import", "LoomFile",
     function(con, ...,
              type = c("SingleCellLoomExperiment", "SummarizedLoomExperiment", "RangedLoomExperiment"),
              rownames_attr = NULL, colnames_attr = NULL)

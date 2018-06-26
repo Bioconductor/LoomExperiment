@@ -14,12 +14,14 @@
 \alias{SingleCellLoomExperiment-class}
 
 % Accessors
+\alias{colGraphs}
+\alias{rowGraphs}
+\alias{colGraphs<-}
+\alias{rowGraphs<-}
 \alias{colGraphs,LoomExperiment-method}
 \alias{rowGraphs,LoomExperiment-method}
 \alias{colGraphs<-,LoomExperiment-method}
 \alias{rowGraphs<-,LoomExperiment-method}
-\alias{colGraphs<-,LoomExperiment,LoomGraphs-method}
-\alias{rowGraphs<-,LoomExperiment,LoomGraphs-method}
 
 % Subsetting
 \alias{[,SummarizedLoomExperiment-method}
@@ -51,16 +53,16 @@
 
 ## Constructor
 
-SummarizedLoomExperiment(...)
-RangedLoomExperiment(...)
-SingleCellLoomExperiment(...)
+SummarizedLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
+RangedLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
+SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
 
 ## Accessors
 
-colGraphs(x, ...)
-colGraphs(x, ...) <- value
-rowGraphs(x, ...)
-rowGraphs(x, ...) <- value
+\S4method{colGraphs}{LoomExperiment}(x, ...)
+\S4method{colGraphs}{LoomExperiment}(x, ...) <- value
+\S4method{rowGraphs}{LoomExperiment}(x, ...)
+\S4method{rowGraphs}{LoomExperiment}(x, ...) <- value
 
 ## Subsetting
 
@@ -73,12 +75,26 @@ rowGraphs(x, ...) <- value
 
   \item{x}{A LoomExperiment object}
 
-  \item{...}{
-    For constructors, \code{...} will be passed on to the respective Experiment constructor.
+  \item{colGraphs,rowGraphs}{
+    LoomGraphs to be placed in either the colGraphs or rowGraphs slot respectively
   }
 
   \item{value}{
     For \code{colGraphs<-} and \code{rowGraphs<-}, \code{value} will be the replacement to the slot.
+  }
+
+  \item{...}{
+    For constructors, \code{...} will be passed on to the respective Experiment constructor.
+  }
+
+  \item{i,j}{
+    Indices specifying elements to subset LoomGraph by
+  }
+
+  \item{drop}{
+    For matrices and arrays.  If 'TRUE' the result is coerced to the lowest 
+    posible dimesnion.  This only woeks for extracting elements, not for the 
+    replacement.
   }
 
 }

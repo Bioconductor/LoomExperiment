@@ -67,8 +67,8 @@ Finally, one can create a `LoomExperiment` object from import a Loom File.
 
 We will use the following `SingleCellLoomExperiment` for the remainder of the package.
 
-```{r fluidigm}
-l1_file <- system.file("extdata", "L1_abrev.loom", package = "LoomExperiment")
+```{r load_l1}
+l1_file <- system.file("extdata", "L1_DRG_20_example.loom", package = "LoomExperiment")
 scle <- import(l1_file)
 scle
 ```

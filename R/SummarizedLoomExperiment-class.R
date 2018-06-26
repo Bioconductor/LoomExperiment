@@ -30,6 +30,7 @@ setValidity2("SummarizedLoomExperiment", .valid.Experiment)
 }
 
 #' @export
+#' @importFrom methods as
 SummarizedLoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
     te <- list(...)

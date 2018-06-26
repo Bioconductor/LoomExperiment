@@ -21,6 +21,7 @@ setClass("LoomGraphs",
 ### Vaidity
 ###
 
+#' @importFrom S4Vectors isEmpty
 .valid.LoomGraph <- function(x) {
     if (isEmpty(x))
         return(NULL)
@@ -54,6 +55,7 @@ setValidity2("LoomGraph", .valid.LoomGraph)
 ### Constructors
 ###
 
+#' @importFrom methods new
 .new_LoomGraph <- function(df) {
     new("LoomGraph", df)
 }
@@ -88,8 +90,8 @@ setMethod("[", c("LoomGraph", "ANY", "missing"),
     subset(x, x[["a"]] %in% ii & x[["b"]] %in% ii)   
 })
 
-#' importFrom plyr mapvalues
 #' @export
+#' @importFrom plyr mapvalues
 setReplaceMethod("[", c("LoomGraph", "ANY", "missing", "numeric"),
     function(x, i, j, ..., value)          
 {

@@ -24,6 +24,7 @@
     unlist(res)
 }
 
+#' @importFrom S4Vectors endoapply
 .subset.LoomExperiment <- function(x, i, j, ...)
 {
     if (!missing(i))

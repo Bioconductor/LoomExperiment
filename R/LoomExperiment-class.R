@@ -41,6 +41,7 @@ setValidity2("LoomExperiment", .valid.LoomExperiment)
 #' @export
 setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
 
+#' @importFrom methods validObject callNextMethod
 .replace.colGraphs <- function(x, ..., value)
 {
     x <- BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)

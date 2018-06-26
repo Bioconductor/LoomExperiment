@@ -1,6 +1,8 @@
 \name{LoomGraph}
 \alias{LoomGraph}
 \alias{LoomGraph-class}
+\alias{[,LoomGraph,ANY,missing,ANY-method}
+\alias{[<-,LoomGraph,ANY,missing,numeric-method}
 
 \docType{class}
 
@@ -9,10 +11,28 @@
 
 \usage{
 LoomGraph(...)
+
+## Subsetting
+
+\S4method{[}{LoomGraph,ANY,missing,ANY}(x, i, j, ..., drop=TRUE)
+\S4method{[}{LoomGraph,ANY,missing,numeric}(x, i, j, ...) <- value
 }
 
 \arguments{
-    \item{...}{Arguments to pass to the \code{DataFrame} constructor.}
+
+  \item{x}{A LoomGraph object}
+
+  \item{i, j}{Indices specifying elements to subset LoomGraph by}
+
+  \item{...}{Arguments to pass to the \code{DataFrame} constructor.}
+
+  \item{drop}{
+    For matrices and arrays.  If 'TRUE' the result is coerced to the lowest
+    posible dimesnion.  This only woeks for extracting elements, not for the
+    replacement.
+  }
+
+  \item{value}{A \code{LoomGraph} to replace the selected entry}
 }
 
 \value{
@@ -20,7 +40,7 @@ A LoomGraph object is returned from the constructor.
 }
 
 \details{
-The LoomGraph class extends the \linkS4class{DataFrame} class.
+The LoomGraph class extends the code{\link[S4Vectors:DataFrame-class]{DataFrame}} class.
 It is meant to store graph information and was created to be used in conjunction with the \code{LoomExperiment} class.
 Its purpose is to store multiple \code{col_graph} or \code{row_graph} as specified by the \code{loom} file format.
 A LoomGraph object must contain two or three columns labeled \code{a}, \code{b}, and \code{w}.
@@ -39,7 +59,7 @@ Daniel Van Twisk
 }
 
 \examples{
-lg1 <- LoomGraph(a=c(1, 2, 3), b=(3, 2, 1), w=c(4, 7, 8))
+lg1 <- LoomGraph(a=c(1, 2, 3), b=c(3, 2, 1), w=c(4, 7, 8))
 lg1
 }
 

@@ -1,5 +1,6 @@
 setClass("LoomFile", contains="RTLFile")
 
+#' @export
 #' @importFrom S4Vectors isSingleString
 LoomFile <- function(path)
 {

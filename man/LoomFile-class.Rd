@@ -27,9 +27,8 @@
 
 \description{
   A \code{LoomFile} object is the base class for classes representing
-  files accessible with rtracklayer. It wraps a resource (either a path,
-  URL or connection). We can represent a list of \code{LoomFile} objects
-  with a \code{LoomFileList}.
+  files accessible with \code{rtracklayer}. It wraps a resource (either a path,
+  URL or connection).
 }
 
 \section{Accessor Methods}{

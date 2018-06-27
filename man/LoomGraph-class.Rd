@@ -51,15 +51,28 @@ All values in a LoomGraph must be \code{numeric}.
 
 \seealso{
 \code{\link{LoomExperiment}},
-\code{\link{LoomGraphs}}
+\code{\link{LoomGraphs}},
+\code{\link[S4Vectors:DataFrame]{DataFrame}}
+}
+
+\examples{
+## Construction
+a <- c(1, 2, 3)
+b <- c(3, 2, 1)
+w <- c(100, 10, 1)
+df <- DataFrame(a, b, w)
+lg <- LoomGraph(df)
+# OR
+lg <- as(df, "LoomGraph")
+# OR
+lg <- LoomGraph(a, b, w)
+lg
+
+## Subsetting
+lg[c(1, 2)]
+lg[-c(2)]
 }
 
 \author{
 Daniel Van Twisk
 }
-
-\examples{
-lg1 <- LoomGraph(a=c(1, 2, 3), b=c(3, 2, 1), w=c(4, 7, 8))
-lg1
-}
-

@@ -43,10 +43,8 @@
 
 \description{
 
-    The LoomExperiment family of classes is used as a bridge between Bioconductor's Experiment classes
-    and the Linnarson Lab's Loom file format.
-    The family of LoomExperiment classes all inherit from the virtual class LoomExperiment as well as their
-    respectively named parent classes.
+    The LoomExperiment family of classes is used as a bridge between Bioconductor's "Experiment" classes and the Linnarson Lab's Loom file format.
+    The family of LoomExperiment classes all inherit from the virtual class LoomExperiment as well as their respectively named parent classes.
 }
 
 \usage{
@@ -80,7 +78,7 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
   }
 
   \item{value}{
-    For \code{colGraphs<-} and \code{rowGraphs<-}, \code{value} will be the replacement to the slot.
+    For \code{colGraphs<-} and \code{rowGraphs<-}, \code{value} will be the replacement to the slot
   }
 
   \item{...}{
@@ -97,6 +95,10 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
     replacement.
   }
 
+}
+
+\value{
+  An object of class \code{LoomExperiment}
 }
 
 \details{
@@ -116,6 +118,44 @@ The \code{colGraphs} and \code{rowGraphs} slot stores a \code{LoomGraphs} object
 \code{\link{SummarizedExperiment}},
 \code{\link{RangedSummarizedExperiment}},
 \code{\link{SingleCellExperiment}}
+}
+
+\examples{
+
+## Construction
+counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+sce <- SingleCellExperiment(assays = list(counts = counts))
+scle <- SingleCellLoomExperiment(sce)
+# OR
+scle <- SingleCellLoomExperiment(assays = list(counts = counts))
+# OR
+scle <- as(sce, "SingleCellLoomExperiment")
+scle
+
+## Get and replace rowGraphs and colGraphs
+colGraphs(scle)
+rowGraphs(scle)
+
+a <- c(1, 2, 3)
+b <- c(3, 2, 1)
+w <- c(100, 10, 1)
+lg <- LoomGraph(a, b, w)
+lgs <- LoomGraphs(lg, lg)
+names(lgs) <- c('lg1', 'lg2')
+lgs
+
+colGraphs(scle) <- lgs
+rowGraphs(scle) <- lgs
+
+colGraphs(scle)
+rowGraphs(scle)
+colGraphs(scle)[[1]]
+rowGraphs(scle)[[1]]
+
+## Subsetting
+scle2 <- scle[c(1, 3), 1:2]
+colGraphs(scle2)[[1]]
+rowGraphs(scle2)[[1]]
 }
 
 \author{

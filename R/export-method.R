@@ -36,12 +36,6 @@ setMethod(".exportLoom", "data.frame",
         object[[rowname_attr]] <- rownames(object)
 
     is.factor <- vapply(object, is, logical(1), "factor")
-    #if (any(is.factor))
-        #warning(
-        #    "'.exportLoom()' coerced 'factor' column(s) to character:\n  ",
-        #    paste(sQuote(names(object)[is.factor]), collapse=", "),
-        #    call. = FALSE
-        #)
     object[is.factor] <- lapply(object[is.factor], as.character)
 
     names <- sprintf("/%s/%s", name, names(object))
@@ -217,18 +211,6 @@ setMethod(".exportLoom", "LoomGraphs",
         if (length(reducedDims(object)) == 0)
             reducedDims_names <- character(0)
         Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
-
-        #rhdf5::h5createGroup(con, "/row_attrs/int_colData")
-        #.exportLoom(object@int_colData, con, "row_attrs/int_colData", NULL)
-
-        #rhdf5::h5createGroup(con, "/row_attrs/int_elementMetadata")
-        #.exportLoom(object@int_elementMetadata, con, "row_attrs/int_elementMetadata", NULL)
-
-        #int_metadata_names <- "/row_attrs/int_metadata"
-        #rhdf5::h5createGroup(con, int_metadata_names)
-        #int_metadata_names <- paste0(int_metadata_names, '/', names(object@int_metadata))
-        #int_metadata <- lapply(object@int_metadata, as.character)
-        #Map(rhdf5::h5write, obj = int_metadata, name = int_metadata_names, MoreArgs = list(file = con))
     }
 
     .exportLoom(colData(object), con, "col_attrs", colnames_attr)
@@ -236,8 +218,6 @@ setMethod(".exportLoom", "LoomGraphs",
     if (is(object, "RangedSummarizedExperiment")) {
         rowRanges <- rowRanges(object)
         if (is(rowRanges, "GRangesList")) {
-#            GRangesList_lengths <- lengths(rowRanges)
-#            rowData <- cbind(rowData, GRangesList_lengths)
             .exportLoom(rowRanges, con, "row_attrs", rownames_attr)
         } else {
             .exportLoom(rowRanges, con, "row_attrs", rownames_attr)

@@ -28,17 +28,23 @@ Only \code{LoomGraph} obects may be stored in a LoomGraphs object.
 
 \seealso{
 \code{\link{LoomExperiment}},
-\code{\link{LoomGraph}}
-}
-
-\author{
-Daniel Van Twisk
+\code{\link{LoomGraph}},
+\code{\link[S4Vectors:SimpleList]{SimpleList}}
 }
 
 \examples{
+
+## Construction
 lg1 <- LoomGraph(a=c(1, 2, 3), b=c(3, 2, 1), w=c(4, 7, 8))
 lg2 <- LoomGraph(a=c(3, 3, 1), b=c(3, 1, 2))
 lgs <- LoomGraphs(lg1, lg2)
 lgs
+
+## Subsetting
+lgs[c(1, 2)]
+}
+
+\author{
+Daniel Van Twisk
 }
 

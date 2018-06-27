@@ -28,10 +28,21 @@
     file.  If it cannot be determined, the \code{LoomExperiment} type will default to
     \code{SingleCellLoomExperiment}.
   }
-  \item{rownames_attr}{A character indicating the row names}
-  \item{colnames_attr}{A character indicating the col names}
+  \item{rownames_attr}{A \code{character vector} indicating the row names}
+  \item{colnames_attr}{A \code{character vector} indicating the col names}
+}
+
+\value{
+  An object of class \code{LoomExperiment}
+}
+
+\examples{
+l1_file <- system.file("extdata", "L1_DRG_20_example.loom", package = "LoomExperiment")
+scle <- import(l1_file, type="SingleCellLoomExperiment")
+scle
 }
 
 \seealso{
-  \code{\linkS4class{LoomExperiment}}, \code{\linkS4class{LoomFile}}
+  \code{\linkS4class{LoomExperiment}},
+  \code{\linkS4class{LoomFile}},
 }

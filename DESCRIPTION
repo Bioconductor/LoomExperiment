@@ -1,8 +1,7 @@
 Package: LoomExperiment
 Title: LoomExperiment container
-Description: The LoomExperiment container extends the SummarizedExperiment
-    class.  It's purpose is to provide a means to easily provide a means to 
-    convert LoomExperiment files to loom files and vice versa.
+Description: The LoomExperiment class provide a means to easily convert
+    Bioconductor's "Experiment" classes to loom files and vice versa.
 Version: 0.99.0
 Encoding: UTF-8
 Author: Martin Morgan, Daniel Van Twisk

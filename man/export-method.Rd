@@ -25,6 +25,20 @@
   \item{colnames_attr}{A character indicating the col names}
 }
 
+\value{
+  An error code indiciating whether the operation was successful
+}
+
+\examples{
+
+counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+sce <- SingleCellExperiment(assays = list(counts = counts))
+scle <- SingleCellLoomExperiment(sce)
+tempfile <- tempfile(fileext=".loom")
+export(scle, tempfile)
+}
+
 \seealso{
-  \code{\linkS4class{LoomExperiment}}, \code{\linkS4class{LoomFile}}
+  \code{\linkS4class{LoomExperiment}},
+  \code{\linkS4class{LoomFile}},
 }

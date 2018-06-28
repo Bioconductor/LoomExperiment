@@ -28,8 +28,8 @@
     file.  If it cannot be determined, the \code{LoomExperiment} type will default to
     \code{SingleCellLoomExperiment}.
   }
-  \item{rownames_attr}{A \code{character vector} indicating the row names}
-  \item{colnames_attr}{A \code{character vector} indicating the col names}
+  \item{rownames_attr}{A \code{character vector} indicating the name of the \code{rowData} attribute to represent the names \code{rownames} in the \code{LoomExperiment} object.}
+  \item{colnames_attr}{A \code{character vector} indicating the name of the \code{colData} attribute to represent the names \code{colnames} in the \code{LoomExperiment} object.}
 }
 
 \value{

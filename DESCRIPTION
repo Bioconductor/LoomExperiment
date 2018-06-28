@@ -24,7 +24,6 @@ Suggests: testthat,
           BiocStyle,
           knitr
 Collate: AllGenerics.R
-         test_loom.R
          utils.R
          SharedMethods.R
          LoomGraph-class.R

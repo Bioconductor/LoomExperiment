@@ -4,15 +4,15 @@
 ###
 
 #' @export
-setClass("LoomGraph",
-    contains = "DataFrame"
+setClass('LoomGraph',
+    contains = 'DataFrame'
 )
 
 #' @export
-setClass("LoomGraphs",
-    contains = "SimpleList",
+setClass('LoomGraphs',
+    contains = 'SimpleList',
     prototype = prototype(
-        elementType = "LoomGraph"
+        elementType = 'LoomGraph'
     )
 )
 
@@ -25,30 +25,30 @@ setClass("LoomGraphs",
 .valid.LoomGraph <- function(x) {
     if (isEmpty(x))
         return(NULL)
-    numerals <- vapply(x, is.numeric, logical(1))
-    if (!all(numerals)) {
-        txt <- sprintf("\n A LoomGraph must only contain numeric elements")
+    integers <- vapply(x, is.numeric, logical(1))
+    if (!all(integers)) {
+        txt <- sprintf('\n A LoomGraph must only contain integer elements')
         return(txt)
     }
     cols <- colnames(x)
     if (length(cols) == 2) {
         if(!all(cols == c('a', 'b'))) {
-            txt <- sprintf("\n A LoomGraph with two columns must be named 'a' and 'b'")
+            txt <- sprintf('\n A LoomGraph with two columns must be named "a" and "b"')
             return(txt)
         }
     } else if (length(cols) == 3) {
         if(!all(cols == c('a', 'b', 'w'))) {
-            txt <- sprintf("\n A LoomGraph with three columns must be named 'a', 'b', and 'w'")
+            txt <- sprintf('\n A LoomGraph with three columns must be named "a", "b", and "w"')
             return(txt)
         }
     } else {
-        txt <- sprintf("\n A LoomGraph must have two or three columns")
+        txt <- sprintf('\n A LoomGraph must have two or three columns')
         return(txt)
     }
     NULL
 }
 
-setValidity2("LoomGraph", .valid.LoomGraph)
+setValidity2('LoomGraph', .valid.LoomGraph)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,11 +57,11 @@ setValidity2("LoomGraph", .valid.LoomGraph)
 
 #' @importFrom methods new
 .new_LoomGraph <- function(df) {
-    new("LoomGraph", df)
+    new('LoomGraph', df)
 }
 
 .new_LoomGraphs <- function(li) {
-    new("LoomGraphs", listData = li)
+    new('LoomGraphs', listData = li)
 }
 
 #' @export
@@ -83,16 +83,16 @@ LoomGraphs <- function(...) {
 ###
 
 #' @export
-setMethod("[", c("LoomGraph", "ANY", "missing"),
+setMethod('[', c('LoomGraph', 'ANY', 'missing'),
     function(x, i, j, ..., drop=TRUE)          
 {
     ii <- .convert_subset_index(i, rownames(x))
-    subset(x, x[["a"]] %in% ii & x[["b"]] %in% ii)   
+    subset(x, x[['a']] %in% ii & x[['b']] %in% ii)   
 })
 
 #' @export
 #' @importFrom plyr mapvalues
-setReplaceMethod("[", c("LoomGraph", "ANY", "missing", "numeric"),
+setReplaceMethod('[', c('LoomGraph', 'ANY', 'missing', 'numeric'),
     function(x, i, j, ..., value)          
 {
     ii <- .convert_subset_index(i, rownames(x))

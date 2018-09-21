@@ -12,8 +12,8 @@
     function(con, name, rowname)
 {
     ls <- h5ls(con)
-    names_ls <- ls[ls$group %in% name & ls$otype %in% "H5I_DATASET", "name"]
-    names <- paste0(name, "/", names_ls)
+    names_ls <- ls[ls$group %in% name & ls$otype %in% 'H5I_DATASET', 'name']
+    names <- paste0(name, '/', names_ls)
 
     df <- lapply(names, function(x) {
         rhdf5::h5read(con, x)
@@ -34,7 +34,7 @@
 .importLoom_GRanges <-
     function(con, name, ls)
 {
-    name <- paste0(name, "/GRanges")
+    name <- paste0(name, '/GRanges')
     ls <- h5ls(con)
     gr <- rhdf5::h5read(con, name)
     gr <- as.data.frame(gr)
@@ -69,6 +69,7 @@
             offset <- offset + len
             res <- do.call(cbind.data.frame, temp)
             rownames(res) <- as.character(res[['rownames']])
+            group_name <- NULL
             res <- subset(res, select = -c(rownames, group_name))
             GRanges(res)
         }
@@ -81,53 +82,53 @@
 #' @importFrom rtracklayer import
 #' @importMethodsFrom rtracklayer import
 #' @export
-setMethod("import", "LoomFile",
+setMethod('import', 'LoomFile',
     function(con, ...,
-             type = c("SingleCellLoomExperiment", "SummarizedLoomExperiment", "RangedLoomExperiment"),
+             type = c('SingleCellLoomExperiment', 'SummarizedLoomExperiment', 'RangedLoomExperiment'),
              rownames_attr = NULL, colnames_attr = NULL)
 {
     con <- path(con)
     stopifnot(file.exists(con))
 
     ls <- rhdf5::h5ls(con)
-    rowColnames <- ls[ls$group == "/row_attrs", "name", drop=TRUE]
-    colColnames <- ls[ls$group == "/col_attrs", "name", drop=TRUE]
-    if (missing(rownames_attr) && "rownames" %in% rowColnames)
-        rownames_attr <- "rownames"
-    if (missing(colnames_attr) && "colnames" %in% colColnames)
-        colnames_attr <- "colnames"
+    rowColnames <- ls[ls$group == '/row_attrs', 'name', drop=TRUE]
+    colColnames <- ls[ls$group == '/col_attrs', 'name', drop=TRUE]
+    if (missing(rownames_attr) && 'rownames' %in% rowColnames)
+        rownames_attr <- 'rownames'
+    if (missing(colnames_attr) && 'colnames' %in% colColnames)
+        colnames_attr <- 'colnames'
     stopifnot(
         is.null(rownames_attr) || rownames_attr %in% rowColnames,
         is.null(colnames_attr) || colnames_attr %in% colColnames
     )
 
-    metadata <- rhdf5::h5readAttributes(con, "/")
+    metadata <- rhdf5::h5readAttributes(con, '/')
 
-    assay <- .importLoom_matrix(con, "/matrix")
-    layerNames <- ls[ls$group == "/layers", "name", drop = TRUE]
+    assay <- .importLoom_matrix(con, '/matrix')
+    layerNames <- ls[ls$group == '/layers', 'name', drop = TRUE]
     layers <- lapply(setNames(layerNames, layerNames), function(layer) {
-        layer <- paste0("/layers/", layer)
+        layer <- paste0('/layers/', layer)
         .importLoom_matrix(con, layer)
     })
     assays <- c(list(matrix = assay), layers)
 
-    is_rangedloomexperiment <- nrow(ls[grep('GRanges', ls$name),]) > 0
-    is_singlecellloomexperiment <- nrow(ls[ls$name == "reducedDims",]) > 0
+    is_rangedloomexperiment <- any(grepl('GRanges', ls$name))
+    is_singlecellloomexperiment <- nrow(ls[ls$name == 'reducedDims',]) > 0
 
-    colData <- .importLoom_DataFrame(con, "/col_attrs", colnames_attr)
+    colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr)
 
     if (is_rangedloomexperiment) {
         if (nrow(ls[grep('GRangesList', ls$name),]) > 0)
-            rowData <- .importLoom_GRangesList(con, "/row_attrs", ls)
+            rowData <- .importLoom_GRangesList(con, '/row_attrs', ls)
         else
-            rowData <- .importLoom_GRanges(con, "/row_attrs", ls)
+            rowData <- .importLoom_GRanges(con, '/row_attrs', ls)
     } else {
-        rowData <- .importLoom_DataFrame(con, "/row_attrs", rownames_attr)
+        rowData <- .importLoom_DataFrame(con, '/row_attrs', rownames_attr)
     }
 
     if (is_singlecellloomexperiment) {
-        reducedDims_names <- "/col_attrs/reducedDims"
-        names <- ls[ls$group %in% reducedDims_names, "name", drop=TRUE]
+        reducedDims_names <- '/col_attrs/reducedDims'
+        names <- ls[ls$group %in% reducedDims_names, 'name', drop=TRUE]
 
         reducedDims <- lapply(paste0(reducedDims_names, '/', names), function(x) {
             as.matrix(.importLoom_matrix(con, x))
@@ -136,19 +137,19 @@ setMethod("import", "LoomFile",
         reducedDims <- SimpleList(reducedDims)
     }
 
-    row_graphs <- ls[ls$group == "/row_edges", "name", drop=TRUE]
+    row_graphs <- ls[ls$group == '/row_edges', 'name', drop=TRUE]
     if (length(row_graphs) > 0)
-        row_graphs_names <- "/row_edges/"
+        row_graphs_names <- '/row_edges/'
     else {
-        row_graphs <- ls[ls$group == "/row_graphs", "name", drop=TRUE]
-        row_graphs_names <- "/row_graphs/"
+        row_graphs <- ls[ls$group == '/row_graphs', 'name', drop=TRUE]
+        row_graphs_names <- '/row_graphs/'
     }
-    col_graphs <- ls[ls$group == "/col_edges", "name", drop=TRUE]
+    col_graphs <- ls[ls$group == '/col_edges', 'name', drop=TRUE]
     if (length(col_graphs) > 0)
-        col_graphs_names <- "/col_edges/"
+        col_graphs_names <- '/col_edges/'
     else {
-        col_graphs <- ls[ls$group == "/col_graphs", "name", drop=TRUE]
-        col_graphs_names <- "/col_graphs/"
+        col_graphs <- ls[ls$group == '/col_graphs', 'name', drop=TRUE]
+        col_graphs_names <- '/col_graphs/'
     }
 
     if (length(row_graphs) == 0)
@@ -164,7 +165,7 @@ setMethod("import", "LoomFile",
             LoomGraph(h5read(con, x))
         })
 
-        row_graphs <- do.call("LoomGraphs", row_graphs)
+        row_graphs <- do.call('LoomGraphs', row_graphs)
     }
 
     if (length(col_graphs) > 0) {
@@ -175,7 +176,7 @@ setMethod("import", "LoomFile",
             LoomGraph(h5read(con, x))
         })
 
-        col_graphs <- do.call("LoomGraphs", col_graphs)
+        col_graphs <- do.call('LoomGraphs', col_graphs)
     }
 
     if (!missing(type)) { ## check if LoomExperiment class is specified

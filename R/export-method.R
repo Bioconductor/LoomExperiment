@@ -1,6 +1,6 @@
 
 #' @importFrom rhdf5 h5write
-setMethod(".exportLoom", "matrix",
+setMethod('.exportLoom', 'matrix',
     function(object, con, name)
 {
     object <- t(object)
@@ -14,14 +14,14 @@ setMethod(".exportLoom", "matrix",
 
 #' @importFrom DelayedArray DelayedArray
 #' @importFrom HDF5Array writeHDF5Array
-setMethod(".exportLoom", "DelayedArray",
+setMethod('.exportLoom', 'DelayedArray',
     function(object, con, name)
 {
     HDF5Array::writeHDF5Array(t(object), con, name)
     0L
 })
 
-setMethod(".exportLoom", "vector",
+setMethod('.exportLoom', 'vector',
     function(object, con, name, rowname_attr)
 {
     object <- as.matrix(object)
@@ -29,16 +29,16 @@ setMethod(".exportLoom", "vector",
 })
 
 #' @importFrom rhdf5 h5write
-setMethod(".exportLoom", "data.frame",
+setMethod('.exportLoom', 'data.frame',
     function(object, con, name, rowname_attr)
 {
     if (!is.null(rowname_attr))
         object[[rowname_attr]] <- rownames(object)
 
-    is.factor <- vapply(object, is, logical(1), "factor")
+    is.factor <- vapply(object, is, logical(1), 'factor')
     object[is.factor] <- lapply(object[is.factor], as.character)
 
-    names <- sprintf("/%s/%s", name, names(object))
+    names <- sprintf('/%s/%s', name, names(object))
     tryCatch({
         Map(rhdf5::h5write, object, names, MoreArgs = list(file = con))
     }, error = function(err) {
@@ -47,7 +47,7 @@ setMethod(".exportLoom", "data.frame",
     })
 })
 
-setMethod(".exportLoom", "DataFrame",
+setMethod('.exportLoom', 'DataFrame',
     function(object, con, name, rowname_attr)
 {
     object <- as.data.frame(object)
@@ -55,11 +55,11 @@ setMethod(".exportLoom", "DataFrame",
 })
 
 #' @import GenomicRanges
-setMethod(".exportLoom", "GenomicRanges",
+setMethod('.exportLoom', 'GenomicRanges',
     function(object, con, name, rowname_attr)
 {
     object <- as.data.frame(object)
-    name <- paste0(name, "/GRanges")
+    name <- paste0(name, '/GRanges')
     rhdf5::h5createGroup(con, name)
     names <- colnames(object)
     colnames(object) <- names
@@ -67,10 +67,10 @@ setMethod(".exportLoom", "GenomicRanges",
 })
 
 .get_empty_GRangesList_value <- function(type) {
-    switch(type, "character" = '', "numeric" = 0, "integer" = 0, "double" = 0, '')
+    switch(type, 'character' = '', 'numeric' = 0, 'integer' = 0, 'double' = 0, '')
 }
 
-setMethod(".exportLoom", "GenomicRangesList",
+setMethod('.exportLoom', 'GenomicRangesList',
     function(object, con, name, rowname_attr)
 {
     lengths <- lengths(object)
@@ -82,11 +82,11 @@ setMethod(".exportLoom", "GenomicRangesList",
     if(is.null(names))
         names <- rep('', length(object))
 
-    name <- paste0(name, "/GRangesList")
+    name <- paste0(name, '/GRangesList')
     rhdf5::h5createGroup(con, name)
 
-    .exportLoom(lengths, con, paste0(name, "/lengths"), rowname_attr)
-    .exportLoom(names, con, paste0(name, "/names"), rowname_attr)
+    .exportLoom(lengths, con, paste0(name, '/lengths'), rowname_attr)
+    .exportLoom(names, con, paste0(name, '/names'), rowname_attr)
 
     rownames <- unlist(lapply(object, function(x) rownames(as.data.frame(x))))
 
@@ -94,7 +94,7 @@ setMethod(".exportLoom", "GenomicRangesList",
     df['rownames'] <- rownames
 
     names <- colnames(df)
-    names <- names[!names %in% c("group")]
+    names <- names[!names %in% c('group')]
     
     na_types <- vapply(df, class, character(1))
     names(na_types) <- names
@@ -110,8 +110,8 @@ setMethod(".exportLoom", "GenomicRangesList",
                     rep_len(na, max) 
                 else {
                     temp <- rep_len(temp, max)
-                    if(is(temp, "factor"))
-                        temp <- as(temp, "character")
+                    if(is(temp, 'factor'))
+                        temp <- as(temp, 'character')
                     temp
                 }
             }
@@ -123,7 +123,7 @@ setMethod(".exportLoom", "GenomicRangesList",
     Map(.exportLoom, dfs, name = df_names, MoreArgs = list(con = con))
 })
 
-setMethod(".exportLoom", "LoomGraph", 
+setMethod('.exportLoom', 'LoomGraph', 
     function(object, con, name)
 {
     rhdf5::h5createGroup(con, name)
@@ -136,7 +136,7 @@ setMethod(".exportLoom", "LoomGraph",
     })
 })
 
-setMethod(".exportLoom", "LoomGraphs", 
+setMethod('.exportLoom', 'LoomGraphs', 
     function(object, con, name)
 {
     rhdf5::h5createGroup(con, name)
@@ -153,7 +153,7 @@ setMethod(".exportLoom", "LoomGraphs",
 .exportLoom.LoomExperiment <-
         function(object, con,
              matrix = assayNames(object)[1],
-             rownames_attr = "rownames", colnames_attr = "colnames")
+             rownames_attr = 'rownames', colnames_attr = 'colnames')
 {
     con <- path(con)
 
@@ -168,17 +168,17 @@ setMethod(".exportLoom", "LoomGraphs",
     )
     
     if (!is.null(rownames(object)) && rownames_attr %in% names(rowData(object)))
-        stop("'rownames_attr' must not be in names(rowData())")
+        stop('"rownames_attr" must not be in names(rowData())')
     if (!is.null(colnames(object)) && colnames_attr %in% names(colData(object)))
-        stop("'colnames_attr()' must not be in names(colData())")
+        stop('"colnames_attr" must not be in names(colData())')
 
     rhdf5::h5createFile(con)
 
     h5f <- H5Fopen(con) 
     tryCatch({
-        rhdf5::h5writeAttribute(paste0("LoomExperiment-", as.character(
-            packageVersion("LoomExperiment"))), name="CreatedWith", h5obj=h5f)
-        rhdf5::h5writeAttribute(class(object), name="LoomExperiment-class",
+        rhdf5::h5writeAttribute(paste0('LoomExperiment-', as.character(
+            packageVersion('LoomExperiment'))), name='CreatedWith', h5obj=h5f)
+        rhdf5::h5writeAttribute(class(object), name='LoomExperiment-class',
             h5obj=h5f)
         Map(rhdf5::h5writeAttribute, metadata(object),
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
@@ -187,25 +187,25 @@ setMethod(".exportLoom", "LoomGraphs",
     }, finally = H5Fclose(h5f))
 
     assays <- assays(object, withDimnames = FALSE)
-    layers <- setNames(paste0("/layers/", names(assays)), names(assays))
-    layers[matrix] <- "/matrix"
+    layers <- setNames(paste0('/layers/', names(assays)), names(assays))
+    layers[matrix] <- '/matrix'
 
     if (length(layers) > 1L)
-        rhdf5::h5createGroup(con, "/layers")
+        rhdf5::h5createGroup(con, '/layers')
     success <- unlist(Map(
         .exportLoom, assays, name = layers, MoreArgs = list(con = con)
     ))
     if (!all(success == 0L))
         stop(
-            "'.exportLoom()' failed to write assay(s)\n  ",
-            paste0(sQuote(names(layers)[success != 0]), collapse = ", ")
+            '".exportLoom()" failed to write assay(s)\n  ',
+            paste0(sQuote(names(layers)[success != 0]), collapse = ', ')
         )
 
-    rhdf5::h5createGroup(con, "/col_attrs")
-    rhdf5::h5createGroup(con, "/row_attrs")
+    rhdf5::h5createGroup(con, '/col_attrs')
+    rhdf5::h5createGroup(con, '/row_attrs')
 
-    if (is(object, "SingleCellLoomExperiment")) {
-        reducedDims_names <- "/col_attrs/reducedDims"
+    if (is(object, 'SingleCellLoomExperiment')) {
+        reducedDims_names <- '/col_attrs/reducedDims'
         rhdf5::h5createGroup(con, reducedDims_names)
         reducedDims_names <- paste0(reducedDims_names, '/', names(reducedDims(object)))
         if (length(reducedDims(object)) == 0)
@@ -213,24 +213,24 @@ setMethod(".exportLoom", "LoomGraphs",
         Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
     }
 
-    .exportLoom(colData(object), con, "col_attrs", colnames_attr)
+    .exportLoom(colData(object), con, 'col_attrs', colnames_attr)
     rowData <- rowData(object)
-    if (is(object, "RangedSummarizedExperiment")) {
+    if (is(object, 'RangedSummarizedExperiment')) {
         rowRanges <- rowRanges(object)
-        if (is(rowRanges, "GRangesList")) {
-            .exportLoom(rowRanges, con, "row_attrs", rownames_attr)
+        if (is(rowRanges, 'GRangesList')) {
+            .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
         } else {
-            .exportLoom(rowRanges, con, "row_attrs", rownames_attr)
+            .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
         }
     }
     else
-        .exportLoom(rowData, con, "row_attrs", rownames_attr)
+        .exportLoom(rowData, con, 'row_attrs', rownames_attr)
 
     if (length(colGraphs(object)) > 0)
-        .exportLoom(colGraphs(object), con, "col_graphs")
+        .exportLoom(colGraphs(object), con, 'col_graphs')
 
     if (length(rowGraphs(object)) > 0)
-        .exportLoom(rowGraphs(object), con, "row_graphs")
+        .exportLoom(rowGraphs(object), con, 'row_graphs')
 
     invisible(con)
 }
@@ -238,6 +238,6 @@ setMethod(".exportLoom", "LoomGraphs",
 #' @importFrom rhdf5 h5createGroup
 #' @importFrom rtracklayer export
 #' @export
-setMethod("export", signature=c("LoomExperiment", "LoomFile", "ANY"),
+setMethod('export', signature=c('LoomExperiment', 'LoomFile', 'ANY'),
     .exportLoom.LoomExperiment)
 

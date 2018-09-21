@@ -7,8 +7,8 @@
 #' @import SingleCellExperiment
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @export
-setClass("SingleCellLoomExperiment",
-    contains=c("SingleCellExperiment", "LoomExperiment")
+setClass('SingleCellLoomExperiment',
+    contains=c('SingleCellExperiment', 'LoomExperiment')
 )
 
 
@@ -16,7 +16,7 @@ setClass("SingleCellLoomExperiment",
 ### Validity.
 ###
 
-setValidity2("SingleCellLoomExperiment", .valid.Experiment)
+setValidity2('SingleCellLoomExperiment', .valid.Experiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,7 +25,7 @@ setValidity2("SingleCellLoomExperiment", .valid.Experiment)
 
 .new_SingleCellLoomExperiment <- function(sce, colGraphs, rowGraphs)
 {
-    new("SingleCellLoomExperiment", sce, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    new('SingleCellLoomExperiment', sce, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
 #' @export
@@ -33,7 +33,7 @@ SingleCellLoomExperiment <-
     function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
     te <- list(...)
-    if (length(te) > 0 && is(te[[1]], "SingleCellExperiment"))
+    if (length(te) > 0 && is(te[[1]], 'SingleCellExperiment'))
         sce <- te[[1]]
     else
         sce <- SingleCellExperiment(...)
@@ -52,7 +52,7 @@ SingleCellLoomExperiment <-
                                   rowGraphs=LoomGraphs())
 }
 
-setAs("SingleCellExperiment", "SingleCellLoomExperiment",
+setAs('SingleCellExperiment', 'SingleCellLoomExperiment',
     .from_SingleCellExperiment_to_SingleCellLoomExperiment
 )
 
@@ -62,8 +62,8 @@ setAs("SingleCellExperiment", "SingleCellLoomExperiment",
 ###
 
 #' @export
-setMethod("[", c("SingleCellLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
+setMethod('[', c('SingleCellLoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
 
 #' @export
-setMethod("show", "SingleCellLoomExperiment", .show.LoomExperiment)
+setMethod('show', 'SingleCellLoomExperiment', .show.LoomExperiment)
 

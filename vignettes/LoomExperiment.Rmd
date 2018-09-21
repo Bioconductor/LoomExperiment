@@ -32,7 +32,7 @@ Both of these slots are `LoomGraphs` objects that describe the `col_graph` and `
 
 ## Create instances of LoomExperiment
 
-There are several  ways to create instances of a `LoomExperiment` class of object.  One can plug an existing Experiment object into the appropriate constructor:
+There are several  ways to create instances of a `LoomExperiment` class of object.  One can plug an existing SummarizedExperiment type class into the appropriate constructor:
 
 ```{r construct1}
 library(LoomExperiment)
@@ -41,7 +41,7 @@ sce <- SingleCellExperiment(assays = list(counts = counts))
 scle <- SingleCellLoomExperiment(sce)
 ```
 
-One can also simply plug the the arguments into the appropriate constructor, since all `LoomExperiment` constructors call the applicable class's constructor
+One can also simply plug the arguments into the appropriate constructor, since all `LoomExperiment` constructors call the applicable class's constructor
 
 ```{r construct2}
 scle <- SingleCellLoomExperiment(assays = list(counts = counts))
@@ -58,7 +58,7 @@ Finally, one can create a `LoomExperiment` object from importing a Loom File.
 
 ## Setting up a simple example
 
-We will use the following `SingleCellLoomExperiment` for the remainder of the package.
+We will use the following `SingleCellLoomExperiment` for the remainder of the vignette.
 
 ```{r load_l1}
 l1_file <- system.file("extdata", "L1_DRG_20_example.loom", package = "LoomExperiment")
@@ -70,13 +70,12 @@ All the following methods apply to all `LoomExperiment` classes.
 
 # The `LoomGraph` class
 
-The `colGraphs` and `rowGraphs` slots correspond to the `col_graphs` and `row_graphs` in the Loom File format.  Both of these slots require `LoomGraphs` objects.
+The `colGraphs` and `rowGraphs` slots correspond to the `col_graphs` and `row_graphs` fields in the Loom File format.  Both of these slots require `LoomGraphs` objects.
 
-A `LoomGraph` object extends the `S4Vectors::DataFrame` object with the requirements that a `LoomGraph` object must:
+A `LoomGraph` class extends the `DataFrame` class from the `S4Vectors` package with the requirements that a `LoomGraph` object must:
 
 * Have 2 or 3 columns named either `c('a','b')` or `c('a','b','w')`
 * Contents must all be of class `numeric`
-* All columns are of equal length
 * Have col/row numbers corresponding to entries in the `LoomExperiment` object (if attached to a `LoomExperiment` object)
 
 The columns `a` and `b` correspond to either `row` or `col` indices in the `LoomExperiment` object while `w` is an optional column that specifies that weight.

@@ -8,11 +8,11 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @export
 
-setClass("LoomExperiment",
+setClass('LoomExperiment',
     representation(
-        "VIRTUAL",
-        colGraphs="LoomGraphs",
-        rowGraphs="LoomGraphs"
+        'VIRTUAL',
+        colGraphs='LoomGraphs',
+        rowGraphs='LoomGraphs'
     )
 )
 
@@ -26,7 +26,7 @@ setClass("LoomExperiment",
     NULL
 }
 
-setValidity2("LoomExperiment", .valid.LoomExperiment)
+setValidity2('LoomExperiment', .valid.LoomExperiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -39,7 +39,7 @@ setValidity2("LoomExperiment", .valid.LoomExperiment)
 }
 
 #' @export
-setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
+setMethod('colGraphs', 'LoomExperiment', .get.colGraphs)
 
 #' @importFrom methods validObject callNextMethod
 .replace.colGraphs <- function(x, ..., value)
@@ -50,7 +50,7 @@ setMethod("colGraphs", "LoomExperiment", .get.colGraphs)
 }
 
 #' @export
-setReplaceMethod("colGraphs", "LoomExperiment", .replace.colGraphs)
+setReplaceMethod('colGraphs', 'LoomExperiment', .replace.colGraphs)
 
 .get.rowGraphs <- function(x, ...)
 {
@@ -58,7 +58,7 @@ setReplaceMethod("colGraphs", "LoomExperiment", .replace.colGraphs)
 }
 
 #' @export
-setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
+setMethod('rowGraphs', 'LoomExperiment', .get.rowGraphs)
 
 .replace.rowGraphs <- function(x, ..., value)
 {
@@ -68,5 +68,5 @@ setMethod("rowGraphs", "LoomExperiment", .get.rowGraphs)
 }
 
 #' @export
-setReplaceMethod("rowGraphs", "LoomExperiment", .replace.rowGraphs)
+setReplaceMethod('rowGraphs', 'LoomExperiment', .replace.rowGraphs)
 

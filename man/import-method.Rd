@@ -9,7 +9,7 @@
 \title{Import LoomExperiment to loomFile}
 
 \description{
-    Imports a \code{LoomExperiment} to a \code{LoomFile}.
+    Imports a \code{LoomExperiment} from a \code{LoomFile}.
 }
 
 \usage{

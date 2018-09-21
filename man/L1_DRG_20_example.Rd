@@ -10,7 +10,7 @@ Lab.
 
 The original file was imported using \code{LoomExperiment} and truncated using
 the package's subsetting methods. The purpose of this truncation was to reduce
-the total size of the total size of the data as the file's purpose is simply to
+the total size of the data as the file's purpose is simply to
 demonstrate \code{LoomExperiment}'s functionality.
 
 The data set has dimensions of 20x20. The file contains 7 \code{rowData} and 103

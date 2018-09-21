@@ -5,25 +5,23 @@
 \docType{class}
 
 \title{LoomGraphs class}
-\description{A description of the LoomGraphs class for storing multiple LoomGraph objects.}
+\description{
+The LoomGraphs class extends the \code{\link[S4Vectors:SimpleList-class]{SimpleList}} class.
+It is meant to store multiple \code{LoomGraph} objects and was created to be used in conjunction with the \code{LoomExperiment} class.
+Its purpose is to store multiple \code{col_graph} or \code{row_graph} as specified by the \code{loom} file format.
+Only \code{LoomGraph} obects may be stored in a LoomGraphs object.
+}
 
 \usage{
 LoomGraphs(...)
 }
 
 \arguments{
-    \item{...}{Arguments to pass to the \code{\link[S4Vectors:SimpleList-class]{SimpleList}} constructor.}
+    \item{...}{\code{LoomGraph} objects.}
 }
 
 \value{
 A LoomGraphs object is returned from the constructor.
-}
-
-\details{
-The LoomGraphs class extends the \code{\link[S4Vectors:SimpleList-class]{SimpleList}} class.
-It is meant to store multiple \code{LoomGraph} objects and was created to be used in conjunction with the \code{LoomExperiment} class.
-Its purpose is to store multiple \code{col_graph} or \code{row_graph} as specified by the \code{loom} file format.
-Only \code{LoomGraph} obects may be stored in a LoomGraphs object.
 }
 
 \seealso{

@@ -7,8 +7,8 @@
 #' @import SummarizedExperiment
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @export
-setClass("SummarizedLoomExperiment",
-    contains=c("SummarizedExperiment", "LoomExperiment")
+setClass('SummarizedLoomExperiment',
+    contains=c('SummarizedExperiment', 'LoomExperiment')
 )
 
 
@@ -16,7 +16,7 @@ setClass("SummarizedLoomExperiment",
 ### Validity.
 ###
 
-setValidity2("SummarizedLoomExperiment", .valid.Experiment)
+setValidity2('SummarizedLoomExperiment', .valid.Experiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,7 +26,7 @@ setValidity2("SummarizedLoomExperiment", .valid.Experiment)
 .new_SummarizedLoomExperiment <-
     function(se, colGraphs, rowGraphs)
 {
-    new("SummarizedLoomExperiment", se, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    new('SummarizedLoomExperiment', se, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
 #' @export
@@ -34,12 +34,12 @@ setValidity2("SummarizedLoomExperiment", .valid.Experiment)
 SummarizedLoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
     te <- list(...)
-    if (length(te) > 0 && is(te[[1]], "SummarizedExperiment"))
+    if (length(te) > 0 && is(te[[1]], 'SummarizedExperiment'))
         se <- te[[1]]
     else {
         se <- SummarizedExperiment(...)
-        if(is(se, "RangedSummarizedExperiment"))
-            se <- as(se, "SummarizedExperiment")
+        if(is(se, 'RangedSummarizedExperiment'))
+            se <- as(se, 'SummarizedExperiment')
     }
     .new_SummarizedLoomExperiment(se, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
@@ -56,7 +56,7 @@ SummarizedLoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=Loom
                         colGraphs=LoomGraphs())
 }
 
-setAs("SummarizedExperiment", "SummarizedLoomExperiment",
+setAs('SummarizedExperiment', 'SummarizedLoomExperiment',
     .from_SummarizedExperiment_to_SummarizedLoomExperiment
 )
 
@@ -66,8 +66,8 @@ setAs("SummarizedExperiment", "SummarizedLoomExperiment",
 ###
 
 #' @export
-setMethod("[", c("SummarizedLoomExperiment", "ANY", "ANY"), .subset.LoomExperiment)
+setMethod('[', c('SummarizedLoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
 
 #' @export
-setMethod("show", "SummarizedLoomExperiment", .show.LoomExperiment)
+setMethod('show', 'SummarizedLoomExperiment', .show.LoomExperiment)
 

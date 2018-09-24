@@ -12,13 +12,6 @@ setClass('RangedLoomExperiment',
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Validity.
-###
-
-setValidity2('RangedLoomExperiment', .valid.Experiment)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor.
 ###
 
@@ -57,15 +50,4 @@ RangedLoomExperiment <-
 setAs('RangedSummarizedExperiment', 'RangedLoomExperiment',
     .from_RangedSummarizedExperiment_to_RangedLoomExperiment
 )
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Miscellenious methods.
-###
-
-#' @export
-setMethod('[', c('RangedLoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
-
-#' @export
-setMethod('show', 'RangedLoomExperiment', .show.LoomExperiment)
 

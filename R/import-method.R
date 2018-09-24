@@ -84,7 +84,7 @@
 #' @export
 setMethod('import', 'LoomFile',
     function(con, ...,
-             type = c('SingleCellLoomExperiment', 'SummarizedLoomExperiment', 'RangedLoomExperiment'),
+             type = c('SingleCellLoomExperiment', 'LoomExperiment', 'RangedLoomExperiment'),
              rownames_attr = NULL, colnames_attr = NULL)
 {
     con <- path(con)
@@ -195,7 +195,7 @@ setMethod('import', 'LoomFile',
             le <- RangedLoomExperiment(assays, rowData = rowData, colData = colData,
                                  rowGraphs = row_graphs, colGraphs = col_graphs)
         } else {
-            le <- SummarizedLoomExperiment(assays, rowData = rowData, colData = colData,
+            le <- LoomExperiment(assays, rowData = rowData, colData = colData,
                                  rowGraphs = row_graphs, colGraphs = col_graphs)
         }
     }

@@ -7,8 +7,8 @@ context("LoomExperiment: Constructors and Methods")
 
 ncells <- 100
 
-experiments <- c(RangedLoomExperiment, SingleCellLoomExperiment, SummarizedLoomExperiment)
-experiments_names <- c("RangedLoomExperiment", "SingleCellLoomExperiment", "SummarizedLoomExperiment")
+experiments <- c(RangedLoomExperiment, SingleCellLoomExperiment, LoomExperiment)
+experiments_names <- c("RangedLoomExperiment", "SingleCellLoomExperiment", "LoomExperiment")
 base_experiments_con <- c(SummarizedExperiment, SingleCellExperiment, SummarizedExperiment)
 base_experiments_class <- c("RangedSummarizedExperiment", "SingleCellExperiment", "SummarizedExperiment")
 

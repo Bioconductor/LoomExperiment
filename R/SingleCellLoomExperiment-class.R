@@ -8,15 +8,8 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @export
 setClass('SingleCellLoomExperiment',
-    contains=c('SingleCellExperiment', 'LoomExperiment')
+    contains=c('SingleCellExperiment', 'RangedLoomExperiment')
 )
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Validity.
-###
-
-setValidity2('SingleCellLoomExperiment', .valid.Experiment)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,15 +48,4 @@ SingleCellLoomExperiment <-
 setAs('SingleCellExperiment', 'SingleCellLoomExperiment',
     .from_SingleCellExperiment_to_SingleCellLoomExperiment
 )
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Miscellenious methods.
-###
-
-#' @export
-setMethod('[', c('SingleCellLoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
-
-#' @export
-setMethod('show', 'SingleCellLoomExperiment', .show.LoomExperiment)
 

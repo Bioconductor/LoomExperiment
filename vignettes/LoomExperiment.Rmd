@@ -19,11 +19,11 @@ knitr::opts_chunk$set(warning=FALSE, error=FALSE, message=FALSE)
 
 ## Definition
 
-The `LoomExperiment` family of classes inherits from the virtual class `LoomExperiment` as well as the Experiment class that they are named after. For example, the `SingleCellLoomExperiment` class inherits from both `LoomExperiment` and `SingleCellExperiment`.
+The `LoomExperiment` family of classes inherits from the main class `LoomExperiment` as well as the Experiment class that they are named after. For example, the `SingleCellLoomExperiment` class inherits from both `LoomExperiment` and `SingleCellExperiment`.
 
 The purpose of the `LoomExperiment` class is to act as an intermediary between Bioconductor's Experiment classes and the Linnarson Lab's Loom File Format (http://linnarssonlab.org/loompy/index.html).  The Loom File Format uses HDF5 to store Experiment data.
 
-The `LoomExperiment` class contains the following slots.
+The `LoomExperiment` family of classes contain the following slots.
 
 * `colGraphs`
 * `rowGraphs`

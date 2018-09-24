@@ -14,7 +14,7 @@
 
 \usage{
 \S4method{import}{LoomFile,ANY,ANY}(con, ...,
-    type = c("SingleCellLoomExperiment", "SummarizedLoomExperiment", "RangedLoomExperiment"),
+    type = c("SingleCellLoomExperiment", "LoomExperiment", "RangedLoomExperiment"),
     rownames_attr=NULL, colnames_attr=NULL)
 }
 
@@ -22,7 +22,7 @@
   \item{con}{A character indicating the loom file to be created. File must have the \code{.loom} extension.}
   \item{...}{Additional arguments}
   \item{type}{
-    Either "SingleCellLoomExperiment", "SummarizedLoomExperiment", or "RangedLoomExperiment".
+    Either "SingleCellLoomExperiment", "LoomExperiment", or "RangedLoomExperiment".
     This value decides what type of object that will be returned by \code{import}.  If left empty
     \code{import} will either determine what type of class should be used by the context of the
     file.  If it cannot be determined, the \code{LoomExperiment} type will default to

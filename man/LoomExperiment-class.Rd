@@ -6,8 +6,6 @@
 % Class
 \alias{LoomExperiment}
 \alias{LoomExperiment-class}
-\alias{SummarizedLoomExperiment}
-\alias{SummarizedLoomExperiment-class}
 \alias{RangedLoomExperiment}
 \alias{RangedLoomExperiment-class}
 \alias{SingleCellLoomExperiment}
@@ -24,34 +22,26 @@
 \alias{rowGraphs<-,LoomExperiment-method}
 
 % Subsetting
-\alias{[,SummarizedLoomExperiment-method}
-\alias{[,SummarizedLoomExperiment,ANY-method}
-\alias{[,SummarizedLoomExperiment,ANY,ANY,ANY-method}
-\alias{[,RangedLoomExperiment-method}
-\alias{[,RangedLoomExperiment,ANY-method}
-\alias{[,RangedLoomExperiment,ANY,ANY,ANY-method}
-\alias{[,SingleCellLoomExperiment-method}
-\alias{[,SingleCellLoomExperiment,ANY-method}
-\alias{[,SingleCellLoomExperiment,ANY,ANY,ANY-method}
+\alias{[,LoomExperiment-method}
+\alias{[,LoomExperiment,ANY-method}
+\alias{[,LoomExperiment,ANY,ANY,ANY-method}
 
 % Display
-\alias{show,SummarizedLoomExperiment-method}
-\alias{show,RangedLoomExperiment-method}
-\alias{show,SingleCellLoomExperiment-method}
+\alias{show,LoomExperiment-method}
 
-\title{LoomExperiment, SummarizedLoomExperiment, RangedLoomExperiment, and SingleCellLoomExperiment class}
+\title{LoomExperiment, RangedLoomExperiment, and SingleCellLoomExperiment classes}
 
 \description{
-
     The LoomExperiment family of classes is used as a bridge between Bioconductor's "Experiment" classes and the Linnarson Lab's Loom file format.
-    The family of LoomExperiment classes all inherit from the virtual class LoomExperiment as well as their respectively named parent classes.
+    The family of LoomExperiment classes all inherit from the class LoomExperiment as well as their respectively named parent classes.
+    The LoomExperiment class inheirts from \code{\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}.
 }
 
 \usage{
 
 ## Constructor
 
-SummarizedLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
+LoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
 RangedLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
 SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs())
 
@@ -64,9 +54,7 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
 
 ## Subsetting
 
-\S4method{[}{SummarizedLoomExperiment}(x, i, j, ..., drop=TRUE)
-\S4method{[}{RangedLoomExperiment}(x, i, j, ..., drop=TRUE)
-\S4method{[}{SingleCellLoomExperiment}(x, i, j, ..., drop=TRUE)
+\S4method{[}{LoomExperiment}(x, i, j, ..., drop=TRUE)
 }
 
 \arguments{

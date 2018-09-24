@@ -27,7 +27,7 @@ grangeslist_full <- GRangesList(lapply(seq_len(20), function(x) granges))
 reducedDims_value <- matrix(seq_len(24), 6)
 reducedDims <- List(KNN=reducedDims_value, MKNN=reducedDims_value)
 
-sle <- SummarizedLoomExperiment(assays=assay, colGraphs=lgs, rowGraphs=lgs)
+sle <- LoomExperiment(assays=assay, colGraphs=lgs, rowGraphs=lgs)
 rle_empty <- RangedLoomExperiment(assays=assay, rowRanges=grangeslist_empty, colGraphs=lgs, rowGraphs=lgs)
 rle_some <- RangedLoomExperiment(assays=assay, rowRanges=grangeslist_some, colGraphs=lgs, rowGraphs=lgs)
 rle_full <- RangedLoomExperiment(assays=assay, rowRanges=grangeslist_full, colGraphs=lgs, rowGraphs=lgs)

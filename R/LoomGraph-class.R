@@ -3,6 +3,7 @@
 ### -------------------------------------------------------------------------
 ###
 
+#' @importFrom S4Vectors SelfHits
 #' @export
 setClass('LoomGraph',
     contains = 'DataFrame'
@@ -72,7 +73,6 @@ LoomGraph <- function(...) {
 
 #' @export
 LoomGraphs <- function(...) {
-    #sl <- SimpleList(...)
     list <- list(...)
     .new_LoomGraphs(list)
 }

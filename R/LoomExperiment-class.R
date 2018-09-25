@@ -29,13 +29,13 @@ setClass('LoomExperiment',
     ## Check that no 'a' or 'b' columns in LoomGraphs lie outside of dimensions.
     col_test <- lapply(clgs, function(lg) {
         txt <- 'All LoomGraph objects in LoomExperiment must reference a column in the LoomExperiment'
-        test <- lg$a %in% cols & lg$b %in% cols
+        test <- from(lg) %in% cols & to(lg) %in% cols
         if ((length(test) == 0 || !all(test)) && length(lg$a) > 0)
             return(txt)
     })
     row_test <- lapply(rlgs, function(lg) {
         txt <- 'All LoomGraph objects in LoomExperiment must reference a row in the LoomExperiment'
-        test <- lg$a %in% rows & lg$b %in% rows
+        test <- from(lg) %in% rows & to(lg) %in% rows
         if ((length(test) == 0 || !all(test)) && length(lg$a) > 0)
             return(txt)
     })

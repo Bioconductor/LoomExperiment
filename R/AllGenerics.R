@@ -6,6 +6,8 @@ setGeneric('colGraphs<-', function(x, ..., value) standardGeneric('colGraphs<-')
 setGeneric('rowGraphs', function(x, ...) standardGeneric('rowGraphs'))
 setGeneric('rowGraphs<-', function(x, ..., value) standardGeneric('rowGraphs<-'))
 
+setGeneric('dropHits', function(x, i, ...) standardGeneric('dropHits'))
+
 setGeneric('import.LoomFile', function(con, ...) standardGeneric('import.LoomFile'))
 
 ## exportLoom

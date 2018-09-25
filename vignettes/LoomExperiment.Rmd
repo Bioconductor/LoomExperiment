@@ -87,15 +87,11 @@ a <- c(1, 2, 3)
 b <- c(3, 2, 1)
 w <- c(100, 10, 1)
 df <- DataFrame(a, b, w)
-lg <- LoomGraph(df)
-
-## OR
-
 lg <- as(df, "LoomGraph")
 
 ## OR
 
-lg <- LoomGraph(a, b, w)
+lg <- LoomGraph(a, b, nnode = max(a, b), weight = w)
 lg
 ```
 

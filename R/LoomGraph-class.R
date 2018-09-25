@@ -6,7 +6,7 @@
 #' @importFrom S4Vectors SelfHits
 #' @export
 setClass('LoomGraph',
-    contains = 'DataFrame'
+    contains = 'SelfHits'
 )
 
 #' @export
@@ -24,26 +24,23 @@ setClass('LoomGraphs',
 
 #' @importFrom S4Vectors isEmpty
 .valid.LoomGraph <- function(x) {
-    if (isEmpty(x))
-        return(NULL)
-    integers <- vapply(x, is.numeric, logical(1))
-    if (!all(integers)) {
-        txt <- sprintf('\n A LoomGraph must only contain integer elements')
+#    if (length(x) == 0)
+#        return(NULL)
+    mcol <- mcols(x)
+    if (!is.integer(c(from(x), to(x)))) {
+        txt <- sprintf('\n The nodes of a LoomGraph must be an integer')
         return(txt)
     }
-    cols <- colnames(x)
-    if (length(cols) == 2) {
-        if(!all(cols == c('a', 'b'))) {
-            txt <- sprintf('\n A LoomGraph with two columns must be named "a" and "b"')
-            return(txt)
-        }
-    } else if (length(cols) == 3) {
-        if(!all(cols == c('a', 'b', 'w'))) {
-            txt <- sprintf('\n A LoomGraph with three columns must be named "a", "b", and "w"')
-            return(txt)
-        }
-    } else {
-        txt <- sprintf('\n A LoomGraph must have two or three columns')
+    if (min(from(x), to(x)) < 0) {
+        txt <- sprintf('\n The nodes of a LoomGraph must be non-negative')
+        return(txt)
+    }
+    if (!is.null(mcol) && !all(names(mcol) == 'w')) {
+        txt <- sprintf('\n A LoomGraph may only have one mcol named "w"')
+        return(txt)
+    }
+    if (!is.null(w <- mcol$w) && !is.numeric(w)) {
+        txt <- sprintf('\n The "w" mcol of a LoomGraph must numeric ')
         return(txt)
     }
     NULL
@@ -66,9 +63,12 @@ setValidity2('LoomGraph', .valid.LoomGraph)
 }
 
 #' @export
-LoomGraph <- function(...) {
-    df <- DataFrame(...)
-    .new_LoomGraph(df)
+LoomGraph <- function(from, to, nnode=max(from, to), ..., weight=NULL) {
+    if (!is.numeric(c(from, to)))
+        stop('"from" and "to" arguments to LoomGraph constructor  must be numeric')
+    sh <- SelfHits(from=as.integer(from), to=as.integer(to), nnode=nnode, ...)
+    mcols(sh)$w <- weight
+    .new_LoomGraph(sh)
 }
 
 #' @export
@@ -79,28 +79,46 @@ LoomGraphs <- function(...) {
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Miscellanious methods
+### Coercion.
+###
+
+.from_DataFrame_to_LoomGraph <- function(from)
+{
+    nam <- names(from)
+    if (!all(nam %in% c('a', 'b', 'w')))
+        stop('columns of DataFrame must be named "a" and "b" or "a", "b", "w"')
+    a <- as.integer(from$a)
+    b <- as.integer(from$b)
+    lg <- LoomGraph(a, b, max(a,b))
+    if('w' %in% nam)
+        mcols(lg)$w <- as.numeric(from$w)
+    lg
+}
+
+setAs('DataFrame', 'LoomGraph', .from_DataFrame_to_LoomGraph)
+
+.from_LoomGraph_to_DataFrame <- function(from)
+{
+    a <- from(from)
+    b <- to(from)
+    if (is.null(w <- mcols(from)))
+        DataFrame(a=a, b=b)
+    else
+        DataFrame(a=a, b=b, w)
+}
+
+setAs('LoomGraph', 'DataFrame', .from_LoomGraph_to_DataFrame)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Miscellanious methods.
 ###
 
 #' @export
-setMethod('[', c('LoomGraph', 'ANY', 'missing'),
-    function(x, i, j, ..., drop=TRUE)          
+setMethod('dropHits', c('LoomGraph', 'ANY'),
+    function(x, i, ..., drop=TRUE)          
 {
     ii <- .convert_subset_index(i, rownames(x))
     subset(x, x[['a']] %in% ii & x[['b']] %in% ii)   
 })
 
-#' @export
-#' @importFrom plyr mapvalues
-setReplaceMethod('[', c('LoomGraph', 'ANY', 'missing', 'numeric'),
-    function(x, i, j, ..., value)          
-{
-    ii <- .convert_subset_index(i, rownames(x))
-
-    ld <- x@listData
-    res <- lapply(ld[c('a', 'b')], function(x){
-        mapvalues(x, ii, value)
-    })
-    ld[c('a', 'b')] <- res
-    x@listData <- ld
-})

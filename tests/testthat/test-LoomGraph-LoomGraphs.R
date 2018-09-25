@@ -3,18 +3,15 @@
 context("LoomGraph: Constructor and Methods")
 ################################################################################
 
-test_that("LoomGraph constructor work", {
+test_that("LoomGraph constructor works", {
     ## non-numeric arguments
     expect_error(LoomGraph(c('a', 'b', 'c'), c('a', 'b', 'c')))
-    ## cols not named "a", "b", "w"
-    expect_error(LoomGraph(c(1, 2, 3), c(3, 2, 1)))
-    expect_error(LoomGraph(c(1, 2, 3), c(3, 2, 1), weight=c(4, 5, 6)))
     ## not between two and three columns
-    expect_error(LoomGraph(a=c(1, 2, 3), b=c(5, 4, 3), weight=c(5, 4, 3), h=c(5, 4, 3)))
+    expect_error(LoomGraph(c(1L, 2L, 3L), c(5L, 4L, 3L), weight=c(5, 4, 3), h=c(5, 4, 3)))
 
-    df <- DataFrame(c(1, 2, 3), c(1, 2, 3), weight=c(1, 2, 3))
+    df <- DataFrame(a=c(1, 2, 3), b=c(1, 2, 3), w=c(1, 2, 3))
     lg <- LoomGraph(c(1, 2, 3), c(1, 2, 3), weight=c(1, 2, 3))
-    lg2 <- LoomGraph(df)
+    lg2 <- as(df, "LoomGraph")
 
     expect_equal(df, as(lg, "DataFrame"))
     expect_equal(df, as(lg2, "DataFrame"))
@@ -24,7 +21,7 @@ test_that("LoomGraph methods work", {
     lg <- LoomGraph(c(1, 2, 3, 4), c(4, 2, 1, 3), weight=c(4, 5, 6, 7))
     lg_new <- LoomGraph(c(3), c(1), weight=c(6))
     
-    expect_equal(lg[c(1, 3)], lg_new)
+    expect_equivalent(lg[c(3)], lg_new)
 })
 
 ################################################################################

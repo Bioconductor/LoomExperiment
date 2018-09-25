@@ -54,6 +54,14 @@ setMethod('.exportLoom', 'DataFrame',
     .exportLoom(object, con, name, rowname_attr)
 })
 
+#setMethod('.exportLoom', 'LoomGraph',
+#    function(object, con, name, rowname_attr)
+#{
+#    browser()
+#    object <- as(object, "DataFrame")
+#    .exportLoom(object, con, name, rowname_attr)
+#})
+
 #' @import GenomicRanges
 setMethod('.exportLoom', 'GenomicRanges',
     function(object, con, name, rowname_attr)
@@ -127,6 +135,7 @@ setMethod('.exportLoom', 'LoomGraph',
     function(object, con, name)
 {
     rhdf5::h5createGroup(con, name)
+    object <- as(object, "DataFrame")
     name <- paste0(name, '/', colnames(object))
     tryCatch({
         Map(rhdf5::h5write, object, name, MoreArgs = list(file = con))

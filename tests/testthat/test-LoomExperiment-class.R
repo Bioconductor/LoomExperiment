@@ -20,20 +20,18 @@ rd <- DataFrame(stuff=runif(nrow(v)))
 cd <- DataFrame(whee=runif(ncells))
 sce <- SingleCellExperiment(u, rowData=rd, colData=cd)
 
-rgs <- LoomGraphs(PPN=LoomGraph(DataFrame(a=c(1, 2, 3), b=c(2, 1, 3))),
-                  KNN=LoomGraph(DataFrame(a=c(3, 2, 1), b=c(3, 1, 2))))
-cgs <- LoomGraphs(PPN=LoomGraph(DataFrame(a=c(1, 2, 3), b=c(1, 2, 3))),
-                  KNN=LoomGraph(DataFrame(a=c(3, 2, 1), b=c(3, 1, 2))))
+rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(2, 1, 3)),
+                  KNN=LoomGraph(c(3, 2, 1), c(3, 1, 2)))
+cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(1, 2, 3)),
+                  KNN=LoomGraph(c(3, 2, 1), c(3, 1, 2)))
 
-new_rgs <- LoomGraphs(PPN=LoomGraph(DataFrame(a=c(1, 2), b=c(2, 1))),
-                  KNN=LoomGraph(DataFrame(a=c(2, 1), b=c(1, 2))))
-new_cgs <- LoomGraphs(PPN=LoomGraph(DataFrame(a=c(1, 2), b=c(1, 2))),
-                  KNN=LoomGraph(DataFrame(a=c(2, 1), b=c(1, 2))))
+new_rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2), c(2, 1)),
+                  KNN=LoomGraph(c(2, 1), c(1, 2)))
+new_cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2), c(1, 2)),
+                  KNN=LoomGraph(c(2, 1), c(1, 2)))
 
-bad_rgs <- LoomGraphs(PPN=LoomGraph(DataFrame(a=c(1, 2, 3), b=c(2, 1, 3))),
-                      KNN=LoomGraph(DataFrame(a=c(3, 2, 100000), b=c(1, 3, 2))))
-bad_cgs <- LoomGraphs(PPN=LoomGraph(DataFrame(a=c(1, 2, 3), b=c(2, 1, 3))),
-                      KNN=LoomGraph(DataFrame(a=c(3, 2, -1), b=c(1, 3, 2))))
+bad_rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(2, 1, 3)),
+                      KNN=LoomGraph(c(3, 2, 100000), c(1, 3, 2)))
 
 .test_constructors <- function(experiment) {
     le <- experiment(assay=list(counts=u, exprs=v))
@@ -101,7 +99,6 @@ test_that("creation through coercion works", {
     expect_equivalent(rowGraphs(both_le), new_rgs)
     expect_equivalent(dim(both_le), c(2, 2))
 
-    expect_error(colGraphs(le) <- bad_cgs)
     expect_error(rowGraphs(le) <- bad_rgs)
 }
 

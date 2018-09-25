@@ -130,11 +130,15 @@ setMethod('import', 'LoomFile',
         reducedDims_names <- '/col_attrs/reducedDims'
         names <- ls[ls$group %in% reducedDims_names, 'name', drop=TRUE]
 
-        reducedDims <- lapply(paste0(reducedDims_names, '/', names), function(x) {
-            as.matrix(.importLoom_matrix(con, x))
-        })
-        names(reducedDims) <- names
-        reducedDims <- SimpleList(reducedDims)
+        if(length(names) == 0) 
+            reducedDims <- list()
+        else {
+            reducedDims <- lapply(paste0(reducedDims_names, '/', names), function(x) {
+                as.matrix(.importLoom_matrix(con, x))
+            })
+            names(reducedDims) <- names
+            reducedDims <- SimpleList(reducedDims)
+        }
     }
 
     row_graphs <- ls[ls$group == '/row_edges', 'name', drop=TRUE]
@@ -162,7 +166,8 @@ setMethod('import', 'LoomFile',
         names(row_graphs) <- basename(row_graphs)
 
         row_graphs <- lapply(row_graphs, function(x) {
-            LoomGraph(h5read(con, x))
+            df <- DataFrame(h5read(con, x))
+            as(df, "LoomGraph")
         })
 
         row_graphs <- do.call('LoomGraphs', row_graphs)
@@ -173,7 +178,8 @@ setMethod('import', 'LoomFile',
         names(col_graphs) <- basename(col_graphs)
 
         col_graphs <- lapply(col_graphs, function(x) {
-            LoomGraph(h5read(con, x))
+            df <- DataFrame(h5read(con, x))
+            as(df, "LoomGraph")
         })
 
         col_graphs <- do.call('LoomGraphs', col_graphs)

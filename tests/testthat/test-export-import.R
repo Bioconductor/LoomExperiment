@@ -13,7 +13,7 @@ file_list <- list(sle_f, rle_empty_f, rle_some_f, rle_full_f, scle_f)
 
 assay <- List(matrix=matrix(seq_len(120), 20))
 
-lg <- LoomGraph(a=c(1, 2, 3), b=c(3, 2, 1), w=c(4, 5, 6))
+lg <- LoomGraph(c(1, 2, 3), c(3, 2, 1), weight=c(4, 5, 6))
 lgs <- LoomGraphs(PAM=lg, KAM=lg)
 
 granges_one <- GRanges("chr1", IRanges(1, 1))

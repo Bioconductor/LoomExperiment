@@ -36,7 +36,7 @@ setClass('LoomGraphs',
         return(txt)
     }
     if (!is.null(mcol) && !all(names(mcol) == 'w')) {
-        txt <- sprintf('\n A LoomGraph may only have one mcol named "w"')
+        txt <- sprintf('\n A LoomGraph may only have one metadata column named "w"')
         return(txt)
     }
     if (!is.null(w <- mcol$w) && !is.numeric(w)) {
@@ -97,6 +97,7 @@ LoomGraphs <- function(...) {
 
 setAs('DataFrame', 'LoomGraph', .from_DataFrame_to_LoomGraph)
 
+#' @importFrom S4Vectors from to
 .from_LoomGraph_to_DataFrame <- function(from)
 {
     a <- from(from)
@@ -115,10 +116,41 @@ setAs('LoomGraph', 'DataFrame', .from_LoomGraph_to_DataFrame)
 ###
 
 #' @export
-setMethod('dropHits', c('LoomGraph', 'ANY'),
-    function(x, i, ..., drop=TRUE)          
+setMethod('selectHits', c('LoomGraph', 'ANY'),
+    function(x, i, ...)          
 {
-    ii <- .convert_subset_index(i, rownames(x))
-    subset(x, x[['a']] %in% ii & x[['b']] %in% ii)   
+    x <- x[from(x) %in% i | to(x) %in% i]
+    nnode <- max(from(x), to(x))
+    x@nLnode <- nnode
+    x@nRnode <- nnode
+    x
+})
+
+#' @export
+setMethod('dropHits', c('LoomGraph', 'ANY'),
+    function(x, i, ...)          
+{
+    x <- x[!from(x) %in% i & !to(x) %in% i]
+    nnode <- max(from(x), to(x))
+    x@nLnode <- nnode
+    x@nRnode <- nnode
+    x
+})
+
+#' @export
+setReplaceMethod('dropHits', c('LoomGraph', 'ANY', 'ANY'),
+    function(x, i, ..., value)
+{
+    from <- from(x)
+    to <- to(x)
+    from <- as.integer(replace(from, from %in% i, value))
+    to <- as.integer(replace(to, to %in% i, value))
+
+    nnode <- max(from, to)
+    x@nLnode <- nnode
+    x@nRnode <- nnode
+    x@from <- from
+    x@to <- to
+    x
 })
 

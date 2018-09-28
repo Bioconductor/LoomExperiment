@@ -80,7 +80,7 @@ A `LoomGraph` class extends the `DataFrame` class from the `S4Vectors` package w
 
 The columns `a` and `b` correspond to either `row` or `col` indices in the `LoomExperiment` object while `w` is an optional column that specifies that weight.
 
-A LoomGraph can be constructed in three ways:
+A LoomGraph can be constructed in two ways:
 
 ```{r construct_LoomGraph}
 a <- c(1, 2, 3)
@@ -91,15 +91,34 @@ lg <- as(df, "LoomGraph")
 
 ## OR
 
-lg <- LoomGraph(a, b, nnode = max(a, b), weight = w)
+lg <- LoomGraph(a, b, weight = w)
 lg
 ```
 
-`LoomGraph` objects can be subset by the 'row'/'col' indices.  If, for an entry in a `LoomGraph`, either the `a` or `b` index is not present in the subsetting operation, this row will not appear in the final object.
-
+`LoomGraph` objects can be subset by the 'row'/'col' indices.
+ 
 ```{r subset_LoomGraph}
 lg[c(1, 2)]
 lg[-c(2)]
+```
+
+`LoomGraph` objects also can be subset on a by-node basis.  The remaining examples in this section will explore this.  First, the `selectHits()` method allows the user to select edges based on whether a node number is present.
+
+```{r select_LoomGraph}
+selectHits(lg, c(1, 3))
+```
+
+The `dropHits()` method removes edges based on whether a node number is present.
+
+```{r drop_LoomGraph}
+dropHits(lg, c(1, 3))
+```
+
+The `dropHits()` method can also replace the given nodes with different nodes.
+
+```{r dropreplace_LoomGraph}
+dropHits(lg, 2) <- 5
+lg
 ```
 
 # The `LoomGraphs` class
@@ -112,12 +131,6 @@ It can be created simply by using `LoomGraph` objects in the `LoomGraphs` constr
 lgs <- LoomGraphs(lg, lg)
 names(lgs) <- c('lg1', 'lg2')
 lgs
-```
-
-`LoomGraphs` objects can be subsetted in a manner similar to `LoomGraph` objects.  The difference is that the subsetting will be passed to all `LoomGraph` objects contained in the `LoomGraphs` object.
-
-```{r subset_LoomGraphs}
-lgs[c(1, 2)]
 ```
 
 # Available methods for the `LoomExperiment` 
@@ -149,7 +162,20 @@ colGraphs(scle2)[[1]]
 rowGraphs(scle2)[[1]]
 ```
 
+The `selectHits()` and `dropHits()` methods can also be used on a `LoomExperiment` object to effect all `colGraph` and `rowGraph` objects contained within the `LoomExperiment` object.
+
+```{r selectdropHits_LoomExperiment}
+selectHits(scle, c(1, 3))
+
+dropHits(scle, c(1, 3))
+
+dropHits(scle, c(1, 3)) <- c(7, 8)
+colGraphs(scle2)[[1]]
+rowGraphs(scle2)[[1]]
+```
+
 Finally, the `LoomExperiment` object can be exported.
+
 ```{r export_LoomExperiment}
 temp <- tempfile(fileext='.loom')
 export(scle2, temp)

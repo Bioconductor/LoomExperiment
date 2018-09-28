@@ -49,3 +49,12 @@ setAs('SingleCellExperiment', 'SingleCellLoomExperiment',
     .from_SingleCellExperiment_to_SingleCellLoomExperiment
 )
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Methods.
+###
+
+setMethod('[', 'SingleCellLoomExperiment', .subset.LoomExperiment)
+
+setMethod('show', 'SingleCellLoomExperiment', .show.LoomExperiment)
+

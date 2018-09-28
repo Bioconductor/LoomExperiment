@@ -25,9 +25,27 @@
 \alias{[,LoomExperiment-method}
 \alias{[,LoomExperiment,ANY-method}
 \alias{[,LoomExperiment,ANY,ANY,ANY-method}
+\alias{[,RangedLoomExperiment-method}
+\alias{[,RangedLoomExperiment,ANY-method}
+\alias{[,RangedLoomExperiment,ANY,ANY,ANY-method}
+\alias{[,SingleCellLoomExperiment-method}
+\alias{[,SingleCellLoomExperiment,ANY-method}
+\alias{[,SingleCellLoomExperiment,ANY,ANY,ANY-method}
+
+% SelectHits
+\alias{selectHits,LoomExperiment-method}
+\alias{selectHits,LoomExperiment,ANY-method}
+
+% DropHits
+\alias{dropHits,LoomExperiment-method}
+\alias{dropHits,LoomExperiment,ANY-method}
+\alias{dropHits<-,LoomExperiment-method}
+\alias{dropHits<-,LoomExperiment,ANY,ANY-method}
 
 % Display
 \alias{show,LoomExperiment-method}
+\alias{show,RangedLoomExperiment-method}
+\alias{show,SingleCellLoomExperiment-method}
 
 \title{LoomExperiment, RangedLoomExperiment, and SingleCellLoomExperiment classes}
 
@@ -52,6 +70,13 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
 \S4method{rowGraphs}{LoomExperiment}(x, ...)
 \S4method{rowGraphs}{LoomExperiment}(x, ...) <- value
 
+## Select Hits
+\S4method{selectHits}{LoomExperiment}(x, i, ...)
+
+## Drop Hits
+\S4method{dropHits}{LoomExperiment}(x, i, ...)
+\S4method{dropHits}{LoomExperiment}(x, i, ...) <- value
+
 ## Subsetting
 
 \S4method{[}{LoomExperiment}(x, i, j, ..., drop=TRUE)
@@ -66,7 +91,8 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
   }
 
   \item{value}{
-    For \code{colGraphs<-} and \code{rowGraphs<-}, \code{value} will be the replacement to the slot
+    For \code{colGraphs<-} and \code{rowGraphs<-}, \code{value} will be the replacement to the slot.
+    For \code{dropHits<-}, indices to replace selected indices with.
   }
 
   \item{...}{
@@ -74,7 +100,8 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
   }
 
   \item{i,j}{
-    Indices specifying elements to subset LoomGraph by
+    For subsetting, indices specifying elements to subset LoomGraph by.
+    For dropHits, numeric indicating the node number
   }
 
   \item{drop}{
@@ -127,7 +154,7 @@ rowGraphs(scle)
 a <- c(1, 2, 3)
 b <- c(3, 2, 1)
 w <- c(100, 10, 1)
-lg <- LoomGraph(a, b, w)
+lg <- LoomGraph(a, b, weight=w)
 lgs <- LoomGraphs(lg, lg)
 names(lgs) <- c('lg1', 'lg2')
 lgs
@@ -142,6 +169,15 @@ rowGraphs(scle)[[1]]
 
 ## Subsetting
 scle2 <- scle[c(1, 3), 1:2]
+colGraphs(scle2)[[1]]
+rowGraphs(scle2)[[1]]
+
+## SelectHits
+selectHits(scle, c(3))
+
+## DropHits
+dropHits(scle, c(2))
+dropHits(scle, c(1)) <- 5
 colGraphs(scle2)[[1]]
 rowGraphs(scle2)[[1]]
 }

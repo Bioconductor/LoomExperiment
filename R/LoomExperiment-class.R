@@ -30,13 +30,13 @@ setClass('LoomExperiment',
     col_test <- lapply(clgs, function(lg) {
         txt <- 'All LoomGraph objects in LoomExperiment must reference a column in the LoomExperiment'
         test <- from(lg) %in% cols & to(lg) %in% cols
-        if ((length(test) == 0 || !all(test)) && length(lg$a) > 0)
+        if ((length(test) == 0 || !all(test)) && length(from(lg)) > 0)
             return(txt)
     })
     row_test <- lapply(rlgs, function(lg) {
         txt <- 'All LoomGraph objects in LoomExperiment must reference a row in the LoomExperiment'
         test <- from(lg) %in% rows & to(lg) %in% rows
-        if ((length(test) == 0 || !all(test)) && length(lg$a) > 0)
+        if ((length(test) == 0 || !all(test)) && length(from(lg)) > 0)
             return(txt)
     })
     res <- list(col_test, row_test)
@@ -102,7 +102,8 @@ setMethod('colGraphs', 'LoomExperiment', .get.colGraphs)
 #' @importFrom methods validObject callNextMethod
 .replace.colGraphs <- function(x, ..., value)
 {
-    x <- BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
+    #x <- BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
+    x@colGraphs <- value
     validObject(x)
     x
 }
@@ -120,7 +121,8 @@ setMethod('rowGraphs', 'LoomExperiment', .get.rowGraphs)
 
 .replace.rowGraphs <- function(x, ..., value)
 {
-    x <- BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
+    #x <- BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
+    x@rowGraphs <- value
     validObject(x)
     x
 }
@@ -128,38 +130,45 @@ setMethod('rowGraphs', 'LoomExperiment', .get.rowGraphs)
 #' @export
 setReplaceMethod('rowGraphs', 'LoomExperiment', .replace.rowGraphs)
 
-#' @importFrom S4Vectors endoapply
-.subset.LoomExperiment <- function(x, i, j, ...)
-{
-    if (!missing(i))
-        rowGraphs(x) <- endoapply(rowGraphs(x), function(y) y[i,])
-    if (!missing(j))
-        colGraphs(x) <- endoapply(colGraphs(x), function(y) y[,j])
-    callNextMethod()
-}
-
 #' @export
 setMethod('[', c('LoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
 
-.show.LoomExperiment <- function(object)
+.selectHits.LoomExperiment <- function(x, i, ...)
 {
-    scat <- function(fmt, vals=character(), exdent=2, ...)
-    {
-        vals <- ifelse(nzchar(vals), vals, "''")
-        lbls <- paste(S4Vectors:::selectSome(vals), collapse=' ')
-        txt <- sprintf(fmt, length(vals), lbls)
-        cat(strwrap(txt, exdent=exdent, ...), sep='\n')
-    }
-    callNextMethod()
-    if (length(object@rowGraphs) > 0)
-        scat('rowGraphs(%d): %s\n', names(object@rowGraphs))
-    else
-        cat('rowGraphs(0): NULL\n')
-    if (length(object@colGraphs) > 0)
-        scat('colGraphs(%d): %s\n', names(object@colGraphs))
-    else
-        cat('colGraphs(0): NULL\n')
+    rowGraphs(x) <- endoapply(rowGraphs(x), function(y) selectHits(y, i))
+    colGraphs(x) <- endoapply(colGraphs(x), function(y) selectHits(y, i))
+    x
 }
+
+#' @export
+setMethod('selectHits', c('LoomExperiment', 'ANY'), .selectHits.LoomExperiment)
+
+.dropHits.LoomExperiment <- function(x, i, ...)
+{ 
+    rowGraphs(x) <- endoapply(rowGraphs(x), function(y) dropHits(y, i))
+    colGraphs(x) <- endoapply(colGraphs(x), function(y) dropHits(y, i))
+    x
+}
+
+#' @export
+setMethod('dropHits', c('LoomExperiment', 'ANY'), .dropHits.LoomExperiment)
+
+.dropHits.replace.LoomExperiment <- function(x, i, ..., value)
+{
+    rowGraphs(x) <- endoapply(rowGraphs(x), function(y){
+        dropHits(y, i) <- value
+        y
+    })
+    colGraphs(x) <- endoapply(colGraphs(x), function(y){
+        dropHits(y, i) <- value
+        y
+    })
+    x
+}
+
+#' @export
+setReplaceMethod('dropHits', c('LoomExperiment', 'ANY', 'ANY'),
+    .dropHits.replace.LoomExperiment)
 
 #' @export
 setMethod('show', 'LoomExperiment', .show.LoomExperiment)

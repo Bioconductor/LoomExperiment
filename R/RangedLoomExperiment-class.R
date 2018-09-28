@@ -51,3 +51,11 @@ setAs('RangedSummarizedExperiment', 'RangedLoomExperiment',
     .from_RangedSummarizedExperiment_to_RangedLoomExperiment
 )
 
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Methods.
+###
+
+setMethod('[', 'RangedLoomExperiment', .subset.LoomExperiment)
+
+setMethod('show', 'RangedLoomExperiment', .show.LoomExperiment)
+

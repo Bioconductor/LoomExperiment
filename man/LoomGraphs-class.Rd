@@ -33,8 +33,8 @@ A LoomGraphs object is returned from the constructor.
 \examples{
 
 ## Construction
-lg1 <- LoomGraph(a=c(1, 2, 3), b=c(3, 2, 1), w=c(4, 7, 8))
-lg2 <- LoomGraph(a=c(3, 3, 1), b=c(3, 1, 2))
+lg1 <- LoomGraph(c(1, 2, 3), c(3, 2, 1), weight=c(4, 7, 8))
+lg2 <- LoomGraph(c(3, 3, 1), c(3, 1, 2))
 lgs <- LoomGraphs(lg1, lg2)
 lgs
 

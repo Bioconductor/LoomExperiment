@@ -19,9 +19,16 @@ test_that("LoomGraph constructor works", {
 
 test_that("LoomGraph methods work", {
     lg <- LoomGraph(c(1, 2, 3, 4), c(4, 2, 1, 3), weight=c(4, 5, 6, 7))
+    lg2 <- LoomGraph(c(7, 2, 8, 4), c(4, 2, 7, 8), weight=c(4, 5, 6, 7))
     lg_new <- LoomGraph(c(3), c(1), weight=c(6))
     
     expect_equivalent(lg[c(3)], lg_new)
+    expect_equivalent(lg[-c(1, 2, 4)], lg_new)
+
+    expect_equivalent(dropHits(lg, c(2, 4)), lg_new)
+
+    dropHits(lg, c(1, 3)) <- c(7, 8)
+    expect_equivalent(lg, lg2)
 })
 
 ################################################################################

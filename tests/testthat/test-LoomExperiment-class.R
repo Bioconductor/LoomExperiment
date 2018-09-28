@@ -25,12 +25,29 @@ rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(2, 1, 3)),
 cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(1, 2, 3)),
                   KNN=LoomGraph(c(3, 2, 1), c(3, 1, 2)))
 
+hits_rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3, 4, 5), c(5, 4, 3, 2, 1)),
+                       KNN=LoomGraph(c(1, 2, 3, 4, 5), c(5, 4, 3, 2, 1)))
+hits_cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3, 4, 5), c(5, 4, 3, 2, 1)),
+                       KNN=LoomGraph(c(1, 2, 3, 4, 5), c(5, 4, 3, 2, 1)))
+
 new_rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2), c(2, 1)),
                   KNN=LoomGraph(c(2, 1), c(1, 2)))
 new_cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2), c(1, 2)),
                   KNN=LoomGraph(c(2, 1), c(1, 2)))
 
+new_hits_rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 4, 5), c(5, 4, 2, 1)),
+                       KNN=LoomGraph(c(1, 2, 4, 5), c(5, 4, 2, 1)))
+new_hits_cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 4, 5), c(5, 4, 2, 1)),
+                       KNN=LoomGraph(c(1, 2, 4, 5), c(5, 4, 2, 1)))
+
+rep_hits_rgs <- LoomGraphs(PPN=LoomGraph(c(6, 7, 3, 4, 5), c(5, 4, 3, 7, 6)),
+                       KNN=LoomGraph(c(6, 7, 3, 4, 5), c(5, 4, 3, 7, 6)))
+rep_hits_cgs <- LoomGraphs(PPN=LoomGraph(c(6, 7, 3, 4, 5), c(5, 4, 3, 7, 6)),
+                       KNN=LoomGraph(c(6, 7, 3, 4, 5), c(5, 4, 3, 7, 6)))
+
 bad_rgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(2, 1, 3)),
+                      KNN=LoomGraph(c(3, 2, 100000), c(1, 3, 2)))
+bad_cgs <- LoomGraphs(PPN=LoomGraph(c(1, 2, 3), c(2, 1, 3)),
                       KNN=LoomGraph(c(3, 2, 100000), c(1, 3, 2)))
 
 .test_constructors <- function(experiment) {
@@ -99,7 +116,22 @@ test_that("creation through coercion works", {
     expect_equivalent(rowGraphs(both_le), new_rgs)
     expect_equivalent(dim(both_le), c(2, 2))
 
+    le2 <- experiment(assay=v, colGraphs=hits_cgs, rowGraphs=hits_rgs)
+
+    select_le <- selectHits(le2, c(1, 2))
+    expect_equivalent(colGraphs(select_le), new_hits_cgs)
+    expect_equivalent(rowGraphs(select_le), new_hits_rgs)
+    
+    drop_le <- selectHits(le2, 3)
+    expect_equivalent(colGraphs(drop_le), new_hits_cgs)
+    expect_equivalent(rowGraphs(drop_le), new_hits_rgs)
+
+    dropHits(le2, c(1, 2)) <- c(6, 7)
+    expect_equivalent(colGraphs(le2), rep_hits_cgs)
+    expect_equivalent(rowGraphs(le2), rep_hits_rgs) 
+
     expect_error(rowGraphs(le) <- bad_rgs)
+    expect_error(colGraphs(le) <- bad_cgs)
 }
 
 test_that("LoomGraphs work with LoomExperiments", {

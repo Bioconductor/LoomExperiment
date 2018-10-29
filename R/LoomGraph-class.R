@@ -116,29 +116,77 @@ setAs('LoomGraph', 'DataFrame', .from_LoomGraph_to_DataFrame)
 ###
 
 #' @export
-setMethod('selectHits', c('LoomGraph', 'ANY'),
-    function(x, i, ...)          
+setMethod('rbind', 'LoomGraph',
+    function(..., deparse.level = 1)
 {
-    x <- x[from(x) %in% i | to(x) %in% i]
+    x <- c(...)
     nnode <- max(from(x), to(x))
     x@nLnode <- nnode
     x@nRnode <- nnode
     x
 })
 
-#' @export
-setMethod('dropHits', c('LoomGraph', 'ANY'),
+setMethod('rbind', 'LoomGraphs',
+    function(..., deparse.level = 1)
+{
+    li <- list(...)
+    res <- lapply(seq_along(li[[1]]), function(i) {
+        lg <- lapply(li, function(x) {
+            x[[i]]
+        })
+        do.call(rbind, lg)
+    })
+    do.call(LoomGraphs, res)
+})
+
+.correctHits <- function(x, i, decr)
+{
+    ifelse(x >= i, decr-1, decr)
+}
+
+setMethod('loomSelectHits', c('LoomGraph', 'ANY'),
+    function(x, i, ...)          
+{
+    x <- x[from(x) %in% i & to(x) %in% i]
+    from_top <- seq_len(max(i))
+    i <- from_top[!from_top %in% i]
+
+    from <- from(x)
+    from_i <- rep(0, length(from))
+    for (n in i)
+        from_i <- .correctHits(from, n, from_i)
+    from <- from + from_i
+    to <- to(x)
+    to_i <- rep(0, length(to))
+    for (n in i)
+        to_i <- .correctHits(to, n, to_i)
+    to <- to + to_i
+
+    nnode <- max(from, to)
+    LoomGraph(from, to, nnode, weight = mcols(x)[[1]])
+})
+
+setMethod('loomDropHits', c('LoomGraph', 'ANY'),
     function(x, i, ...)          
 {
     x <- x[!from(x) %in% i & !to(x) %in% i]
-    nnode <- max(from(x), to(x))
-    x@nLnode <- nnode
-    x@nRnode <- nnode
-    x
+
+    from <- from(x)
+    from_i <- rep(0, length(from))
+    for (n in i)
+        from_i <- .correctHits(from, n, from_i)
+    from <- from + from_i
+    to <- to(x)
+    to_i <- rep(0, length(to))
+    for (n in i)
+        to_i <- .correctHits(to, n, to_i)
+    to <- to + to_i
+
+    nnode <- max(from, to)
+    LoomGraph(from, to, nnode, weight = mcols(x)[[1]])
 })
 
-#' @export
-setReplaceMethod('dropHits', c('LoomGraph', 'ANY', 'ANY'),
+setReplaceMethod('loomDropHits', c('LoomGraph', 'ANY', 'ANY'),
     function(x, i, ..., value)
 {
     from <- from(x)

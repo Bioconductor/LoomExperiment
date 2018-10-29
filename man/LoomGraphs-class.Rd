@@ -1,6 +1,9 @@
 \name{LoomGraphs}
+
+%Class
 \alias{LoomGraphs}
 \alias{LoomGraphs-class}
+\alias{rbind,LoomGraphs-method}
 
 \docType{class}
 
@@ -14,10 +17,14 @@ Only \code{LoomGraph} obects may be stored in a LoomGraphs object.
 
 \usage{
 LoomGraphs(...)
+
+\S4method{rbind}{LoomGraphs}(..., deparse.level=1)
 }
 
 \arguments{
     \item{...}{\code{LoomGraph} objects.}
+    
+    \item{deparse.level}{See '?base::cbind' for a description of this argument}
 }
 
 \value{
@@ -37,9 +44,6 @@ lg1 <- LoomGraph(c(1, 2, 3), c(3, 2, 1), weight=c(4, 7, 8))
 lg2 <- LoomGraph(c(3, 3, 1), c(3, 1, 2))
 lgs <- LoomGraphs(lg1, lg2)
 lgs
-
-## Subsetting
-lgs[c(1, 2)]
 }
 
 \author{

@@ -25,9 +25,9 @@ test_that("LoomGraph methods work", {
     expect_equivalent(lg[c(3)], lg_new)
     expect_equivalent(lg[-c(1, 2, 4)], lg_new)
 
-    expect_equivalent(dropHits(lg, c(2, 4)), lg_new)
+    expect_equivalent(loomDropHits(lg, c(2, 4)), lg_new)
 
-    dropHits(lg, c(1, 3)) <- c(7, 8)
+    loomDropHits(lg, c(1, 3)) <- c(7, 8)
     expect_equivalent(lg, lg2)
 })
 

@@ -57,7 +57,6 @@ setMethod('.exportLoom', 'DataFrame',
 #setMethod('.exportLoom', 'LoomGraph',
 #    function(object, con, name, rowname_attr)
 #{
-#    browser()
 #    object <- as(object, "DataFrame")
 #    .exportLoom(object, con, name, rowname_attr)
 #})

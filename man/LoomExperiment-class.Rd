@@ -31,16 +31,7 @@
 \alias{[,SingleCellLoomExperiment-method}
 \alias{[,SingleCellLoomExperiment,ANY-method}
 \alias{[,SingleCellLoomExperiment,ANY,ANY,ANY-method}
-
-% SelectHits
-\alias{selectHits,LoomExperiment-method}
-\alias{selectHits,LoomExperiment,ANY-method}
-
-% DropHits
-\alias{dropHits,LoomExperiment-method}
-\alias{dropHits,LoomExperiment,ANY-method}
-\alias{dropHits<-,LoomExperiment-method}
-\alias{dropHits<-,LoomExperiment,ANY,ANY-method}
+\alias{rbind,LoomExperiment-method}
 
 % Display
 \alias{show,LoomExperiment-method}
@@ -50,7 +41,7 @@
 \title{LoomExperiment, RangedLoomExperiment, and SingleCellLoomExperiment classes}
 
 \description{
-    The LoomExperiment family of classes is used as a bridge between Bioconductor's "Experiment" classes and the Linnarson Lab's Loom file format.
+    The LoomExperiment family of classes is used as a bridge between Bioconductor's "Experiment" classes and the Linnarson Lab's \href{Loom file format}{http://linnarssonlab.org/loompy/index.html}.
     The family of LoomExperiment classes all inherit from the class LoomExperiment as well as their respectively named parent classes.
     The LoomExperiment class inheirts from \code{\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}.
 }
@@ -70,17 +61,15 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
 \S4method{rowGraphs}{LoomExperiment}(x, ...)
 \S4method{rowGraphs}{LoomExperiment}(x, ...) <- value
 
-## Select Hits
-\S4method{selectHits}{LoomExperiment}(x, i, ...)
-
-## Drop Hits
-\S4method{dropHits}{LoomExperiment}(x, i, ...)
-\S4method{dropHits}{LoomExperiment}(x, i, ...) <- value
-
 ## Subsetting
 
 \S4method{[}{LoomExperiment}(x, i, j, ..., drop=TRUE)
+
+## Binding
+
+\S4method{rbind}{LoomExperiment}(..., deparse.level=1)
 }
+
 
 \arguments{
 
@@ -108,6 +97,10 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
     For matrices and arrays.  If 'TRUE' the result is coerced to the lowest 
     posible dimesnion.  This only woeks for extracting elements, not for the 
     replacement.
+  }
+
+  \item{deparse.level}{
+    See '?base::cbind' for a description of this argument.
   }
 
 }
@@ -169,15 +162,6 @@ rowGraphs(scle)[[1]]
 
 ## Subsetting
 scle2 <- scle[c(1, 3), 1:2]
-colGraphs(scle2)[[1]]
-rowGraphs(scle2)[[1]]
-
-## SelectHits
-selectHits(scle, c(3))
-
-## DropHits
-dropHits(scle, c(2))
-dropHits(scle, c(1)) <- 5
 colGraphs(scle2)[[1]]
 rowGraphs(scle2)[[1]]
 }

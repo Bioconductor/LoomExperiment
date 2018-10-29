@@ -2,10 +2,18 @@
 #' @importFrom S4Vectors endoapply
 .subset.LoomExperiment <- function(x, i, j, ...)
 {
-    if (!missing(i))
-        rowGraphs(x) <- endoapply(rowGraphs(x), function(y) y[i,])
-    if (!missing(j))
-        colGraphs(x) <- endoapply(colGraphs(x), function(y) y[j,])
+    if (!missing(i)) {
+        if(all(i > 0))
+            rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomSelectHits(y, i))
+        else
+            rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomDropHits(y, abs(i)))
+    }
+    if (!missing(j)) {
+        if(all(j > 0))
+            colGraphs(x) <- endoapply(colGraphs(x), function(y) loomSelectHits(y, j))
+        else
+            colGraphs(x) <- endoapply(colGraphs(x), function(y) loomDropHits(y, abs(j)))
+    }
     callNextMethod()
 }
 

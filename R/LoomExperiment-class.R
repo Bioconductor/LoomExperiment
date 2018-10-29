@@ -133,42 +133,57 @@ setReplaceMethod('rowGraphs', 'LoomExperiment', .replace.rowGraphs)
 #' @export
 setMethod('[', c('LoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
 
-.selectHits.LoomExperiment <- function(x, i, ...)
+.loomSelectHits.LoomExperiment <- function(x, i, ...)
 {
-    rowGraphs(x) <- endoapply(rowGraphs(x), function(y) selectHits(y, i))
-    colGraphs(x) <- endoapply(colGraphs(x), function(y) selectHits(y, i))
+    rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomSelectHits(y, i))
+    colGraphs(x) <- endoapply(colGraphs(x), function(y) loomSelectHits(y, i))
     x
 }
 
+#' @importFrom S4Vectors rbind
 #' @export
-setMethod('selectHits', c('LoomExperiment', 'ANY'), .selectHits.LoomExperiment)
+setMethod('rbind', 'LoomExperiment',
+    function(..., deparse.level = 1)
+{
+    x <- callNextMethod()
+    rn <- names(rowGraphs(x))
+    cn <- names(colGraphs(x))
+    li <- list(...)
+    rlgs <- lapply(li, rowGraphs)
+    clgs <- lapply(li, colGraphs)
+    rlgs <- do.call(rbind, rlgs)
+    if (is(rlgs, "matrix"))
+        rlgs <- LoomGraphs()
+    clgs <- do.call(cbind, clgs)
+    if (is(clgs, "matrix"))
+        clgs <- LoomGraphs()
+    names(rlgs) <- rn
+    names(clgs) <- cn
+    rowGraphs(x) <- rlgs
+    colGraphs(x) <- clgs
+    
+    x
+})
 
-.dropHits.LoomExperiment <- function(x, i, ...)
+.loomDropHits.LoomExperiment <- function(x, i, ...)
 { 
-    rowGraphs(x) <- endoapply(rowGraphs(x), function(y) dropHits(y, i))
-    colGraphs(x) <- endoapply(colGraphs(x), function(y) dropHits(y, i))
+    rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomDropHits(y, i))
+    colGraphs(x) <- endoapply(colGraphs(x), function(y) loomDropHits(y, i))
     x
 }
 
-#' @export
-setMethod('dropHits', c('LoomExperiment', 'ANY'), .dropHits.LoomExperiment)
-
-.dropHits.replace.LoomExperiment <- function(x, i, ..., value)
+.loomDropHits.replace.LoomExperiment <- function(x, i, ..., value)
 {
     rowGraphs(x) <- endoapply(rowGraphs(x), function(y){
-        dropHits(y, i) <- value
+        loomDropHits(y, i) <- value
         y
     })
     colGraphs(x) <- endoapply(colGraphs(x), function(y){
-        dropHits(y, i) <- value
+        loomDropHits(y, i) <- value
         y
     })
     x
 }
-
-#' @export
-setReplaceMethod('dropHits', c('LoomExperiment', 'ANY', 'ANY'),
-    .dropHits.replace.LoomExperiment)
 
 #' @export
 setMethod('show', 'LoomExperiment', .show.LoomExperiment)

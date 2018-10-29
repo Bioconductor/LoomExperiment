@@ -3,27 +3,17 @@
 %Class
 \alias{LoomGraph}
 \alias{LoomGraph-class}
-
-%SelectHits
-\alias{selectHits}
-\alias{selectHits,LoomGraph-method}
-\alias{selectHits,LoomGraph,ANY-method}
-
-%DropHits
-\alias{dropHits}
-\alias{dropHits<-}
-\alias{dropHits,LoomGraph-method}
-\alias{dropHits,LoomGraph,ANY-method}
-\alias{dropHits<-,LoomGraph-method}
-\alias{dropHits<-,LoomGraph,ANY,ANY-method}
+\alias{rbind,LoomGraph-method}
 
 \docType{class}
 
 \title{LoomGraph class}
 \description{
-The LoomGraph class extends the code{\link[S4Vectors:Hits-class]{SelfHits}} class.
-It is meant to store graph information and was created to be used in conjunction with the \code{LoomExperiment} class.
-Its purpose is to store multiple \code{col_graph} or \code{row_graph} as specified by the \code{loom} file format.
+The \code{LoomGraph} class extends the \code{\link[S4Vectors:Hits-class]{SelfHits}} class.
+The \code{SelfHits} class represents a set of hits between a set of left node and right nodes.
+Only the Hits are stored in a \code{SelfHits object}.
+The \code{LoomGraph} class is meant to store graph information and was created to be used in conjunction with the \code{LoomExperiment} class.
+Its purpose is to store either a \code{col_graph} or \code{row_graph} as specified by the \code{loom} file format.
 Attributes \code{from} and \code{to} indicate an edge between two vertices.
 The \code{w} column indicates the weight of the corresponding edge and is optional.
 }
@@ -31,20 +21,10 @@ The \code{w} column indicates the weight of the corresponding edge and is option
 \usage{
 LoomGraph(from, to, nnode=max(from, to), ..., weight=NULL)
 
-## SelectHits
-\S4method{selectHits}{LoomGraph}(x, i, ...)
-
-## DropHits
-\S4method{dropHits}{LoomGraph}(x, i, ...)
-\S4method{dropHits}{LoomGraph}(x, i, ...) <- value
-
+\S4method{rbind}{LoomGraph}(..., deparse.level=1)
 }
 
 \arguments{
-
-  \item{x}{A LoomGraph object}
-
-  \item{i}{Indices specifying elements to subset, select elements, or drop elements from LoomGraph by}
 
   \item{...}{Arguments to pass to the \code{SelfHits} constructor.}
 
@@ -56,8 +36,7 @@ LoomGraph(from, to, nnode=max(from, to), ..., weight=NULL)
 
   \item{weight}{A numeric vector indicating the weight between the prospective edges.}
 
-  \item{value}{For subsetting methods, a \code{SelfHits} to replace the selected entry.
-               For dropHits methods, a \code{numeric} to replace selected nodes.}
+  \item{deparse.level}{See '?base::cbind' for a description of this argument}
 }
 
 \value{
@@ -67,7 +46,7 @@ A LoomGraph object is returned from the constructor.
 \seealso{
 \code{\link{LoomExperiment}},
 \code{\link{LoomGraphs}},
-\code{\link[S4Vectors:DataFrame]{DataFrame}}
+\code{\link[S4Vectors:SelfHits]{SelfHits}}
 }
 
 \examples{
@@ -84,13 +63,6 @@ lg
 ## Subsetting
 lg[c(1, 2)]
 lg[-c(2)]
-
-## SelectHits
-selectHits(lg, c(1))
-
-## DropHits
-dropHits(lg, c(2))
-dropHits(lg, c(1)) <- c(7)
 }
 
 \author{

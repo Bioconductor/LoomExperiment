@@ -6,10 +6,10 @@ setGeneric('colGraphs<-', function(x, ..., value) standardGeneric('colGraphs<-')
 setGeneric('rowGraphs', function(x, ...) standardGeneric('rowGraphs'))
 setGeneric('rowGraphs<-', function(x, ..., value) standardGeneric('rowGraphs<-'))
 
-setGeneric('selectHits', function(x, i, ...) standardGeneric('selectHits'))
+setGeneric('loomSelectHits', function(x, i, ...) standardGeneric('loomSelectHits'))
 
-setGeneric('dropHits', function(x, i, ...) standardGeneric('dropHits'))
-setGeneric('dropHits<-', function(x, i, ..., value) standardGeneric('dropHits<-'))
+setGeneric('loomDropHits', function(x, i, ...) standardGeneric('loomDropHits'))
+setGeneric('loomDropHits<-', function(x, i, ..., value) standardGeneric('loomDropHits<-'))
 
 setGeneric('import.LoomFile', function(con, ...) standardGeneric('import.LoomFile'))
 

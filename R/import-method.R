@@ -80,7 +80,6 @@
 
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @importFrom rtracklayer import
-#' @importMethodsFrom rtracklayer import
 #' @export
 setMethod('import', 'LoomFile',
     function(con, ...,
@@ -118,7 +117,7 @@ setMethod('import', 'LoomFile',
     colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr)
 
     if (is_rangedloomexperiment) {
-        if (nrow(ls[grep('GRangesList', ls$name),]) > 0)
+        if (any(grepl('GRangesList', ls$name)))
             rowData <- .importLoom_GRangesList(con, '/row_attrs', ls)
         else
             rowData <- .importLoom_GRanges(con, '/row_attrs', ls)

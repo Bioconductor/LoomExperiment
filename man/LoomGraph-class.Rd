@@ -46,7 +46,6 @@ A LoomGraph object is returned from the constructor.
 \seealso{
 \code{\link{LoomExperiment}},
 \code{\link{LoomGraphs}},
-\code{\link[S4Vectors:SelfHits]{SelfHits}}
 }
 
 \examples{

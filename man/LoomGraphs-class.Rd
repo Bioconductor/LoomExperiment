@@ -34,6 +34,7 @@ A LoomGraphs object is returned from the constructor.
 \seealso{
 \code{\link{LoomExperiment}},
 \code{\link{LoomGraph}},
+\code{\link[S4Vectors:SimpleList-class]{SimpleList}}
 }
 
 \examples{

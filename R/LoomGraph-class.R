@@ -119,10 +119,19 @@ setAs('LoomGraph', 'DataFrame', .from_LoomGraph_to_DataFrame)
 setMethod('rbind', 'LoomGraph',
     function(..., deparse.level = 1)
 {
-    x <- c(...)
-    nnode <- max(from(x), to(x))
-    x@nLnode <- nnode
-    x@nRnode <- nnode
+    li <- list(...)
+    nr <- 0
+    for (x in li)
+        nr <- nr + nnode(x)
+    offset <- 0L
+    li <- lapply(li, function(x) {
+        pe <- parent.env(environment())
+        from <- from(x) + pe$offset
+        to <- to(x) + pe$offset
+        pe$offset <- pe$offset + nnode(x)
+        LoomGraph(from, to, nr, weight = mcols(x)[[1]])
+    })
+    x <- do.call(c, li)
     x
 })
 
@@ -145,7 +154,7 @@ setMethod('rbind', 'LoomGraphs',
 }
 
 setMethod('loomSelectHits', c('LoomGraph', 'ANY'),
-    function(x, i, ...)          
+    function(x, i, nr = NULL, ...)          
 {
     x <- x[from(x) %in% i & to(x) %in% i]
     from_top <- seq_len(max(i))
@@ -162,12 +171,13 @@ setMethod('loomSelectHits', c('LoomGraph', 'ANY'),
         to_i <- .correctHits(to, n, to_i)
     to <- to + to_i
 
-    nnode <- max(from, to)
-    LoomGraph(from, to, nnode, weight = mcols(x)[[1]])
+    if (is.null(nr))
+        nr <- max(from, to)
+    LoomGraph(from, to, nr, weight = mcols(x)[[1]])
 })
 
 setMethod('loomDropHits', c('LoomGraph', 'ANY'),
-    function(x, i, ...)          
+    function(x, i, nr = NULL, ...)          
 {
     x <- x[!from(x) %in% i & !to(x) %in% i]
 
@@ -182,8 +192,9 @@ setMethod('loomDropHits', c('LoomGraph', 'ANY'),
         to_i <- .correctHits(to, n, to_i)
     to <- to + to_i
 
-    nnode <- max(from, to)
-    LoomGraph(from, to, nnode, weight = mcols(x)[[1]])
+    if (is.null(nr))
+        nr <- max(from, to)
+    LoomGraph(from, to, nr, weight = mcols(x)[[1]])
 })
 
 setReplaceMethod('loomDropHits', c('LoomGraph', 'ANY', 'ANY'),

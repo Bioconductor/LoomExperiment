@@ -6,7 +6,7 @@
 \alias{export-methods}
 \alias{export,LoomExperiment,LoomFile,ANY-method}
 
-\title{Export LoomExperiment to loomFile}
+\title{Export LoomExperiment to LoomFile}
 
 \description{
     Exports a \code{LoomExperiment} to a \code{LoomFile}.

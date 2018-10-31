@@ -112,7 +112,7 @@ setMethod('import', 'LoomFile',
     assays <- c(list(matrix = assay), layers)
 
     is_rangedloomexperiment <- any(grepl('GRanges', ls$name))
-    is_singlecellloomexperiment <- nrow(ls[ls$name == 'reducedDims',]) > 0
+    is_singlecellloomexperiment <- any(grepl('reducedDims', ls$name))
 
     colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr)
 

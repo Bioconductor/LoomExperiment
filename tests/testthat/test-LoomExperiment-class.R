@@ -110,7 +110,7 @@ test_that("creation through coercion works", {
     row_le <- le[c(1,2),]
     expect_equivalent(rowGraphs(row_le), new_rgs)
     expect_equivalent(dim(row_le), c(2, 100))
-    
+
     both_le <- le[c(1,2), c(1,2)]
     expect_equivalent(colGraphs(both_le), new_cgs)
     expect_equivalent(rowGraphs(both_le), new_rgs)

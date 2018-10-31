@@ -32,12 +32,18 @@ setClass('LoomExperiment',
         test <- from(lg) %in% cols & to(lg) %in% cols
         if ((length(test) == 0 || !all(test)) && length(from(lg)) > 0)
             return(txt)
+#        txt <- 'All LoomGraph objects in LoomExperiment colGraphs must have the same nnode as columns in the LoomExperiment'
+#        if (nnode(lg) != nrow(x))
+#            return(txt)
     })
     row_test <- lapply(rlgs, function(lg) {
         txt <- 'All LoomGraph objects in LoomExperiment must reference a row in the LoomExperiment'
         test <- from(lg) %in% rows & to(lg) %in% rows
         if ((length(test) == 0 || !all(test)) && length(from(lg)) > 0)
             return(txt)
+#        txt <- 'All LoomGraph objects in LoomExperiment rowGraphs must have the same nnode as rows in the LoomExperiment'
+#        if (nnode(lg) != nrow(x))
+#            return(txt)
     })
     res <- list(col_test, row_test)
     unlist(res)
@@ -61,14 +67,32 @@ setValidity2('LoomExperiment', .valid.Experiment)
 LoomExperiment <- function(..., colGraphs=LoomGraphs(), rowGraphs=LoomGraphs())
 {
     te <- list(...)
-    if (length(te) > 0 && is(te[[1]], 'SummarizedExperiment'))
+    if (length(te) > 0 && is(te[[1]], 'SingleCellExperiment')) {
         se <- te[[1]]
+        .new_SingleCellLoomExperiment(se,
+                            colGraphs=.change.nnode(colGraphs, ncol(se)),
+                            rowGraphs=.change.nnode(rowGraphs, nrow(se)))
+    }
+    else if (length(te) > 0 && is(te[[1]], 'RangedSummarizedExperiment')) {
+        se <- te[[1]]
+        .new_RangedLoomExperiment(se,
+                            colGraphs=.change.nnode(colGraphs, ncol(se)),
+                            rowGraphs=.change.nnode(rowGraphs, nrow(se)))
+    }
+    else if (length(te) > 0 && is(te[[1]], 'SummarizedExperiment')) {
+        se <- te[[1]]
+        .new_LoomExperiment(se,
+                            colGraphs=.change.nnode(colGraphs, ncol(se)),
+                            rowGraphs=.change.nnode(rowGraphs, nrow(se)))
+    }
     else {
         se <- SummarizedExperiment(...)
         if(is(se, 'RangedSummarizedExperiment'))
             se <- as(se, 'SummarizedExperiment')
+        .new_LoomExperiment(se,
+                            colGraphs=.change.nnode(colGraphs, ncol(se)),
+                            rowGraphs=.change.nnode(rowGraphs, nrow(se)))
     }
-    .new_LoomExperiment(se, colGraphs=colGraphs, rowGraphs=rowGraphs)
 }
 
 
@@ -91,6 +115,15 @@ setAs('SummarizedExperiment', 'LoomExperiment',
 ### Miscellenious methods.
 ###
 
+.change.nnode <- function(x, nr)
+{
+    endoapply(x, function(y) {
+        y@nLnode <- nr
+        y@nRnode <- nr
+        y
+    })
+}
+
 .get.colGraphs <- function(x, ...)
 {
     x@colGraphs
@@ -103,7 +136,7 @@ setMethod('colGraphs', 'LoomExperiment', .get.colGraphs)
 .replace.colGraphs <- function(x, ..., value)
 {
     #x <- BiocGenerics:::replaceSlots(x, colGraphs=value, check=FALSE)
-    x@colGraphs <- value
+    x@colGraphs <- .change.nnode(value, ncol(x))
     validObject(x)
     x
 }
@@ -122,7 +155,7 @@ setMethod('rowGraphs', 'LoomExperiment', .get.rowGraphs)
 .replace.rowGraphs <- function(x, ..., value)
 {
     #x <- BiocGenerics:::replaceSlots(x, rowGraphs=value, check=FALSE)
-    x@rowGraphs <- value
+    x@rowGraphs <- .change.nnode(value, nrow(x))
     validObject(x)
     x
 }
@@ -140,30 +173,9 @@ setMethod('[', c('LoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
     x
 }
 
-#' @importFrom S4Vectors rbind
+#' @importFrom S4Vectors rbind nnode
 #' @export
-setMethod('rbind', 'LoomExperiment',
-    function(..., deparse.level = 1)
-{
-    x <- callNextMethod()
-    rn <- names(rowGraphs(x))
-    cn <- names(colGraphs(x))
-    li <- list(...)
-    rlgs <- lapply(li, rowGraphs)
-    clgs <- lapply(li, colGraphs)
-    rlgs <- do.call(rbind, rlgs)
-    if (is(rlgs, "matrix"))
-        rlgs <- LoomGraphs()
-    clgs <- do.call(cbind, clgs)
-    if (is(clgs, "matrix"))
-        clgs <- LoomGraphs()
-    names(rlgs) <- rn
-    names(clgs) <- cn
-    rowGraphs(x) <- rlgs
-    colGraphs(x) <- clgs
-    
-    x
-})
+setMethod('rbind', 'LoomExperiment', .rbind.LoomExperiment)
 
 .loomDropHits.LoomExperiment <- function(x, i, ...)
 { 

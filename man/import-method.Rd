@@ -6,7 +6,7 @@
 \alias{import-methods}
 \alias{import,LoomFile,ANY,ANY-method}
 
-\title{Import LoomExperiment to loomFile}
+\title{Import LoomExperiment from LoomFile}
 
 \description{
     Imports a \code{LoomExperiment} from a \code{LoomFile}.

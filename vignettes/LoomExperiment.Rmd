@@ -39,6 +39,8 @@ library(LoomExperiment)
 counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 sce <- SingleCellExperiment(assays = list(counts = counts))
 scle <- SingleCellLoomExperiment(sce)
+## OR
+scle <- LoomExperiment(sce)
 ```
 
 One can also simply plug the arguments into the appropriate constructor, since all `LoomExperiment` constructors call the applicable class's constructor
@@ -141,6 +143,15 @@ rowGraphs(scle)[[1]]
 scle2 <- scle[c(1, 3), 1:2]
 colGraphs(scle2)[[1]]
 rowGraphs(scle2)[[1]]
+```
+
+```{r rbind_LoomExperiment}
+scle3 <- rbind(scle, scle)
+scle3
+colGraphs(scle3)
+rowGraphs(scle3)
+colGraphs(scle3)[[1]]
+rowGraphs(scle3)[[1]]
 ```
 
 Finally, the `LoomExperiment` object can be exported.

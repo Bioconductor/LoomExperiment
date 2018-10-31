@@ -2,21 +2,45 @@
 #' @importFrom S4Vectors endoapply
 .subset.LoomExperiment <- function(x, i, j, ...)
 {
+    rg <- rowGraphs(x)
+    cg <- colGraphs(x)
+    rowGraphs(x) <- LoomGraphs()
+    colGraphs(x) <- LoomGraphs()
+    x <- callNextMethod()
     if (!missing(i)) {
         if(all(i > 0))
-            rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomSelectHits(y, i))
+            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomSelectHits(y, i)), nrow(x))
         else
-            rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomDropHits(y, abs(i)))
+            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomDropHits(y, abs(i))), nrow(x))
     }
     if (!missing(j)) {
         if(all(j > 0))
-            colGraphs(x) <- endoapply(colGraphs(x), function(y) loomSelectHits(y, j))
+            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomSelectHits(y, j)), ncol(x))
         else
-            colGraphs(x) <- endoapply(colGraphs(x), function(y) loomDropHits(y, abs(j)))
+            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomDropHits(y, abs(j))), ncol(x))
     }
-    callNextMethod()
+    x
 }
 
+.rbind.LoomExperiment <-
+    function(..., deparse.level = 1)
+{
+    li <- list(...)
+    rn <- names(rowGraphs(li[[1]]))
+
+    clgs <- lapply(li, colGraphs)
+    clgs <- do.call(c, clgs)
+
+    rlgs <- lapply(li, rowGraphs)
+    rlgs <- do.call(rbind, rlgs)
+    if (is(rlgs, "matrix"))
+        rlgs <- LoomGraphs()
+    names(rlgs) <- rn
+    x <- callNextMethod()
+    rowGraphs(x) <- .change.nnode(rlgs, nrow(x))
+    colGraphs(x) <- clgs
+    x
+}
 
 .show.LoomExperiment <- function(object)
 {
@@ -28,12 +52,20 @@
         cat(strwrap(txt, exdent=exdent, ...), sep='\n')
     }
     callNextMethod()
-    if (length(object@rowGraphs) > 0)
-        scat('rowGraphs(%d): %s\n', names(object@rowGraphs))
+    if (length(object@rowGraphs) > 0) {
+        if (is.null(names(object@rowGraphs)))
+            cat(sprintf('rowGraphs(%d):\n', length(object@rowGraphs)))
+        else
+            scat('rowGraphs(%d): %s\n', names(object@rowGraphs))
+    }
     else
         cat('rowGraphs(0): NULL\n')
-    if (length(object@colGraphs) > 0)
-        scat('colGraphs(%d): %s\n', names(object@colGraphs))
+    if (length(object@colGraphs) > 0) {
+        if (is.null(names(object@rowGraphs)))
+            cat(sprintf('colGraphs(%d):\n', length(object@rowGraphs)))
+        else
+            scat('colGraphs(%d): %s\n', names(object@colGraphs))
+    }
     else
         cat('colGraphs(0): NULL\n')
 }

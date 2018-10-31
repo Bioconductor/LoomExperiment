@@ -32,6 +32,7 @@
 \alias{[,SingleCellLoomExperiment,ANY-method}
 \alias{[,SingleCellLoomExperiment,ANY,ANY,ANY-method}
 \alias{rbind,LoomExperiment-method}
+\alias{rbind,SingleCellLoomExperiment-method}
 
 % Display
 \alias{show,LoomExperiment-method}

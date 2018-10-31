@@ -32,7 +32,9 @@ RangedLoomExperiment <-
         if(!is(rse, 'RangedSummarizedExperiment'))
             rse <- as(rse, 'RangedSummarizedExperiment')
     }
-    .new_RangedLoomExperiment(rse, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    .new_RangedLoomExperiment(rse,
+                              colGraphs=.change.nnode(colGraphs, ncol(rse)),
+                              rowGraphs=.change.nnode(rowGraphs, nrow(rse)))
 }
 
 
@@ -55,7 +57,5 @@ setAs('RangedSummarizedExperiment', 'RangedLoomExperiment',
 ### Methods.
 ###
 
-setMethod('[', 'RangedLoomExperiment', .subset.LoomExperiment)
-
-setMethod('show', 'RangedLoomExperiment', .show.LoomExperiment)
+#setMethod('[', 'RangedLoomExperiment', .subset.LoomExperiment)
 

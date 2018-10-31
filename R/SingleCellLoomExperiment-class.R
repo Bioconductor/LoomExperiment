@@ -30,7 +30,9 @@ SingleCellLoomExperiment <-
         sce <- te[[1]]
     else
         sce <- SingleCellExperiment(...)
-    .new_SingleCellLoomExperiment(sce, colGraphs=colGraphs, rowGraphs=rowGraphs)
+    .new_SingleCellLoomExperiment(sce,
+                                  colGraphs=.change.nnode(colGraphs, ncol(sce)),
+                                  rowGraphs=.change.nnode(rowGraphs, nrow(sce)))
 }
 
 
@@ -55,6 +57,8 @@ setAs('SingleCellExperiment', 'SingleCellLoomExperiment',
 ###
 
 setMethod('[', 'SingleCellLoomExperiment', .subset.LoomExperiment)
+
+setMethod('rbind', 'SingleCellLoomExperiment', .rbind.LoomExperiment)
 
 setMethod('show', 'SingleCellLoomExperiment', .show.LoomExperiment)
 

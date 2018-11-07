@@ -60,5 +60,7 @@ setMethod('[', 'SingleCellLoomExperiment', .subset.LoomExperiment)
 
 setMethod('rbind', 'SingleCellLoomExperiment', .rbind.LoomExperiment)
 
+setMethod('cbind', 'SingleCellLoomExperiment', .cbind.LoomExperiment)
+
 setMethod('show', 'SingleCellLoomExperiment', .show.LoomExperiment)
 

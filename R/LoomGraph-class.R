@@ -135,6 +135,26 @@ setMethod('rbind', 'LoomGraph',
     x
 })
 
+#' @export
+setMethod('cbind', 'LoomGraph',
+    function(..., deparse.level = 1)
+{
+    li <- list(...)
+    nc <- 0
+    for (x in li)
+        nc <- nc + nnode(x)
+    offset <- 0L
+    li <- lapply(li, function(x) {
+        pe <- parent.env(environment())
+        from <- from(x) + pe$offset
+        to <- to(x) + pe$offset
+        pe$offset <- pe$offset + nnode(x)
+        LoomGraph(from, to, nc, weight = mcols(x)[[1]])
+    })
+    x <- do.call(c, li)
+    x
+})
+
 setMethod('rbind', 'LoomGraphs',
     function(..., deparse.level = 1)
 {
@@ -144,6 +164,19 @@ setMethod('rbind', 'LoomGraphs',
             x[[i]]
         })
         do.call(rbind, lg)
+    })
+    do.call(LoomGraphs, res)
+})
+
+setMethod('cbind', 'LoomGraphs',
+    function(..., deparse.level = 1)
+{
+    li <- list(...)
+    res <- lapply(seq_along(li[[1]]), function(i) {
+        lg <- lapply(li, function(x) {
+            x[[i]]
+        })
+        do.call(cbind, lg)
     })
     do.call(LoomGraphs, res)
 })

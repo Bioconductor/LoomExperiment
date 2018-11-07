@@ -33,6 +33,8 @@
 \alias{[,SingleCellLoomExperiment,ANY,ANY,ANY-method}
 \alias{rbind,LoomExperiment-method}
 \alias{rbind,SingleCellLoomExperiment-method}
+\alias{cbind,LoomExperiment-method}
+\alias{cbind,SingleCellLoomExperiment-method}
 
 % Display
 \alias{show,LoomExperiment-method}
@@ -69,6 +71,7 @@ SingleCellLoomExperiment(..., colGraphs = LoomGraphs(), rowGraphs = LoomGraphs()
 ## Binding
 
 \S4method{rbind}{LoomExperiment}(..., deparse.level=1)
+\S4method{cbind}{LoomExperiment}(..., deparse.level=1)
 }
 
 

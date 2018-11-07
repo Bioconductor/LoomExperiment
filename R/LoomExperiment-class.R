@@ -177,6 +177,10 @@ setMethod('[', c('LoomExperiment', 'ANY', 'ANY'), .subset.LoomExperiment)
 #' @export
 setMethod('rbind', 'LoomExperiment', .rbind.LoomExperiment)
 
+#' @importFrom S4Vectors cbind
+#' @export
+setMethod('cbind', 'LoomExperiment', .cbind.LoomExperiment)
+
 .loomDropHits.LoomExperiment <- function(x, i, ...)
 { 
     rowGraphs(x) <- endoapply(rowGraphs(x), function(y) loomDropHits(y, i))

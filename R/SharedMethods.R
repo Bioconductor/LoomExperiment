@@ -42,6 +42,27 @@
     x
 }
 
+.cbind.LoomExperiment <-
+    function(..., deparse.level = 1)
+{
+    li <- list(...)
+    browser()
+    cn <- names(colGraphs(li[[1]]))
+
+    rlgs <- lapply(li, rowGraphs)
+    rlgs <- do.call(c, rlgs)
+
+    clgs <- lapply(li, colGraphs)
+    clgs <- do.call(cbind, clgs)
+    if (is(clgs, "matrix"))
+        clgs <- LoomGraphs()
+    names(clgs) <- cn
+    x <- callNextMethod()
+    colGraphs(x) <- .change.nnode(clgs, ncol(x))
+    rowGraphs(x) <- rlgs
+    x
+}
+
 .show.LoomExperiment <- function(object)
 {
     scat <- function(fmt, vals=character(), exdent=2, ...)
@@ -61,8 +82,8 @@
     else
         cat('rowGraphs(0): NULL\n')
     if (length(object@colGraphs) > 0) {
-        if (is.null(names(object@rowGraphs)))
-            cat(sprintf('colGraphs(%d):\n', length(object@rowGraphs)))
+        if (is.null(names(object@colGraphs)))
+            cat(sprintf('colGraphs(%d):\n', length(object@colGraphs)))
         else
             scat('colGraphs(%d): %s\n', names(object@colGraphs))
     }

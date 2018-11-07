@@ -4,6 +4,7 @@
 \alias{LoomGraph}
 \alias{LoomGraph-class}
 \alias{rbind,LoomGraph-method}
+\alias{cbind,LoomGraph-method}
 
 \docType{class}
 
@@ -22,6 +23,7 @@ The \code{w} column indicates the weight of the corresponding edge and is option
 LoomGraph(from, to, nnode=max(from, to), ..., weight=NULL)
 
 \S4method{rbind}{LoomGraph}(..., deparse.level=1)
+\S4method{cbind}{LoomGraph}(..., deparse.level=1)
 }
 
 \arguments{

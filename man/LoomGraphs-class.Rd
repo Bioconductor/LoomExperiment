@@ -4,6 +4,7 @@
 \alias{LoomGraphs}
 \alias{LoomGraphs-class}
 \alias{rbind,LoomGraphs-method}
+\alias{cbind,LoomGraphs-method}
 
 \docType{class}
 
@@ -19,6 +20,7 @@ Only \code{LoomGraph} obects may be stored in a LoomGraphs object.
 LoomGraphs(...)
 
 \S4method{rbind}{LoomGraphs}(..., deparse.level=1)
+\S4method{cbind}{LoomGraphs}(..., deparse.level=1)
 }
 
 \arguments{

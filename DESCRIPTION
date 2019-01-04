@@ -2,7 +2,7 @@ Package: LoomExperiment
 Title: LoomExperiment container
 Description: The LoomExperiment class provide a means to easily convert
     Bioconductor's "Experiment" classes to loom files and vice versa.
-Version: 1.1.1
+Version: 1.1.2
 Encoding: UTF-8
 Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
@@ -33,5 +33,5 @@ Collate: AllGenerics.R
          import-method.R
 License: Artistic-2.0
 VignetteBuilder: knitr
-biocViews: DataRepresentation, DataImport, Infrastructure, SingleCell
+biocViews: ImmunoOncology, DataRepresentation, DataImport, Infrastructure, SingleCell
 RoxygenNote: 6.1.0

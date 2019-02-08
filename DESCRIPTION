@@ -33,5 +33,5 @@ Collate: AllGenerics.R
          import-method.R
 License: Artistic-2.0
 VignetteBuilder: knitr
-biocViews: DataRepresentation, DataImport, Infrastructure, SingleCell
+biocViews: ImmunoOncology, DataRepresentation, DataImport, Infrastructure, SingleCell
 RoxygenNote: 6.1.0

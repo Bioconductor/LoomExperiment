@@ -223,12 +223,12 @@ setMethod('.exportLoom', 'LoomGraphs',
 
     .exportLoom(colData(object), con, 'col_attrs', colnames_attr)
     rowData <- rowData(object)
-    if (is(object, 'RangedSummarizedExperiment')) {
-        rowRanges <- rowRanges(object)
-        if (is(rowRanges, 'GRangesList')) {
-            .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
-        } else {
-            .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
+    if (is(object, 'RangedSummarizedExperiment') &&
+        !all(lengths(rowRanges <- rowRanges(object)) == 0)) {
+            if (is(rowRanges, 'GRangesList')) {
+                .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
+            } else {
+                .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
         }
     }
     else

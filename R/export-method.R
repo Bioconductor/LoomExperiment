@@ -225,10 +225,14 @@ setMethod('.exportLoom', 'LoomGraphs',
     rowData <- rowData(object)
     if (is(object, 'RangedSummarizedExperiment')) {
         rowRanges <- rowRanges(object)
-        if (is(rowRanges, 'GRangesList')) {
+        if (is(rowRanges, 'GRanges'))
+            rr_length <- length(rowRanges) == 0
+        if (is(rowRanges, 'GRangesList'))
+            rr_length <- lengths(rowRanges) == 0
+        if(!all(rr_length)) {
             .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
         } else {
-            .exportLoom(rowRanges, con, 'row_attrs', rownames_attr)
+            .exportLoom(rowData, con, 'row_attrs', rownames_attr)
         }
     }
     else

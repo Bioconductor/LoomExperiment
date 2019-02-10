@@ -46,7 +46,6 @@
     function(..., deparse.level = 1)
 {
     li <- list(...)
-    browser()
     cn <- names(colGraphs(li[[1]]))
 
     rlgs <- lapply(li, rowGraphs)

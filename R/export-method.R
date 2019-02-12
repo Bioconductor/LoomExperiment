@@ -21,6 +21,13 @@ setMethod('.exportLoom', 'DelayedArray',
     0L
 })
 
+setMethod('.exportLoom', 'dgCMatrix',
+    function(object, con, name)
+{
+    HDF5Array::writeHDF5Array(object, con, name)
+    0L
+})
+
 setMethod('.exportLoom', 'vector',
     function(object, con, name, rowname_attr)
 {

@@ -184,6 +184,13 @@ setMethod('import', 'LoomFile',
         col_graphs <- do.call('LoomGraphs', col_graphs)
     }
 
+    ## if a transposition couldn't be performed on the array in export; do it here
+    if(ncol(assays[[1]]) != nrow(colData) && nrow(assays[[1]]) != nrow(rowData)) {
+        if(ncol(assays[[1]]) == nrow(rowData) && nrow(assays[[1]]) == nrow(colData)) {
+            assays <- lapply(assays, t)
+        }
+    }
+
     if (!missing(type)) { ## check if LoomExperiment class is specified
         type <- match.arg(type)
         le <- do.call(type, list(assays=assays, rowData=rowData, colData=colData,

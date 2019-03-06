@@ -9,7 +9,8 @@
 \title{Import LoomExperiment from LoomFile}
 
 \description{
-    Imports a \code{LoomExperiment} from a \code{LoomFile}.
+    Imports a \code{LoomExperiment} from a \code{LoomFile}. Note the \code{colGraph} and \code{rowGraph} contained within
+the 0-indexed loom file will be converted to the 1-indexed represnetation in the resulting \code{LoomExperiment} object.
 }
 
 \usage{

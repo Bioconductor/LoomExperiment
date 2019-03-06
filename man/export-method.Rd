@@ -9,7 +9,8 @@
 \title{Export LoomExperiment to LoomFile}
 
 \description{
-    Exports a \code{LoomExperiment} to a \code{LoomFile}.
+    Exports a \code{LoomExperiment} to a \code{LoomFile}. Note the \code{colGraph} and \code{rowGraph} contained within
+the \code{LoomExperimnet} object are 1-indexed in \code{R} and are converted to 0-indexed in the loom file.
 }
 
 \usage{

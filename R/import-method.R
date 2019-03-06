@@ -166,6 +166,10 @@ setMethod('import', 'LoomFile',
 
         row_graphs <- lapply(row_graphs, function(x) {
             df <- DataFrame(h5read(con, x))
+            df <- as.matrix(df)
+            df[,1] <- df[,1] + 1
+            df[,2] <- df[,2] + 1
+            df <- DataFrame(df)
             as(df, "LoomGraph")
         })
 
@@ -178,6 +182,10 @@ setMethod('import', 'LoomFile',
 
         col_graphs <- lapply(col_graphs, function(x) {
             df <- DataFrame(h5read(con, x))
+            df <- as.matrix(df)
+            df[,1] <- df[,1] + 1
+            df[,2] <- df[,2] + 1
+            df <- DataFrame(df)
             as(df, "LoomGraph")
         })
 

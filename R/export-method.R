@@ -195,6 +195,7 @@ setMethod('.exportLoom', 'LoomGraphs',
 
     h5f <- H5Fopen(con) 
     tryCatch({
+        rhdf5::h5writeAttribute('2.0.1', h5obj=h5f, name='LOOM_SPEC_VERSION')
         rhdf5::h5writeAttribute(paste0('LoomExperiment-', as.character(
             packageVersion('LoomExperiment'))), name='CreatedWith', h5obj=h5f)
         rhdf5::h5writeAttribute(class(object), name='LoomExperiment-class',

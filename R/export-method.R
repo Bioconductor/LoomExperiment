@@ -200,6 +200,7 @@ setMethod('.exportLoom', 'LoomGraphs',
             packageVersion('LoomExperiment'))), name='CreatedWith', h5obj=h5f)
         rhdf5::h5writeAttribute(class(object), name='LoomExperiment-class',
             h5obj=h5f)
+        rhdf5::h5writeAttribute(matrix, h5obj=h5f, name='MatrixName')
         Map(rhdf5::h5writeAttribute, metadata(object),
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
     }, error = function(err) {

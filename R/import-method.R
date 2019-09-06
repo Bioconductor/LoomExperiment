@@ -109,7 +109,9 @@ setMethod('import', 'LoomFile',
         layer <- paste0('/layers/', layer)
         .importLoom_matrix(con, layer)
     })
-    assays <- c(list(matrix = assay), layers)
+    assay_matrix <- list(assay)
+    names(assay_matrix) <- metadata$MatrixName
+    assays <- c(assay_matrix, layers)
 
     is_rangedloomexperiment <- any(grepl('GRanges', ls$name))
     is_singlecellloomexperiment <- any(grepl('reducedDims', ls$name))

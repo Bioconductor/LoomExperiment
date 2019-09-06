@@ -159,8 +159,10 @@ setMethod('.exportLoom', 'LoomGraphs',
     function(object, con, name)
 {
     rhdf5::h5createGroup(con, name)
-    name <- paste0(name, '/', names(object))
-    Map(.exportLoom, object, name = name, MoreArgs = list(con = con))
+    if (length(object) > 0) {
+        name <- paste0(name, '/', names(object))
+        Map(.exportLoom, object, name = name, MoreArgs = list(con = con))
+    }
 })
 
 #' @importFrom S4Vectors metadata
@@ -247,11 +249,8 @@ setMethod('.exportLoom', 'LoomGraphs',
     else
         .exportLoom(rowData, con, 'row_attrs', rownames_attr)
 
-    if (length(colGraphs(object)) > 0)
-        .exportLoom(colGraphs(object), con, 'col_graphs')
-
-    if (length(rowGraphs(object)) > 0)
-        .exportLoom(rowGraphs(object), con, 'row_graphs')
+    .exportLoom(colGraphs(object), con, 'col_graphs')
+    .exportLoom(rowGraphs(object), con, 'row_graphs')
 
     invisible(con)
 }

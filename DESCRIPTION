@@ -2,7 +2,7 @@ Package: LoomExperiment
 Title: LoomExperiment container
 Description: The LoomExperiment class provide a means to easily convert
     Bioconductor's "Experiment" classes to loom files and vice versa.
-Version: 1.3.2
+Version: 1.3.3
 Encoding: UTF-8
 Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>

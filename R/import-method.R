@@ -109,8 +109,12 @@ setMethod('import', 'LoomFile',
         layer <- paste0('/layers/', layer)
         .importLoom_matrix(con, layer)
     })
+
     assay_matrix <- list(assay)
-    names(assay_matrix) <- metadata$MatrixName
+    matrix_name <- metadata$MatrixName
+    if(is.null(matrix_name))
+       matrix_name <- 'matrix'
+    names(assay_matrix) <- matrix_name
     assays <- c(assay_matrix, layers)
 
     is_rangedloomexperiment <- any(grepl('GRanges', ls$name))

@@ -9,11 +9,16 @@
 #' @importFrom S4Vectors DataFrame SimpleList
 #' @importFrom rhdf5 h5read
 .importLoom_DataFrame <-
-    function(con, name, rowname)
+    function(con, name, rowname, exclude)
 {
     ls <- h5ls(con)
     names_ls <- ls[ls$group %in% name & ls$otype %in% 'H5I_DATASET', 'name']
     names <- paste0(name, '/', names_ls)
+    if (!missing(exclude)) {
+        indices <- !names %in% exclude
+        names <- names[indices]
+        names_ls <- names_ls[indices]
+    }
 
     df <- lapply(names, function(x) {
         rhdf5::h5read(con, x)
@@ -80,6 +85,7 @@
 
 #' @importFrom rhdf5 h5ls h5readAttributes
 #' @importFrom rtracklayer import
+#' @importFrom stringr str_split
 #' @export
 setMethod('import', 'LoomFile',
     function(con, ...,
@@ -102,6 +108,9 @@ setMethod('import', 'LoomFile',
     )
 
     metadata <- rhdf5::h5readAttributes(con, '/')
+    metadata_names <- names(metadata)
+    idx <- grep("ReducedDims", metadata_names)
+    reducedDims_names <- metadata_names[idx]
 
     assay <- .importLoom_matrix(con, '/matrix')
     layerNames <- ls[ls$group == '/layers', 'name', drop = TRUE]
@@ -120,7 +129,7 @@ setMethod('import', 'LoomFile',
     is_rangedloomexperiment <- any(grepl('GRanges', ls$name))
     is_singlecellloomexperiment <- any(grepl('reducedDims', ls$name))
 
-    colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr)
+    colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr, unlist(metadata[reducedDims_names]))
 
     if (is_rangedloomexperiment) {
         if (any(grepl('GRangesList', ls$name)))
@@ -132,15 +141,19 @@ setMethod('import', 'LoomFile',
     }
 
     if (is_singlecellloomexperiment) {
-        reducedDims_names <- '/col_attrs/reducedDims'
-        names <- ls[ls$group %in% reducedDims_names, 'name', drop=TRUE]
+        #reducedDims_names <- '/col_attrs/reducedDims'
+        #names <- ls[ls$group %in% reducedDims_names, 'name', drop=TRUE]
 
-        if(length(names) == 0) 
+        if(length(reducedDims_names) == 0) 
             reducedDims <- list()
         else {
-            reducedDims <- lapply(paste0(reducedDims_names, '/', names), function(x) {
+            reducedDims <- metadata[reducedDims_names]
+            reducedDims <- lapply(paste0('/', reducedDims), function(x) {
                 as.matrix(.importLoom_matrix(con, x))
             })
+            names <- stringr::str_split(metadata[reducedDims_names], '/col_attrs/reducedDims_')
+            names <- unlist(names)
+            names <- names[!names %in% '']
             names(reducedDims) <- names
             reducedDims <- SimpleList(reducedDims)
         }
@@ -225,6 +238,8 @@ setMethod('import', 'LoomFile',
                                  rowGraphs = row_graphs, colGraphs = col_graphs)
         }
     }
+
+    metadata <- metadata[-c(idx)]
     metadata(le) <- metadata
     le
 })

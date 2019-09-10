@@ -195,20 +195,6 @@ setMethod('.exportLoom', 'LoomGraphs',
 
     rhdf5::h5createFile(con)
 
-    h5f <- H5Fopen(con) 
-    tryCatch({
-        rhdf5::h5writeAttribute('2.0.1', h5obj=h5f, name='LOOM_SPEC_VERSION')
-        rhdf5::h5writeAttribute(paste0('LoomExperiment-', as.character(
-            packageVersion('LoomExperiment'))), name='CreatedWith', h5obj=h5f)
-        rhdf5::h5writeAttribute(class(object), name='LoomExperiment-class',
-            h5obj=h5f)
-        rhdf5::h5writeAttribute(matrix, h5obj=h5f, name='MatrixName')
-        Map(rhdf5::h5writeAttribute, metadata(object),
-            name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
-    }, error = function(err) {
-        warning(conditionMessage(err))
-    }, finally = H5Fclose(h5f))
-
     assays <- assays(object, withDimnames = FALSE)
     layers <- setNames(paste0('/layers/', names(assays)), names(assays))
     layers[matrix] <- '/matrix'
@@ -228,9 +214,9 @@ setMethod('.exportLoom', 'LoomGraphs',
     rhdf5::h5createGroup(con, '/row_attrs')
 
     if (is(object, 'SingleCellLoomExperiment')) {
-        reducedDims_names <- '/col_attrs/reducedDims'
-        rhdf5::h5createGroup(con, reducedDims_names)
-        reducedDims_names <- paste0(reducedDims_names, '/', names(reducedDims(object)))
+        reducedDims_names <- '/col_attrs/reducedDims_'
+        reducedDims_names <- paste0(reducedDims_names, names(reducedDims(object)))
+	reducedDims_attr_names <- paste0('ReducedDimsName', seq_along(reducedDims_names))
         if (length(reducedDims(object)) == 0)
             reducedDims_names <- character(0)
         Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
@@ -248,6 +234,22 @@ setMethod('.exportLoom', 'LoomGraphs',
     }
     else
         .exportLoom(rowData, con, 'row_attrs', rownames_attr)
+
+    h5f <- H5Fopen(con) 
+    tryCatch({
+        rhdf5::h5writeAttribute('2.0.1', h5obj=h5f, name='LOOM_SPEC_VERSION')
+        rhdf5::h5writeAttribute(paste0('LoomExperiment-', as.character(
+            packageVersion('LoomExperiment'))), name='CreatedWith', h5obj=h5f)
+        rhdf5::h5writeAttribute(class(object), name='LoomExperiment-class',
+            h5obj=h5f)
+        rhdf5::h5writeAttribute(matrix, h5obj=h5f, name='MatrixName')
+        Map(rhdf5::h5writeAttribute, metadata(object),
+            name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
+        Map(rhdf5::h5writeAttribute, reducedDims_names,
+            name = reducedDims_attr_names, MoreArgs = list(h5obj = h5f))
+    }, error = function(err) {
+        warning(conditionMessage(err))
+    }, finally = H5Fclose(h5f))
 
     .exportLoom(colGraphs(object), con, 'col_graphs')
     .exportLoom(rowGraphs(object), con, 'row_graphs')

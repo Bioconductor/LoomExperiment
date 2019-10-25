@@ -21,10 +21,11 @@ setMethod('.exportLoom', 'DelayedArray',
     0L
 })
 
+#' @importFrom Matrix t
 setMethod('.exportLoom', 'dgCMatrix',
     function(object, con, name)
 {
-    HDF5Array::writeHDF5Array(object, con, name)
+    HDF5Array::writeHDF5Array(Matrix::t(object), con, name)
     0L
 })
 

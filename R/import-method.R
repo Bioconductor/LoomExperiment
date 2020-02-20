@@ -141,19 +141,15 @@ setMethod('import', 'LoomFile',
     }
 
     if (is_singlecellloomexperiment) {
-        #reducedDims_names <- '/col_attrs/reducedDims'
-        #names <- ls[ls$group %in% reducedDims_names, 'name', drop=TRUE]
+        names <- ls[ls$group %in% '/reducedDims', 'name', drop=TRUE]
 
-        if(length(reducedDims_names) == 0) 
+        if(length(reducedDims_names) == 0)
             reducedDims <- list()
         else {
             reducedDims <- metadata[reducedDims_names]
             reducedDims <- lapply(paste0('/', reducedDims), function(x) {
                 as.matrix(.importLoom_matrix(con, x))
             })
-            names <- stringr::str_split(metadata[reducedDims_names], '/col_attrs/reducedDims_')
-            names <- unlist(names)
-            names <- names[!names %in% '']
             names(reducedDims) <- names
             reducedDims <- SimpleList(reducedDims)
         }

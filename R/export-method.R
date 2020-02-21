@@ -217,13 +217,29 @@ setMethod('.exportLoom', 'LoomGraphs',
     rhdf5::h5createGroup(con, '/row_attrs')
 
     if (is(object, 'SingleCellLoomExperiment')) {
-        rhdf5::h5createGroup(con, '/reducedDims')
-        reducedDims_names <- paste0('/reducedDims/',
-            names(reducedDims(object)))
-	reducedDims_attr_names <- paste0('ReducedDimsName', seq_along(reducedDims_names))
-        if (length(reducedDims(object)) == 0)
+        rdo <- reducedDims(object)
+        reducedDims_names <- paste0('/col_attrs/reducedDims_',
+            names(rdo))
+        lad <- seq_along(reducedDims_names)
+        reducedDims_colnames <- paste0(reducedDims_names, "_colnames")
+        reducedDims_rownames <- paste0(reducedDims_names, "_rownames")
+        reducedDims_attr_names <- paste0('ReducedDimsName', lad)
+        if (!length(rdo))
             reducedDims_names <- character(0)
-        Map(.exportLoom, reducedDims(object), name = reducedDims_names, MoreArgs = list(con = con))
+        Map(.exportLoom, rdo, name = reducedDims_names, MoreArgs = list(con = con))
+
+        rdcolnames <- lapply(rdo, colnames)
+        rdrownames <- lapply(rdo, rownames)
+        if (length(rdcolnames)) {
+            reducedDims_attr_colnames <- paste0('ReducedDimsColNames', lad)
+            Map(.exportLoom, lapply(rdo, colnames),
+                name = reducedDims_colnames, MoreArgs = list(con = con))
+        }
+        if (any(!is.null(unlist(rdrownames)))) {
+            reducedDims_attr_rownames <- paste0('ReducedDimsRowNames', lad)
+            Map(.exportLoom, lapply(rdo, rownames),
+                name = reducedDims_rownames, MoreArgs = list(con = con))
+        }
     }
 
     .exportLoom(colData(object), con, 'col_attrs', colnames_attr)
@@ -251,6 +267,10 @@ setMethod('.exportLoom', 'LoomGraphs',
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
         Map(rhdf5::h5writeAttribute, reducedDims_names,
             name = reducedDims_attr_names, MoreArgs = list(h5obj = h5f))
+        Map(rhdf5::h5writeAttribute, reducedDims_colnames,
+            name = reducedDims_attr_colnames, MoreArgs = list(h5obj = h5f))
+        Map(rhdf5::h5writeAttribute, reducedDims_rownames,
+            name = reducedDims_attr_rownames, MoreArgs = list(h5obj = h5f))
     }, error = function(err) {
         warning(conditionMessage(err))
     }, finally = H5Fclose(h5f))

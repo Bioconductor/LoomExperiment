@@ -1,4 +1,10 @@
 
+.importLoom_colchar <-
+    function(con, name)
+{
+    as.character(rhdf5::h5read(con, name))
+}
+
 #' @importFrom HDF5Array HDF5Array
 .importLoom_matrix <-
     function(con, name)
@@ -109,7 +115,7 @@ setMethod('import', 'LoomFile',
 
     metadata <- rhdf5::h5readAttributes(con, '/')
     metadata_names <- names(metadata)
-    idx <- grep("ReducedDims", metadata_names)
+    idx <- grep("ReducedDimsName", metadata_names)
     reducedDims_names <- metadata_names[idx]
 
     assay <- .importLoom_matrix(con, '/matrix')
@@ -141,15 +147,18 @@ setMethod('import', 'LoomFile',
     }
 
     if (is_singlecellloomexperiment) {
-        names <- ls[ls$group %in% '/reducedDims', 'name', drop=TRUE]
-
-        if(length(reducedDims_names) == 0)
+        if (length(reducedDims_names) == 0)
             reducedDims <- list()
         else {
             reducedDims <- metadata[reducedDims_names]
-            reducedDims <- lapply(paste0('/', reducedDims), function(x) {
-                as.matrix(.importLoom_matrix(con, x))
-            })
+            reducedattrs <- strsplit(unlist(reducedDims), "_")
+            names <- vapply(reducedattrs, `[[`, character(1L), 3L)
+            rdimcols <- metadata[grep("ReducedDimsColNames", metadata_names)]
+            reducedDims <- Map(function(x, y) {
+                mat <- as.matrix(.importLoom_matrix(con, x))
+                colnames(mat) <- .importLoom_colchar(con, y)
+                mat
+            }, x = reducedDims, y = rdimcols)
             names(reducedDims) <- names
             reducedDims <- SimpleList(reducedDims)
         }

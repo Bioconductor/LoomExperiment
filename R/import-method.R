@@ -2,6 +2,7 @@
 .importLoom_colchar <-
     function(con, name)
 {
+    name <- as.character(name)
     as.character(rhdf5::h5read(con, name))
 }
 
@@ -9,6 +10,7 @@
 .importLoom_matrix <-
     function(con, name)
 {
+    name <- as.character(name)
     t(HDF5Array::HDF5Array(con, name))
 }
 

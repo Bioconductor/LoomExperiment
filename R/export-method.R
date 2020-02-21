@@ -41,7 +41,10 @@ setMethod('.exportLoom', 'vector',
 setMethod('.exportLoom', 'data.frame',
     function(object, con, name, rowname_attr)
 {
-    if (!is.null(rowname_attr))
+    rnames <- rownames(object)
+    hasdfrownames <- identical(rownames(object),
+        as.character(seq_along(rownames(object))))
+    if (!is.null(rowname_attr) && !hasdfrownames)
         object[[rowname_attr]] <- rownames(object)
 
     is.factor <- vapply(object, is, logical(1), 'factor')
@@ -267,10 +270,12 @@ setMethod('.exportLoom', 'LoomGraphs',
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
         Map(rhdf5::h5writeAttribute, reducedDims_names,
             name = reducedDims_attr_names, MoreArgs = list(h5obj = h5f))
-        Map(rhdf5::h5writeAttribute, reducedDims_colnames,
-            name = reducedDims_attr_colnames, MoreArgs = list(h5obj = h5f))
-        Map(rhdf5::h5writeAttribute, reducedDims_rownames,
-            name = reducedDims_attr_rownames, MoreArgs = list(h5obj = h5f))
+        if (exists("reducedDims_attr_colnames"))
+            Map(rhdf5::h5writeAttribute, reducedDims_colnames,
+                name = reducedDims_attr_colnames, MoreArgs = list(h5obj = h5f))
+        if (exists("reducedDims_attr_rownames"))
+            Map(rhdf5::h5writeAttribute, reducedDims_rownames,
+                name = reducedDims_attr_rownames, MoreArgs = list(h5obj = h5f))
     }, error = function(err) {
         warning(conditionMessage(err))
     }, finally = H5Fclose(h5f))

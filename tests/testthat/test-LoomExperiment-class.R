@@ -76,7 +76,7 @@ test_that("creation through construction works", {
 
     expect_equivalent(le, le2)
     expect_equivalent(be, be2)
-    
+
     le3 <- as(be, names)
     be3 <- as(le2, class)
 
@@ -90,7 +90,7 @@ test_that("creation through coercion works", {
 
 .test_LoomGraphs <- function(experiment) {
     le <- experiment(assay=v, colGraphs=cgs, rowGraphs=rgs)
-    
+
     expect_equivalent(colGraphs(le), cgs)
     expect_equivalent(rowGraphs(le), rgs)
 
@@ -122,4 +122,20 @@ test_that("creation through coercion works", {
 
 test_that("LoomGraphs work with LoomExperiments", {
     Map(.test_LoomGraphs, experiments)
+})
+
+test_that("reducedDim dimnames persist after export and import", {
+    example(SingleCellExperiment)
+    sce <- as(se, "SingleCellExperiment")
+    scle <- as(sce, "SingleCellLoomExperiment")
+    rdresults <- list(
+        pca = matrix(1:200, nrow = 100, dimnames = list(NULL, c("A", "B"))),
+        tsne = matrix(1:200, nrow = 100, dimnames = list(NULL, c("C", "D")))
+    )
+    reducedDims(scle) <- rdresults
+    expect_identical(reducedDims(scle), SimpleList(rdresults))
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_identical(reducedDims(iscle), SimpleList(rdresults))
 })

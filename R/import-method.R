@@ -43,10 +43,12 @@
         df[] <- lapply(df, as.vector)
     df <- DataFrame(df)
 
-    if (!is.null(rowname)) {
+    rnames <- as.character(df[[rowname]])
+    hasdfrownames <- identical(rnames, as.character(seq_along(rnames)))
+    if (!is.null(rowname) && !hasdfrownames) {
         rownames(df) <- df[[rowname]]
-        df <- df[, -match(rowname, colnames(df)), drop = FALSE]
     }
+    df <- df[, -match(rowname, colnames(df)), drop = FALSE]
     if (nrow(df) == 0L)
         df <- NULL
     df
@@ -97,6 +99,19 @@
     })
 
     GRangesList(final)
+}
+
+.eq_dims <- function(asys, coldat , rowdat) {
+    adims <- if (all(isEmpty(asys))) c(0L, 0L) else dim(asys[[1L]])
+    zrows <- if (isEmpty(rowdat)) {
+        adims[1]
+    } else if (inherits(rowdat, "GenomicRanges_OR_GRangesList")) {
+        length(rowdat)
+    } else {
+        nrow(rowdat)
+    }
+    crows <- if (isEmpty(coldat)) adims[2] else nrow(coldat)
+    identical(adims, c(zrows, crows))
 }
 
 #' @importFrom rhdf5 h5ls h5readAttributes
@@ -235,11 +250,8 @@ setMethod('import', 'LoomFile',
     }
 
     ## if a transposition couldn't be performed on the array in export; do it here
-    if(ncol(assays[[1]]) != nrow(colData) && nrow(assays[[1]]) != nrow(rowData)) {
-        if(ncol(assays[[1]]) == nrow(rowData) && nrow(assays[[1]]) == nrow(colData)) {
-            assays <- lapply(assays, t)
-        }
-    }
+    if (!.eq_dims(assays, colData, rowData))
+        assays <- lapply(assays, t)
 
     if (!missing(type)) { ## check if LoomExperiment class is specified
         type <- match.arg(type)

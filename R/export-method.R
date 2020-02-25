@@ -41,10 +41,7 @@ setMethod('.exportLoom', 'vector',
 setMethod('.exportLoom', 'data.frame',
     function(object, con, name, rowname_attr)
 {
-    rnames <- rownames(object)
-    hasdfrownames <- identical(rownames(object),
-        as.character(seq_along(rownames(object))))
-    if (!is.null(rowname_attr) && !hasdfrownames)
+    if (!is.null(rowname_attr))
         object[[rowname_attr]] <- rownames(object)
 
     is.factor <- vapply(object, is, logical(1), 'factor')

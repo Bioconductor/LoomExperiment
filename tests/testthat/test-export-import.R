@@ -65,7 +65,7 @@ test_that("import", {
     expect_equal(rle_m, assays(rle_empty)[[1]])
     rle_mat0 <- rowData(rle_empty)
     rownames(rle_mat0) <- seq_len(20)
-    expect_equal(rle_mat0, rowData(rle2))
+    expect_equal(rle_mat0, rowData(rle2), check.attributes = FALSE)
     expect_equivalent(colData(rle_empty), colData(rle2))
 ## Possibly not important to return empty rowRanges?
 #    expect_equal(rowRanges(rle_empty), rowRanges(rle2))
@@ -97,7 +97,7 @@ test_that("import", {
         rd
     })
     rd_scle <- List(rd_scle)
-    expect_equal(rd_scle, reducedDims(scle2))
+    expect_equal(rd_scle, reducedDims(scle2), check.attributes = FALSE)
     expect_equal(scle@int_colData, scle2@int_colData)
     expect_equal(scle@int_elementMetadata, scle2@int_elementMetadata)
     expect_equal(scle@int_metadata, scle2@int_metadata)
@@ -118,7 +118,8 @@ test_that("reducedDim dimnames persist after export and import", {
     f <- tempfile(fileext = ".loom")
     export(scle, f)
     iscle <- import(f, type = "SingleCellLoomExperiment")
-    expect_identical(reducedDims(iscle), SimpleList(rdresults))
+    expect_equal(reducedDims(iscle), SimpleList(rdresults),
+        check.attributes = FALSE)
 })
 
 test_that("reducedDim mixed dimnames persist after export and import", {
@@ -131,7 +132,8 @@ test_that("reducedDim mixed dimnames persist after export and import", {
     f <- tempfile(fileext = ".loom")
     export(scle, f)
     iscle <- import(f, type = "SingleCellLoomExperiment")
-    expect_identical(reducedDims(iscle), SimpleList(rdresults))
+    expect_equal(reducedDims(iscle), SimpleList(rdresults),
+        check.attributes = FALSE)
 })
 
 test_that("colData factor columns persist after import", {

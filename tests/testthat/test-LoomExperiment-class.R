@@ -124,18 +124,3 @@ test_that("LoomGraphs work with LoomExperiments", {
     Map(.test_LoomGraphs, experiments)
 })
 
-test_that("reducedDim dimnames persist after export and import", {
-    example(SingleCellExperiment)
-    sce <- as(se, "SingleCellExperiment")
-    scle <- as(sce, "SingleCellLoomExperiment")
-    rdresults <- list(
-        pca = matrix(1:200, nrow = 100, dimnames = list(NULL, c("A", "B"))),
-        tsne = matrix(1:200, nrow = 100, dimnames = list(NULL, c("C", "D")))
-    )
-    reducedDims(scle) <- rdresults
-    expect_identical(reducedDims(scle), SimpleList(rdresults))
-    f <- tempfile(fileext = ".loom")
-    export(scle, f)
-    iscle <- import(f, type = "SingleCellLoomExperiment")
-    expect_identical(reducedDims(iscle), SimpleList(rdresults))
-})

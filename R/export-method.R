@@ -49,7 +49,10 @@ setMethod('.exportLoom', 'data.frame',
 
     is.factor <- vapply(object, is, logical(1), 'factor')
     object[is.factor] <- lapply(object[is.factor], as.character)
+    isfactor <- as.numeric(is.factor)
 
+    if (length(isfactor) && identical(rowname_attr, "colnames"))
+        .exportLoom(isfactor, con, paste0("/col_attrs/colnames_factor"))
     names <- sprintf('/%s/%s', name, names(object))
     tryCatch({
         Map(rhdf5::h5write, object, names, MoreArgs = list(file = con))
@@ -171,6 +174,13 @@ setMethod('.exportLoom', 'LoomGraphs',
     }
 })
 
+.charnames <- function(x, FUN = colnames) {
+    lapply(x, function(y) {
+        nnames <- FUN(y)
+        if (is.null(nnames)) character(0L) else nnames
+    })
+}
+
 #' @importFrom S4Vectors metadata
 #' @importFrom methods is
 #' @importFrom rhdf5 H5Fclose H5Fopen
@@ -231,16 +241,20 @@ setMethod('.exportLoom', 'LoomGraphs',
             reducedDims_names <- character(0)
         Map(.exportLoom, rdo, name = reducedDims_names, MoreArgs = list(con = con))
 
-        rdcolnames <- lapply(rdo, colnames)
-        rdrownames <- lapply(rdo, rownames)
-        if (length(rdcolnames)) {
-            reducedDims_attr_colnames <- paste0('ReducedDimsColNames', lad)
-            Map(.exportLoom, lapply(rdo, colnames),
+        rdcols <- .charnames(rdo, colnames)
+        rdrows <- .charnames(rdo, rownames)
+        rdcolnames <- !vapply(rdo, function(x) is.null(colnames(x)), logical(1L))
+        rdrownames <- !vapply(rdo, function(x) is.null(rownames(x)), logical(1L))
+        if (any(rdcolnames)) {
+            reducedDims_attr_colnames <- paste0('ReducedDimsColNames', lad[rdcolnames])
+            reducedDims_colnames <- reducedDims_colnames[rdcolnames]
+            Map(.exportLoom, rdcols[rdcolnames],
                 name = reducedDims_colnames, MoreArgs = list(con = con))
         }
-        if (any(!is.null(unlist(rdrownames)))) {
-            reducedDims_attr_rownames <- paste0('ReducedDimsRowNames', lad)
-            Map(.exportLoom, lapply(rdo, rownames),
+        if (any(rdrownames)) {
+            reducedDims_attr_rownames <- paste0('ReducedDimsRowNames', lad[rdrownames])
+            reducedDims_rownames <- reducedDims_rownames[rdrownames]
+            Map(.exportLoom, rdrows[rdrownames],
                 name = reducedDims_rownames, MoreArgs = list(con = con))
         }
     }

@@ -101,8 +101,33 @@ test_that("import", {
     expect_equal(scle@int_colData, scle2@int_colData)
     expect_equal(scle@int_elementMetadata, scle2@int_elementMetadata)
     expect_equal(scle@int_metadata, scle2@int_metadata)
-    
+
     l1 <- import(l1_f, type="SingleCellLoomExperiment")
     expect_equal(nrow(l1), 20)
+})
+
+context("reducedDim is exported and imported correctly")
+
+test_that("reducedDim dimnames persist after export and import", {
+    rdresults <- list(
+        pca = matrix(1:12, nrow = 6, dimnames = list(NULL, c("A", "B"))),
+        tsne = matrix(1:12, nrow = 6, dimnames = list(NULL, c("C", "D")))
+    )
+    reducedDims(scle) <- rdresults
+    expect_identical(reducedDims(scle), SimpleList(rdresults))
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_identical(reducedDims(iscle), SimpleList(rdresults))
+})
+
+test_that("colData factor columns persist after import", {
+    coldat <- DataFrame(cluster = factor(rep(1:3, each = 2)),
+        tray = rep(letters[1:2], each = 3), value = 1:6)
+    colData(scle) <- coldat
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_identical(colData(iscle), coldat)
 })
 

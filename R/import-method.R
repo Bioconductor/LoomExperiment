@@ -22,19 +22,27 @@
     ls <- h5ls(con)
     names_ls <- ls[ls$group %in% name & ls$otype %in% 'H5I_DATASET', 'name']
     names <- paste0(name, '/', names_ls)
+    cfa <- paste0(name, "/", "colnames_factor")
+    has_factor <- cfa %in% names
     if (!missing(exclude)) {
-        indices <- !names %in% exclude
+        indices <- !names %in% c(exclude, cfa)
         names <- names[indices]
         names_ls <- names_ls[indices]
     }
 
+    if (has_factor)
+        isfactor <- as.logical(rhdf5::h5read(con, cfa))
     df <- lapply(names, function(x) {
         rhdf5::h5read(con, x)
     })
     names(df) <- names_ls
+    if (has_factor) {
+        df[isfactor] <- lapply(df[isfactor], as.factor)
+        df[!isfactor] <- lapply(df[!isfactor], as.vector)
+    } else
+        df[] <- lapply(df, as.vector)
     df <- DataFrame(df)
-    #df <- DataFrame(rhdf5::h5read(con, name))
-    df[] <- lapply(df, as.vector)
+
     if (!is.null(rowname)) {
         rownames(df) <- df[[rowname]]
         df <- df[, -match(rowname, colnames(df)), drop = FALSE]
@@ -117,7 +125,7 @@ setMethod('import', 'LoomFile',
 
     metadata <- rhdf5::h5readAttributes(con, '/')
     metadata_names <- names(metadata)
-    idx <- grep("ReducedDimsName", metadata_names)
+    idx <- grep("ReducedDims", metadata_names)
     reducedDims_names <- metadata_names[idx]
 
     assay <- .importLoom_matrix(con, '/matrix')
@@ -152,15 +160,23 @@ setMethod('import', 'LoomFile',
         if (length(reducedDims_names) == 0)
             reducedDims <- list()
         else {
-            reducedDims <- metadata[reducedDims_names]
+            reducedDims <- grep("colnames", metadata[reducedDims_names],
+                invert = TRUE, value = TRUE)
             reducedattrs <- strsplit(unlist(reducedDims), "_")
             names <- vapply(reducedattrs, `[[`, character(1L), 3L)
             rdimcols <- metadata[grep("ReducedDimsColNames", metadata_names)]
-            reducedDims <- Map(function(x, y) {
-                mat <- as.matrix(.importLoom_matrix(con, x))
-                colnames(mat) <- .importLoom_colchar(con, y)
-                mat
-            }, x = reducedDims, y = rdimcols)
+            reducedDims <- lapply(reducedDims, function(x)
+                as.matrix(.importLoom_matrix(con, x))
+            )
+            if (length(rdimcols)) {
+                withCols <- gsub("ColNames", "Name", names(rdimcols))
+                reducedDims[withCols] <- Map(function(x, y) {
+                    colnames(x) <- .importLoom_colchar(con, y)
+                    x
+                },
+                x = reducedDims[withCols],
+                y = rdimcols)
+            }
             names(reducedDims) <- names
             reducedDims <- SimpleList(reducedDims)
         }

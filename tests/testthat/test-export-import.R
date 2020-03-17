@@ -116,6 +116,24 @@ test_that("import", {
 
 context("reducedDim is exported and imported correctly")
 
+test_that("reducedDim works after export and import", {
+    rdresults <- list(
+        pca = matrix(1:12, nrow = 6),
+        tsne = matrix(1:12, nrow = 6)
+    )
+    reducedDims(scle) <- rdresults
+    expect_identical(reducedDims(scle), SimpleList(rdresults))
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_equal(reducedDims(iscle), SimpleList(rdresults),
+        check.attributes = FALSE)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
+})
+
+
 test_that("reducedDim dimnames persist after export and import", {
     rdresults <- list(
         pca = matrix(1:12, nrow = 6, dimnames = list(NULL, c("A", "B"))),

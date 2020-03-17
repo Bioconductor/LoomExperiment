@@ -229,8 +229,7 @@ setMethod('.exportLoom', 'LoomGraphs',
 
     if (is(object, 'SingleCellLoomExperiment')) {
         rdo <- reducedDims(object)
-        reducedDims_names <- paste0('/col_attrs/reducedDims_',
-            names(rdo))
+        reducedDims_names <- paste0('/col_attrs/reducedDims_', names(rdo))
         lad <- seq_along(reducedDims_names)
         reducedDims_colnames <- paste0(reducedDims_names, "_colnames")
         reducedDims_rownames <- paste0(reducedDims_names, "_rownames")
@@ -244,7 +243,8 @@ setMethod('.exportLoom', 'LoomGraphs',
         rdcolnames <- !vapply(rdo, function(x) is.null(colnames(x)), logical(1L))
         rdrownames <- !vapply(rdo, function(x) is.null(rownames(x)), logical(1L))
         if (any(rdcolnames)) {
-            reducedDims_attr_colnames <- paste0('ReducedDimsColNames', lad[rdcolnames])
+            reducedDims_attr_colnames <- paste0('ReducedDimsColNames',
+                lad[rdcolnames])
             reducedDims_colnames <- reducedDims_colnames[rdcolnames]
             rdatcolnames <- lapply(rdcols[rdcolnames], function(x) {
                 ctemp <- vector("character", ncol(object))

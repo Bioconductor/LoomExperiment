@@ -160,7 +160,8 @@ setMethod('import', 'LoomFile',
     is_rangedloomexperiment <- any(grepl('GRanges', ls$name))
     is_singlecellloomexperiment <- any(grepl('reducedDims', ls$name))
 
-    colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr, unlist(metadata[reducedDims_names]))
+    colData <- .importLoom_DataFrame(con, '/col_attrs', colnames_attr,
+        unlist(metadata[reducedDims_names]))
 
     if (is_rangedloomexperiment) {
         if (any(grepl('GRangesList', ls$name)))

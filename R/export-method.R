@@ -246,7 +246,12 @@ setMethod('.exportLoom', 'LoomGraphs',
         if (any(rdcolnames)) {
             reducedDims_attr_colnames <- paste0('ReducedDimsColNames', lad[rdcolnames])
             reducedDims_colnames <- reducedDims_colnames[rdcolnames]
-            Map(.exportLoom, rdcols[rdcolnames],
+            rdatcolnames <- lapply(rdcols[rdcolnames], function(x) {
+                ctemp <- vector("character", ncol(object))
+                ctemp[seq_along(x)] <- x
+                ctemp
+            })
+            Map(.exportLoom, rdatcolnames,
                 name = reducedDims_colnames, MoreArgs = list(con = con))
         }
         if (any(rdrownames)) {

@@ -232,16 +232,13 @@ setMethod('.exportLoom', 'LoomGraphs',
         reducedDims_names <- paste0('/col_attrs/reducedDims_', names(rdo))
         lad <- seq_along(reducedDims_names)
         reducedDims_colnames <- paste0(reducedDims_names, "_colnames")
-        reducedDims_rownames <- paste0(reducedDims_names, "_rownames")
         reducedDims_attr_names <- paste0('ReducedDimsName', lad)
         if (!length(rdo))
             reducedDims_names <- character(0)
         Map(.exportLoom, rdo, name = reducedDims_names, MoreArgs = list(con = con))
 
         rdcols <- .charnames(rdo, colnames)
-        rdrows <- .charnames(rdo, rownames)
         rdcolnames <- !vapply(rdo, function(x) is.null(colnames(x)), logical(1L))
-        rdrownames <- !vapply(rdo, function(x) is.null(rownames(x)), logical(1L))
         if (any(rdcolnames)) {
             reducedDims_attr_colnames <- paste0('ReducedDimsColNames',
                 lad[rdcolnames])
@@ -253,12 +250,6 @@ setMethod('.exportLoom', 'LoomGraphs',
             })
             Map(.exportLoom, rdatcolnames,
                 name = reducedDims_colnames, MoreArgs = list(con = con))
-        }
-        if (any(rdrownames)) {
-            reducedDims_attr_rownames <- paste0('ReducedDimsRowNames', lad[rdrownames])
-            reducedDims_rownames <- reducedDims_rownames[rdrownames]
-            Map(.exportLoom, rdrows[rdrownames],
-                name = reducedDims_rownames, MoreArgs = list(con = con))
         }
     }
 

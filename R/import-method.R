@@ -31,14 +31,14 @@
     }
 
     if (has_factor)
-        isfactor <- as.logical(rhdf5::h5read(con, cfa))
+        isfactor <- as.logical(t(rhdf5::h5read(con, cfa))[1L, ])
     df <- lapply(names, function(x) {
         rhdf5::h5read(con, x)
     })
     names(df) <- names_ls
     if (has_factor) {
-        df[isfactor] <- lapply(df[isfactor], as.factor)
-        df[!isfactor] <- lapply(df[!isfactor], as.vector)
+        df <- Map(function(x, y) { if (y) as.factor(x) else as.vector(x) },
+            x = df, y = isfactor)
     } else
         df[] <- lapply(df, as.vector)
     df <- DataFrame(df)
@@ -186,7 +186,7 @@ setMethod('import', 'LoomFile',
             if (length(rdimcols)) {
                 withCols <- gsub("ColNames", "Name", names(rdimcols))
                 reducedDims[withCols] <- Map(function(x, y) {
-                    colnames(x) <- .importLoom_colchar(con, y)
+                    colnames(x) <- .importLoom_colchar(con, y)[seq_len(ncol(x))]
                     x
                 },
                 x = reducedDims[withCols],

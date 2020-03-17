@@ -46,8 +46,8 @@ setMethod('.exportLoom', 'data.frame',
 
     is.factor <- vapply(object, is, logical(1), 'factor')
     object[is.factor] <- lapply(object[is.factor], as.character)
-    isfactor <- as.numeric(is.factor)
-
+    isfactor <- matrix(rep(as.integer(is.factor), each = nrow(object)),
+        ncol = ncol(object))
     if (length(isfactor) && identical(rowname_attr, "colnames"))
         .exportLoom(isfactor, con, paste0("/col_attrs/colnames_factor"))
     names <- sprintf('/%s/%s', name, names(object))

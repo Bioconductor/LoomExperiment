@@ -35,6 +35,14 @@ scle <- SingleCellLoomExperiment(assays=assay, rowRanges=granges, reducedDims=re
 
 experiment_list <- list(sle, rle_empty, rle_some, rle_full, scle)
 
+skip_if_no_loompy <- function() {
+    have_loompy <- reticulate::py_module_available("loompy")
+    if (!have_loompy)
+        skip("loompy not available for testing")
+    else
+        reticulate::import("loompy")
+}
+
 ################################################################################
 context("export method works")
 ################################################################################
@@ -120,6 +128,9 @@ test_that("reducedDim dimnames persist after export and import", {
     iscle <- import(f, type = "SingleCellLoomExperiment")
     expect_equal(reducedDims(iscle), SimpleList(rdresults),
         check.attributes = FALSE)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
 })
 
 test_that("reducedDim mixed dimnames persist after export and import", {
@@ -134,6 +145,9 @@ test_that("reducedDim mixed dimnames persist after export and import", {
     iscle <- import(f, type = "SingleCellLoomExperiment")
     expect_equal(reducedDims(iscle), SimpleList(rdresults),
         check.attributes = FALSE)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
 })
 
 test_that("colData factor columns persist after import", {
@@ -144,5 +158,8 @@ test_that("colData factor columns persist after import", {
     export(scle, f)
     iscle <- import(f, type = "SingleCellLoomExperiment")
     expect_identical(colData(iscle), coldat)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
 })
 

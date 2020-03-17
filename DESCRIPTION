@@ -22,7 +22,8 @@ Imports: DelayedArray,
          utils
 Suggests: testthat,
           BiocStyle,
-          knitr
+          knitr,
+          reticulate
 Collate: AllGenerics.R
          utils.R
          SharedMethods.R

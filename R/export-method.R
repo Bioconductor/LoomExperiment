@@ -149,9 +149,10 @@ setMethod('.exportLoom', 'LoomGraph',
     rhdf5::h5createGroup(con, name)
     object <- as(object, "DataFrame")
     object <- as.matrix(object)
-    object[,1] <- object[,1] - 1
-    object[,2] <- object[,2] - 1
+    object[,1] <- object[,1] - 1L
+    object[,2] <- object[,2] - 1L
     object <- DataFrame(object)
+    object[,c("a","b")] <- lapply(object[, c("a","b")], as.integer)
     name <- paste0(name, '/', colnames(object))
     tryCatch({
         Map(rhdf5::h5write, object, name, MoreArgs = list(file = con))

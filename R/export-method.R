@@ -79,10 +79,10 @@ setMethod('.exportLoom', 'GenomicRanges',
     function(object, con, name, rowname_attr)
 {
     object <- as.data.frame(object)
-    name <- paste0(name, '/GRanges')
+    #name <- paste0(name, '/GRanges')
     rhdf5::h5createGroup(con, name)
     names <- colnames(object)
-    colnames(object) <- names
+    colnames(object) <- paste0('GRanges_', names)
     .exportLoom(object, con, name, rowname_attr)
 })
 
@@ -102,11 +102,11 @@ setMethod('.exportLoom', 'GenomicRangesList',
     if(is.null(names))
         names <- rep('', length(object))
 
-    name <- paste0(name, '/GRangesList')
+#    name <- paste0(name, '/GRangesList')
     rhdf5::h5createGroup(con, name)
 
-    .exportLoom(lengths, con, paste0(name, '/lengths'), rowname_attr)
-    .exportLoom(names, con, paste0(name, '/names'), rowname_attr)
+    .exportLoom(lengths, con, paste0(name, '/GRangesList_lengths'), rowname_attr)
+    .exportLoom(names, con, paste0(name, '/GRangesList_names'), rowname_attr)
 
     rownames <- unlist(lapply(object, function(x) rownames(as.data.frame(x))))
 
@@ -139,7 +139,7 @@ setMethod('.exportLoom', 'GenomicRangesList',
         do.call(rbind, val)
     })
 
-    df_names <- paste0(name, '/', names)
+    df_names <- paste0(name, '/GRangesList_', names)
     Map(.exportLoom, dfs, name = df_names, MoreArgs = list(con = con))
 })
 
@@ -276,14 +276,15 @@ setMethod('.exportLoom', 'LoomGraphs',
         rhdf5::h5writeAttribute(matrix, h5obj=h5f, name='MatrixName')
         Map(rhdf5::h5writeAttribute, metadata(object),
             name = names(metadata(object)), MoreArgs = list(h5obj = h5f))
-        Map(rhdf5::h5writeAttribute, reducedDims_names,
-            name = reducedDims_attr_names, MoreArgs = list(h5obj = h5f))
+        if (is(object, "SingleCellLoomExperiment"))
+            Map(rhdf5::h5writeAttribute, reducedDims_names,
+                name = reducedDims_attr_names, MoreArgs = list(h5obj = h5f))
         if (exists("reducedDims_attr_colnames"))
             Map(rhdf5::h5writeAttribute, reducedDims_colnames,
                 name = reducedDims_attr_colnames, MoreArgs = list(h5obj = h5f))
-        if (exists("reducedDims_attr_rownames"))
-            Map(rhdf5::h5writeAttribute, reducedDims_rownames,
-                name = reducedDims_attr_rownames, MoreArgs = list(h5obj = h5f))
+#        if (exists("reducedDims_attr_rownames"))
+#            Map(rhdf5::h5writeAttribute, reducedDims_rownames,
+#                name = reducedDims_attr_rownames, MoreArgs = list(h5obj = h5f))
     }, error = function(err) {
         warning(conditionMessage(err))
     }, finally = H5Fclose(h5f))

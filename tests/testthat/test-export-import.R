@@ -70,7 +70,7 @@ test_that("import", {
     rle_m <- as.matrix(assays(rle2)[[1]])
     colnames(rle_m) <- NULL
     rownames(rle_m) <- NULL
-    expect_equal(rle_m, assays(rle_empty)[[1]])
+    expect_equal(rle_m, assays(rle_empty)[[1]], check.attributes = FALSE)
     rle_mat0 <- rowData(rle_empty)
     rownames(rle_mat0) <- seq_len(20)
     expect_equal(rle_mat0, rowData(rle2), check.attributes = FALSE)
@@ -109,9 +109,6 @@ test_that("import", {
     expect_equal(scle@int_colData, scle2@int_colData)
     expect_equal(scle@int_elementMetadata, scle2@int_elementMetadata)
     expect_equal(scle@int_metadata, scle2@int_metadata)
-
-    l1 <- import(l1_f, type="SingleCellLoomExperiment")
-    expect_equal(nrow(l1), 20)
 })
 
 context("reducedDim is exported and imported correctly")
@@ -125,6 +122,7 @@ test_that("reducedDim works after export and import", {
     expect_identical(reducedDims(scle), SimpleList(rdresults))
     f <- tempfile(fileext = ".loom")
     export(scle, f)
+    pp <- f
     iscle <- import(f, type = "SingleCellLoomExperiment")
     expect_equal(reducedDims(iscle), SimpleList(rdresults),
         check.attributes = FALSE)

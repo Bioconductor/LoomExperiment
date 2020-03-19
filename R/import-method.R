@@ -54,18 +54,25 @@
     df
 }
 
+#' @importFrom stringr str_replace
 .importLoom_GRanges <-
     function(con, name, ls)
 {
-    name <- paste0(name, '/GRanges')
+    #name <- paste0(name, '/GRanges')
     ls <- h5ls(con)
-    gr <- rhdf5::h5read(con, name)
-    gr <- as.data.frame(gr)
+    labels <- ls$name
+    labels <- labels[grep("GRanges_", labels)]
+    names <- stringr::str_replace(labels, "GRanges_", "")
+    labels <- paste0(name, '/', labels)
 
+    gr <- Map(rhdf5::h5read, con, labels)
+    names(gr) <- names
+    gr <- as.data.frame(gr)
     gr['seqnames'] <- as.character(gr[['seqnames']])
     gr['rownames'] <- as.character(gr[['rownames']])
     gr <- subset(gr, select = -c(rownames))
 
+    gr <- GRanges(gr)
     GRanges(gr)
 }
 
@@ -73,8 +80,13 @@
     function(con, name, ls)
 {
     ls <- h5ls(con)
-    grl <- rhdf5::h5read(con, name)
-    grl <- grl[[1]]
+    labels <- ls$name
+    labels <- labels[grep("GRangesList_", labels)]
+    names <- stringr::str_replace(labels, "GRangesList_", "")
+    labels <- paste0(name, '/', labels)
+
+    grl <- Map(rhdf5::h5read, con, labels)
+    names(grl) <- names
 
     lengths <- as.vector(grl[['lengths']])
     names <- as.vector(grl[['names']])

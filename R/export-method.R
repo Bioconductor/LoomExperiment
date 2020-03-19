@@ -282,9 +282,6 @@ setMethod('.exportLoom', 'LoomGraphs',
         if (exists("reducedDims_attr_colnames"))
             Map(rhdf5::h5writeAttribute, reducedDims_colnames,
                 name = reducedDims_attr_colnames, MoreArgs = list(h5obj = h5f))
-#        if (exists("reducedDims_attr_rownames"))
-#            Map(rhdf5::h5writeAttribute, reducedDims_rownames,
-#                name = reducedDims_attr_rownames, MoreArgs = list(h5obj = h5f))
     }, error = function(err) {
         warning(conditionMessage(err))
     }, finally = H5Fclose(h5f))

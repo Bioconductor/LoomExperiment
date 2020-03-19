@@ -76,7 +76,7 @@ test_that("creation through construction works", {
 
     expect_equivalent(le, le2)
     expect_equivalent(be, be2)
-    
+
     le3 <- as(be, names)
     be3 <- as(le2, class)
 
@@ -90,7 +90,7 @@ test_that("creation through coercion works", {
 
 .test_LoomGraphs <- function(experiment) {
     le <- experiment(assay=v, colGraphs=cgs, rowGraphs=rgs)
-    
+
     expect_equivalent(colGraphs(le), cgs)
     expect_equivalent(rowGraphs(le), rgs)
 
@@ -123,3 +123,4 @@ test_that("creation through coercion works", {
 test_that("LoomGraphs work with LoomExperiments", {
     Map(.test_LoomGraphs, experiments)
 })
+

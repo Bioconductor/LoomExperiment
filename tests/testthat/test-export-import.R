@@ -35,6 +35,14 @@ scle <- SingleCellLoomExperiment(assays=assay, rowRanges=granges, reducedDims=re
 
 experiment_list <- list(sle, rle_empty, rle_some, rle_full, scle)
 
+skip_if_no_loompy <- function() {
+    have_loompy <- reticulate::py_module_available("loompy")
+    if (!have_loompy)
+        skip("loompy not available for testing")
+    else
+        reticulate::import("loompy")
+}
+
 ################################################################################
 context("export method works")
 ################################################################################
@@ -62,10 +70,10 @@ test_that("import", {
     rle_m <- as.matrix(assays(rle2)[[1]])
     colnames(rle_m) <- NULL
     rownames(rle_m) <- NULL
-    expect_equal(rle_m, assays(rle_empty)[[1]])
+    expect_equal(rle_m, assays(rle_empty)[[1]], check.attributes = FALSE)
     rle_mat0 <- rowData(rle_empty)
     rownames(rle_mat0) <- seq_len(20)
-    expect_equal(rle_mat0, rowData(rle2))
+    expect_equal(rle_mat0, rowData(rle2), check.attributes = FALSE)
     expect_equivalent(colData(rle_empty), colData(rle2))
 ## Possibly not important to return empty rowRanges?
 #    expect_equal(rowRanges(rle_empty), rowRanges(rle2))
@@ -97,12 +105,77 @@ test_that("import", {
         rd
     })
     rd_scle <- List(rd_scle)
-    expect_equal(rd_scle, reducedDims(scle2))
+    expect_equal(rd_scle, reducedDims(scle2), check.attributes = FALSE)
     expect_equal(scle@int_colData, scle2@int_colData)
     expect_equal(scle@int_elementMetadata, scle2@int_elementMetadata)
     expect_equal(scle@int_metadata, scle2@int_metadata)
-    
-    l1 <- import(l1_f, type="SingleCellLoomExperiment")
-    expect_equal(nrow(l1), 20)
+})
+
+context("reducedDim is exported and imported correctly")
+
+test_that("reducedDim works after export and import", {
+    rdresults <- list(
+        pca = matrix(1:12, nrow = 6),
+        tsne = matrix(1:12, nrow = 6)
+    )
+    reducedDims(scle) <- rdresults
+    expect_identical(reducedDims(scle), SimpleList(rdresults))
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    pp <- f
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_equal(reducedDims(iscle), SimpleList(rdresults),
+        check.attributes = FALSE)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
+})
+
+
+test_that("reducedDim dimnames persist after export and import", {
+    rdresults <- list(
+        pca = matrix(1:12, nrow = 6, dimnames = list(NULL, c("A", "B"))),
+        tsne = matrix(1:12, nrow = 6, dimnames = list(NULL, c("C", "D")))
+    )
+    reducedDims(scle) <- rdresults
+    expect_identical(reducedDims(scle), SimpleList(rdresults))
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_equal(reducedDims(iscle), SimpleList(rdresults),
+        check.attributes = FALSE)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
+})
+
+test_that("reducedDim mixed dimnames persist after export and import", {
+    rdresults <- list(
+        pca = matrix(1:12, nrow = 6, dimnames = list(NULL, c("A", "B"))),
+        tsne = matrix(1:12, nrow = 6, dimnames = list(NULL, NULL))
+    )
+    reducedDims(scle) <- rdresults
+    expect_identical(reducedDims(scle), SimpleList(rdresults))
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_equal(reducedDims(iscle), SimpleList(rdresults),
+        check.attributes = FALSE)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
+})
+
+test_that("colData factor columns persist after import", {
+    coldat <- DataFrame(cluster = factor(rep(1:3, each = 2)),
+        tray = rep(letters[1:2], each = 3), value = 1:6)
+    colData(scle) <- coldat
+    f <- tempfile(fileext = ".loom")
+    export(scle, f)
+    iscle <- import(f, type = "SingleCellLoomExperiment")
+    expect_identical(colData(iscle), coldat)
+
+    ly <- skip_if_no_loompy()
+    ly$connect(f)$shape
 })
 

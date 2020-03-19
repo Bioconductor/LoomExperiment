@@ -67,20 +67,11 @@ setMethod('.exportLoom', 'DataFrame',
     .exportLoom(object, con, name, rowname_attr)
 })
 
-#setMethod('.exportLoom', 'LoomGraph',
-#    function(object, con, name, rowname_attr)
-#{
-#    object <- as(object, "DataFrame")
-#    .exportLoom(object, con, name, rowname_attr)
-#})
-
 #' @import GenomicRanges
 setMethod('.exportLoom', 'GenomicRanges',
     function(object, con, name, rowname_attr)
 {
     object <- as.data.frame(object)
-    #name <- paste0(name, '/GRanges')
-    rhdf5::h5createGroup(con, name)
     names <- colnames(object)
     colnames(object) <- paste0('GRanges_', names)
     .exportLoom(object, con, name, rowname_attr)
@@ -101,9 +92,6 @@ setMethod('.exportLoom', 'GenomicRangesList',
     names <- names(object)
     if(is.null(names))
         names <- rep('', length(object))
-
-#    name <- paste0(name, '/GRangesList')
-    rhdf5::h5createGroup(con, name)
 
     .exportLoom(lengths, con, paste0(name, '/GRangesList_lengths'), rowname_attr)
     .exportLoom(names, con, paste0(name, '/GRangesList_names'), rowname_attr)

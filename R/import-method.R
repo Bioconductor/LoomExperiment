@@ -43,12 +43,14 @@
         df[] <- lapply(df, as.vector)
     df <- DataFrame(df)
 
-    rnames <- as.character(df[[rowname]])
-    hasdfrownames <- identical(rnames, as.character(seq_along(rnames)))
-    if (!is.null(rowname) && !hasdfrownames) {
-        rownames(df) <- df[[rowname]]
+    if (!is.null(rowname)) {
+        rnames <- as.character(df[[rowname]])
+        hasdfrownames <- identical(rnames, as.character(seq_along(rnames)))
+        if (!hasdfrownames) {
+            rownames(df) <- df[[rowname]]
+        }
+        df <- df[, -match(rowname, colnames(df)), drop = FALSE]
     }
-    df <- df[, -match(rowname, colnames(df)), drop = FALSE]
     if (nrow(df) == 0L)
         df <- NULL
     df

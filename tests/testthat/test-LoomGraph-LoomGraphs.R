@@ -31,7 +31,7 @@ test_that("LoomGraph methods work", {
     expect_equivalent(lg, lg2)
 })
 
-test_that("Subsetting issue is resolved", {
+test_that("Test that subsetting issue is resolved", {
     counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
     sce <- SingleCellExperiment(assays = list(counts = counts))
     scle <- as(sce, "SingleCellLoomExperiment")

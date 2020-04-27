@@ -204,9 +204,11 @@ setMethod('loomSelectHits', c('LoomGraph', 'ANY'),
         to_i <- .correctHits(to, n, to_i)
     to <- to + to_i
 
+    if (length(from) == 0 && length(to) == 0)
+        nr <- 0
     if (is.null(nr))
         nr <- max(from, to)
-    LoomGraph(from, to, nr, weight = mcols(x)[[1]])
+    suppressWarnings(LoomGraph(from, to, nr, weight = mcols(x)[[1]]))
 })
 
 setMethod('loomDropHits', c('LoomGraph', 'ANY'),
@@ -225,9 +227,11 @@ setMethod('loomDropHits', c('LoomGraph', 'ANY'),
         to_i <- .correctHits(to, n, to_i)
     to <- to + to_i
 
+    if (length(from) == 0 && length(to) == 0)
+        nr <- 0
     if (is.null(nr))
         nr <- max(from, to)
-    LoomGraph(from, to, nr, weight = mcols(x)[[1]])
+    suppressWarnings(LoomGraph(from, to, nr, weight = mcols(x)[[1]]))
 })
 
 setReplaceMethod('loomDropHits', c('LoomGraph', 'ANY', 'ANY'),

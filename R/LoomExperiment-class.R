@@ -115,7 +115,7 @@ setAs('SummarizedExperiment', 'LoomExperiment',
 ### Miscellenious methods.
 ###
 
-.change.nnode <- function(x, nr)
+.change.nnode <- function(x, nr = 0L)
 {
     endoapply(x, function(y) {
         y@nLnode <- nr

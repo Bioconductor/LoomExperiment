@@ -8,17 +8,25 @@
     colGraphs(x) <- LoomGraphs()
     x <- callNextMethod()
     if (!missing(i)) {
-        if(all(i > 0))
+        if (is.logical(i))
+            i <- which(i)
+        if (all(i > 0))
             rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomSelectHits(y, i)), nrow(x))
         else
-            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomDropHits(y, abs(i))), nrow(x))
+            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomDropHits(y, i)), nrow(x))
     }
+    else
+        rowGraphs(x) <- rg
     if (!missing(j)) {
-        if(all(j > 0))
+        if (is.logical(j))
+            j <- which(j)
+        if (all(j > 0))
             colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomSelectHits(y, j)), ncol(x))
         else
-            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomDropHits(y, abs(j))), ncol(x))
+            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomDropHits(y, j)), ncol(x))
     }
+    else
+        colGraphs(x) <- cg
     x
 }
 

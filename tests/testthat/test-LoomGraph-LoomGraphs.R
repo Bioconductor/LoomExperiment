@@ -31,6 +31,25 @@ test_that("LoomGraph methods work", {
     expect_equivalent(lg, lg2)
 })
 
+test_that("Subsetting issue is resolved", {
+    counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+    sce <- SingleCellExperiment(assays = list(counts = counts))
+    scle <- as(sce, "SingleCellLoomExperiment")
+
+    a <- c(1, 2, 3)
+    b <- c(3, 2, 1)
+    w <- c(100, 10, 1)
+    lg <- LoomGraph(a, b, weight=w)
+    lgs <- LoomGraphs(lg, lg)
+    names(lgs) <- c('lg1', 'lg2')
+
+    colGraphs(scle) <- lgs
+    rowGraphs(scle) <- lgs
+
+    colData(scle)$foo = sample(c("A", "B"), ncol(scle), replace = TRUE)
+    expect_error(scle[,scle$foo == "A"], NA)
+})
+
 ################################################################################
 context("LoomGraphs: Constructor and Methods")
 ################################################################################
@@ -43,5 +62,5 @@ test_that("LoomGraphs constructor works", {
     expect_error(LoomGraphs(lg, df))
 
     lgs <- LoomGraphs(lg, lg)
-    expect_equal(lg, lgs[[1]])
+   expect_equal(lg, lgs[[1]])
 })

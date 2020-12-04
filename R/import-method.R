@@ -264,28 +264,39 @@ setMethod('import', 'LoomFile',
         col_graphs <- do.call('LoomGraphs', col_graphs)
     }
 
-    ## if a transposition couldn't be performed on the array in export; do it here
+    ## if a transposition couldn't be performed on the array in
+    ## export; do it here
     if (!.eq_dims(assays, colData, rowData))
         assays <- lapply(assays, t)
 
     if (!missing(type)) { ## check if LoomExperiment class is specified
         type <- match.arg(type)
-        le <- do.call(type, list(assays=assays, rowData=rowData, colData=colData,
-                           rowGraphs=row_graphs, colGraphs=col_graphs))
+        le <- do.call(
+            type,
+            list(assays=assays, rowData=rowData, colData=colData,
+                 rowGraphs=row_graphs, colGraphs=col_graphs)
+        )
         if (is_singlecellloomexperiment) {
             reducedDims(le) <- reducedDims
         }
     } else { ## discover
         if (is_singlecellloomexperiment) {
-            le <- SingleCellLoomExperiment(assays, rowData = rowData, colData = colData,
-                                           reducedDims = reducedDims,
-                                           rowGraphs = row_graphs, colGraphs = col_graphs)
+            le <- SingleCellLoomExperiment(
+                assays, rowData = rowData, colData = colData,
+                reducedDims = reducedDims, rowGraphs = row_graphs,
+                colGraphs = col_graphs
+            )
+
         } else if (is_rangedloomexperiment) {
-            le <- RangedLoomExperiment(assays, rowData = rowData, colData = colData,
-                                 rowGraphs = row_graphs, colGraphs = col_graphs)
+            le <- RangedLoomExperiment(
+                assays, rowData = rowData, colData = colData,
+                rowGraphs = row_graphs, colGraphs = col_graphs
+            )
         } else {
-            le <- LoomExperiment(assays, rowData = rowData, colData = colData,
-                                 rowGraphs = row_graphs, colGraphs = col_graphs)
+            le <- LoomExperiment(
+                assays, rowData = rowData, colData = colData,
+                rowGraphs = row_graphs, colGraphs = col_graphs
+            )
         }
     }
 

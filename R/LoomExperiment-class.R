@@ -28,22 +28,22 @@ setClass('LoomExperiment',
     rows <- c(0, seq_len(dim(x)[[1]]))
     ## Check that no 'a' or 'b' columns in LoomGraphs lie outside of dimensions.
     col_test <- lapply(clgs, function(lg) {
-        txt <- 'All LoomGraph objects in LoomExperiment must reference a column in the LoomExperiment'
+        txt <- paste0(
+            'All LoomGraph objects in LoomExperiment must reference a column ',
+            'in the LoomExperiment'
+        )
         test <- from(lg) %in% cols & to(lg) %in% cols
         if ((length(test) == 0 || !all(test)) && length(from(lg)) > 0)
             return(txt)
-#        txt <- 'All LoomGraph objects in LoomExperiment colGraphs must have the same nnode as columns in the LoomExperiment'
-#        if (nnode(lg) != nrow(x))
-#            return(txt)
     })
     row_test <- lapply(rlgs, function(lg) {
-        txt <- 'All LoomGraph objects in LoomExperiment must reference a row in the LoomExperiment'
+        txt <- paste0(
+            'All LoomGraph objects in LoomExperiment must reference a row ',
+            'in the LoomExperiment'
+        )
         test <- from(lg) %in% rows & to(lg) %in% rows
         if ((length(test) == 0 || !all(test)) && length(from(lg)) > 0)
             return(txt)
-#        txt <- 'All LoomGraph objects in LoomExperiment rowGraphs must have the same nnode as rows in the LoomExperiment'
-#        if (nnode(lg) != nrow(x))
-#            return(txt)
     })
     res <- list(col_test, row_test)
     unlist(res)

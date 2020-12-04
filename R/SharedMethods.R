@@ -11,9 +11,13 @@
         if (is.logical(i))
             i <- which(i)
         if (all(i > 0))
-            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomSelectHits(y, i)))
+            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) {
+                loomSelectHits(y, i)
+            }))
         else
-            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) loomDropHits(y, i)))
+            rowGraphs(x) <- .change.nnode(endoapply(rg, function(y) {
+                loomDropHits(y, i)
+            }))
     }
     else
         rowGraphs(x) <- rg
@@ -21,9 +25,13 @@
         if (is.logical(j))
             j <- which(j)
         if (all(j > 0))
-            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomSelectHits(y, j)))
+            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) {
+                loomSelectHits(y, j)
+            }))
         else
-            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) loomDropHits(y, j)))
+            colGraphs(x) <- .change.nnode(endoapply(cg, function(y) {
+                loomDropHits(y, j)
+            }))
     }
     else
         colGraphs(x) <- cg

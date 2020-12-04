@@ -24,26 +24,18 @@ setClass('LoomGraphs',
 
 #' @importFrom S4Vectors isEmpty
 .valid.LoomGraph <- function(x) {
-#    if (length(x) == 0)
-#        return(NULL)
     mcol <- mcols(x)
     if (!is.integer(c(from(x), to(x)))) {
-        txt <- sprintf('\n The nodes of a LoomGraph must be an integer')
-        return(txt)
+        '\n The nodes of a LoomGraph must be an integer'
+    } else if (min(from(x), to(x)) < 0) {
+        '\n The nodes of a LoomGraph must be non-negative'
+    } else if (!is.null(mcol) && !all(names(mcol) == 'w')) {
+        '\n A LoomGraph may only have one metadata column named "w"'
+    } else if (!is.null(w <- mcol$w) && !is.numeric(w)) {
+        '\n The "w" mcol of a LoomGraph must numeric '
+    } else {
+        NULL
     }
-    if (min(from(x), to(x)) < 0) {
-        txt <- sprintf('\n The nodes of a LoomGraph must be non-negative')
-        return(txt)
-    }
-    if (!is.null(mcol) && !all(names(mcol) == 'w')) {
-        txt <- sprintf('\n A LoomGraph may only have one metadata column named "w"')
-        return(txt)
-    }
-    if (!is.null(w <- mcol$w) && !is.numeric(w)) {
-        txt <- sprintf('\n The "w" mcol of a LoomGraph must numeric ')
-        return(txt)
-    }
-    NULL
 }
 
 setValidity2('LoomGraph', .valid.LoomGraph)
@@ -65,7 +57,9 @@ setValidity2('LoomGraph', .valid.LoomGraph)
 #' @export
 LoomGraph <- function(from, to, nnode=max(from, to), ..., weight=NULL) {
     if (!is.numeric(c(from, to)))
-        stop('"from" and "to" arguments to LoomGraph constructor  must be numeric')
+        stop(
+            '"from" and "to" arguments to LoomGraph constructor  must be numeric'
+        )
     sh <- SelfHits(from=as.integer(from), to=as.integer(to), nnode=nnode, ...)
     mcols(sh)$w <- weight
     .new_LoomGraph(sh)

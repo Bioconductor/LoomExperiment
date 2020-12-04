@@ -1,2 +1,7 @@
-CHANGES IN VERSION 0.0.0
+CHANGES IN VERSION 1.10.0
 -------------------------
+
+BUG FIXES
+
+    o (v 1.9.1) use BiocIO rather than rtracklayer for import(),
+    export(), and LoomFile() definitions.

@@ -129,7 +129,7 @@
 }
 
 #' @importFrom rhdf5 h5ls h5readAttributes
-#' @importFrom rtracklayer import
+#' @importFrom BiocIO import
 #' @importFrom stringr str_split
 #' @export
 setMethod('import', 'LoomFile',

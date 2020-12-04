@@ -15,7 +15,7 @@
     datasets.
 
     The \code{LoomFile} class extends the functionality of the
-    \code{\link[rtracklayer:RTLFile-class]{RTLFile}} from the \code{rtracklayer}
+    \code{\link[BiocIO:BiocFile-class]{BiocFile}} from the \code{BiocIO}
     package.
 }
 

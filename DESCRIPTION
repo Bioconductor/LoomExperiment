@@ -12,7 +12,7 @@ Depends: R (>= 3.5.0),
          SummarizedExperiment,
          methods,
          rhdf5,
-         rtracklayer
+         BiocIO
 Imports: DelayedArray,
          GenomicRanges,
          HDF5Array,
@@ -37,4 +37,4 @@ Collate: AllGenerics.R
 License: Artistic-2.0
 VignetteBuilder: knitr
 biocViews: ImmunoOncology, DataRepresentation, DataImport, Infrastructure, SingleCell
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1

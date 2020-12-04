@@ -170,7 +170,7 @@ setMethod('.exportLoom', 'LoomGraphs',
 #' @importFrom S4Vectors metadata
 #' @importFrom methods is
 #' @importFrom rhdf5 H5Fclose H5Fopen
-#' @importFrom rtracklayer path
+#' @importFrom BiocIO path
 #' @importFrom stats setNames
 #' @importFrom utils packageVersion
 .exportLoom.LoomExperiment <-
@@ -281,7 +281,7 @@ setMethod('.exportLoom', 'LoomGraphs',
 }
 
 #' @importFrom rhdf5 h5createGroup
-#' @importFrom rtracklayer export
+#' @importFrom BiocIO export
 #' @export
 setMethod('export', signature=c('LoomExperiment', 'LoomFile', 'ANY'),
     .exportLoom.LoomExperiment)

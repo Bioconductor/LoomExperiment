@@ -1,4 +1,5 @@
-setClass('LoomFile', contains='RTLFile')
+#' @importClassesFrom BiocIO BiocFile
+setClass('LoomFile', contains='BiocFile')
 
 #' @export
 #' @importFrom S4Vectors isSingleString

@@ -1,8 +1,8 @@
 Package: LoomExperiment
 Title: LoomExperiment container
-Description: The LoomExperiment class provide a means to easily convert
-    Bioconductor's "Experiment" classes to loom files and vice versa.
-Version: 1.11.0
+Description: The LoomExperiment package provide a means to easily convert
+    the Bioconductor "Experiment" classes to loom files and vice versa.
+Version: 1.11.1
 Encoding: UTF-8
 Author: Martin Morgan, Daniel Van Twisk
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
@@ -23,6 +23,7 @@ Imports: DelayedArray,
 Suggests: testthat,
           BiocStyle,
           knitr,
+          rmarkdown,
           reticulate
 Collate: AllGenerics.R
          utils.R

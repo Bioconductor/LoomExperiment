@@ -153,6 +153,8 @@ setMethod('import', 'LoomFile',
     )
 
     metadata <- rhdf5::h5readAttributes(con, '/')
+    if ("/attrs" %in% ls$group)
+        metadata <- c(metadata, rhdf5::h5read(con, "/attrs"))
     metadata_names <- names(metadata)
     idx <- grep("ReducedDims", metadata_names)
     reducedDims_names <- metadata_names[idx]

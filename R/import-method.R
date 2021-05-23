@@ -300,7 +300,7 @@ setMethod('import', 'LoomFile',
         }
     }
 
-    metadata <- metadata[-c(idx)]
+    metadata <- metadata[names(metadata) != "ReducedDims"]
     metadata(le) <- metadata
     le
 })
